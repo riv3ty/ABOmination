@@ -2,6 +2,7 @@
 import "./fonts/fonts.css";
 import "./styles.css";
 import { startAuth } from "./auth.js";
+import { setupPwa } from "./pwa.js";
 
 // Auf der Rücksprung-Seite der Microsoft-Anmeldung (Popup, siehe Skript im <head>) nichts starten
-if (!window.__aboCb) startAuth();
+if (!window.__aboCb) { setupPwa(); startAuth(); }

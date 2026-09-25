@@ -6,6 +6,7 @@ Abo- und Ratenzahlungs-Manager im Browser. Der Build erzeugt eine einzige HTML-D
 - Profile mit Login, Daten AES-256-GCM-verschluesselt im Browser (PBKDF2)
 - Optional Sync: Datei, Nextcloud, Google Drive, OneNote (siehe SYNC-EINRICHTEN.md)
 - Optional: eigener Server (Docker) mit Konten fuer mehrere Geraete, Ende-zu-Ende-verschluesselt – siehe [DEPLOYMENT.md](DEPLOYMENT.md)
+- Installierbar als App (PWA) auf Android, iOS und Desktop, startet auch ohne Netz
 
 Externe Aufrufe (optional, die App funktioniert auch offline):
 - Wechselkurse von api.frankfurter.dev (nur bei Fremdwaehrungen, sonst Naeherungswerte; mit Server-Konto ueber den eigenen Server)
@@ -47,6 +48,9 @@ web/src/auth.js         Anmelde-Oberflaeche, Konto-Funktionen
 web/src/app.js          App-Oberflaeche, Dialoge, Cloud-Sync (startet erst nach dem Entsperren)
 web/src/server/store.js Server-Konto: Anmeldung, Offline-Kopie, Abgleich
 web/src/cryptoutil.js   Schluesselableitung, AES-GCM
+web/src/pwa.js          Manifest/Service Worker einbinden, "App installieren"
+web/public/             sw.js, manifest.webmanifest, icons/ (werden unveraendert nach dist/ kopiert)
+scripts/make-icons.js   Icons aus SVG erzeugen
 web/src/lib/            reine Logik ohne DOM/Zustand (Datum, Kredit, Auswertung, Optimierung, ICS, Kontoauszug)
 web/tests/              Tests zu lib/
 server/src/             API-Server (app.js, routes/, db.js, cli.js)

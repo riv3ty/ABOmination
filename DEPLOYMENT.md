@@ -104,6 +104,12 @@ Bestehende lokale Profile aus dem Browser lassen sich dabei übernehmen (*Daten 
 
 > **Kein Passwort-Reset:** Die Daten werden im Browser mit deinem Passwort verschlüsselt; der Server kann sie nicht lesen. Wer das Passwort vergisst, verliert den Zugriff. Regelmäßig *Sicherung (JSON)* exportieren.
 
+### Als App aufs Handy
+
+Android (Chrome): `https://abo.example.de` öffnen → Menü ⋮ → **App installieren** (bzw. *Zum Startbildschirm hinzufügen*). Am Desktop (Chrome/Edge) erscheint das Installations-Symbol in der Adressleiste oder unter *Einstellungen → App installieren*.
+iPhone (Safari): Teilen → **Zum Home-Bildschirm**.
+Die installierte App startet auch ohne Netz (Anmeldung dann mit der verschlüsselten Offline-Kopie).
+
 ## 5. Verwaltung
 
 ```bash

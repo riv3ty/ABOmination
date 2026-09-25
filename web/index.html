@@ -4,6 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ABOmination</title>
+<meta name="description" content="Abos und Ratenzahlungen im Blick – Ende-zu-Ende-verschlüsselt.">
+<meta name="theme-color" content="#f4f4f5" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f0f11" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ABOmination">
+<link rel="icon" type="image/svg+xml" href="/icons/icon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
 <script>
 // Rücksprung-Seite der Microsoft-Anmeldung (Popup): Ergebnis ans Hauptfenster melden, App hier nicht starten
 (function(){var p=new URLSearchParams(location.search);if((p.get("state")||"").indexOf("aboms-")===0){window.__aboCb=true;try{if(window.opener)window.opener.postMessage({type:"aboms",href:location.href},location.origin);}catch(e){}document.addEventListener("DOMContentLoaded",function(){document.body.innerHTML='<p style="font:16px sans-serif;padding:24px">Anmeldung abgeschlossen. Dieses Fenster kann geschlossen werden.</p>';});}})();
@@ -254,6 +262,12 @@
         </select>
       </label>
       <div id="syncPanel"></div>
+    </section>
+
+    <section id="secInstall" hidden>
+      <h3>App</h3>
+      <p class="muted small" style="margin-top:0">ABOmination als App auf diesem Gerät installieren (eigenes Fenster, Symbol auf dem Startbildschirm, startet auch ohne Netz).</p>
+      <div class="row-btns"><button class="btn small primary" id="btnInstall">App installieren</button></div>
     </section>
 
     <section>

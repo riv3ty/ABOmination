@@ -179,6 +179,25 @@ try {
   check("Sicherung: Errungenschaft übernommen", /Vorsorge getroffen/.test(await A.p.$eval("#achTile", e => e.textContent)));
   await A.p.evaluate(() => document.querySelector("#dlgSet").close());
 
+  // 13) PWA: Manifest, Service Worker, Start ohne Netz
+  const mf = await A.p.evaluate(async () => { const l = document.querySelector('link[rel="manifest"]'); if (!l) return null; const r = await fetch(l.href); return r.ok ? r.json() : null; });
+  check("PWA: Manifest mit Icons", !!mf && mf.display === "standalone" && mf.icons.some(i => i.purpose === "maskable" && i.sizes === "512x512"));
+  await A.p.reload();
+  await A.p.waitForFunction(() => navigator.serviceWorker?.controller, { timeout: 15000 });
+  check("PWA: Service Worker aktiv", true);
+  const cdp = await A.p.createCDPSession();
+  const inst = await cdp.send("Page.getInstallabilityErrors");
+  check("PWA: Chrome meldet die App als installierbar", inst.installabilityErrors.length === 0, JSON.stringify(inst.installabilityErrors));
+  await A.p.setOfflineMode(true);
+  await A.p.reload({ waitUntil: "domcontentloaded" });
+  await A.p.waitForSelector("[data-srv]", { timeout: 15000 });
+  check("PWA: App startet ohne Netz", true);
+  await A.p.click("[data-srv]"); await A.p.waitForSelector("#auPw");
+  await A.p.type("#auPw", PW2); await A.p.$eval("#auSrvLogin", f => f.requestSubmit());
+  await unlocked(A.p);
+  check("PWA: offline anmelden und Daten sehen", (await rows(A.p)).includes("Import-Abo") && /Offline/.test(await pill(A.p)), await pill(A.p));
+  await A.p.setOfflineMode(false);
+
   check("Keine JS-/CSP-Fehler in der Konsole", errors.length === 0, errors.join(" | "));
   await A.b.close(); await B.b.close();
 } catch (e) {

@@ -296,10 +296,18 @@ describe("Web-App ausliefern", () => {
   it("liefert index.html mit CSP aus", async () => {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), "abo-dist-"));
     fs.writeFileSync(path.join(dir, "index.html"), "<!doctype html><script>1</script>");
+    fs.writeFileSync(path.join(dir, "sw.js"), "self.addEventListener('fetch', () => {});");
+    fs.writeFileSync(path.join(dir, "manifest.webmanifest"), "{}");
+    fs.mkdirSync(path.join(dir, "icons")); fs.writeFileSync(path.join(dir, "icons", "icon-192.png"), "png");
     await app.close(); await setup({ STATIC_DIR: dir });
     const r = await app.inject("/");
     expect(r.statusCode).toBe(200);
     expect(r.headers["content-security-policy"]).toContain("script-src 'self' 'sha256-");
     expect(r.headers["cache-control"]).toBe("no-cache");
+    const sw = await app.inject("/sw.js"), mf = await app.inject("/manifest.webmanifest"), ic = await app.inject("/icons/icon-192.png");
+    expect(sw.headers["cache-control"]).toBe("no-cache");                   // Service-Worker-Updates sofort erkennen
+    expect(sw.headers["content-type"]).toMatch(/javascript/);
+    expect(mf.headers["content-type"]).toMatch(/manifest\+json/);
+    expect(ic.headers["cache-control"]).toContain("max-age");
   });
 });

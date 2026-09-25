@@ -15,6 +15,7 @@ Abo-/Ratenzahlungs-Manager, reiner Web-Client (Vanilla JS, keine Frameworks). UI
 - Speicher-Schluessel in `PRIVATE_KEYS` (app.js) landen im Tresor, alles andere unverschluesselt im localStorage.
 - `Vault.mode`: `local` (Profil im Browser) oder `server` (Konto; `web/src/server/store.js` = ServerStore: Login inkl. Offline-Login, verschluesselte Offline-Kopie `abo-srv-<name>`, `save()`/`pull()` mit 409-Zusammenfuehrung). Neue Server-Staende kommen per Event `abo:remote` (App ruft `loadState()` + `render()`), Status per `abo:serverstatus`.
 - Zusammenfuehren: `lib/merge.js`. Deshalb bei jeder Aenderung an einem Abo `updatedAt` setzen, beim Loeschen einen Grabstein in `meta.deleted`; `saveSettings`/`saveCfg` setzen `changedAt`.
+- PWA: `web/src/pwa.js` (nur http/https, SW nur im Build), `web/public/sw.js` (Seite network-first, Icons cache-first, `/api` nie). Bei neuen Dateien in `SHELL` die Cache-Version `CACHE` in sw.js erhoehen. Icons: `node scripts/make-icons.js`.
 - Markup: `.srv-only` / `.local-only` blenden je nach Modus ein/aus (Klasse `server-mode` am body).
 
 ## Server (`server/`)
@@ -32,4 +33,4 @@ Abo-/Ratenzahlungs-Manager, reiner Web-Client (Vanilla JS, keine Frameworks). UI
 - Port 8765 ist bei Google/Microsoft als Ursprung registriert.
 
 ## Geplant (Server-Deployment)
-Phase 0 (Module/Tests), 1 (Backend), 2 (Web-Client im Server-Modus), 3 (Docker: Dockerfile, compose.yaml, DEPLOYMENT.md) und 4 (Haertung: eingebettete Schriften, /api/rates, scrypt-Begrenzung, Header) fertig; offen: 5 PWA/Android. Docker-Container auf Ubuntu hinter dem vorhandenen Reverse Proxy des Users; Server speichert nur verschluesselte Tresor-Blobs (E2E, getrennter Auth-/Enc-Key), Registrierung nur per Einladung, spaeter Android-App. Lokaler Modus mit den bisherigen Sync-Anbietern bleibt erhalten.
+Phase 0 (Module/Tests), 1 (Backend), 2 (Web-Client im Server-Modus), 3 (Docker: Dockerfile, compose.yaml, DEPLOYMENT.md) 4 (Haertung: eingebettete Schriften, /api/rates, scrypt-Begrenzung, Header) und 5 (PWA: Manifest, Service Worker, Icons, installierbar) fertig. Naechstes Ziel: native Android-App (nutzt dieselbe API und dasselbe Schluesselprotokoll aus server/API.md). Docker-Container auf Ubuntu hinter dem vorhandenen Reverse Proxy des Users; Server speichert nur verschluesselte Tresor-Blobs (E2E, getrennter Auth-/Enc-Key), Registrierung nur per Einladung, spaeter Android-App. Lokaler Modus mit den bisherigen Sync-Anbietern bleibt erhalten.

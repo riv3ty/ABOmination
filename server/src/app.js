@@ -83,6 +83,8 @@ export async function buildApp({ config, db, logger = { level: config.logLevel }
       root: config.staticDir, index: ["index.html"], wildcard: false,
       setHeaders: (reply, file) => {                                           // @fastify/static ≥ 10: Fastify-Reply
         if (file.endsWith(".html")) reply.header("Content-Security-Policy", csp).header("Cache-Control", "no-cache");
+        else if (/sw\.js$|\.webmanifest$/.test(file)) reply.header("Cache-Control", "no-cache");   // Updates sofort erkennen
+        else reply.header("Cache-Control", "public, max-age=86400");
       }
     });
   } else app.log.warn(`Keine Web-App gefunden (${index}) – nur die API läuft. Vorher "npm run build" ausführen.`);
