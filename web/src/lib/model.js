@@ -25,7 +25,8 @@ export function normalizeSub(s) {
     // Kaufpreis und Zinssatz p. a.: wenn gesetzt, ergibt sich der Betrag pro Rate (price) daraus
     principal: inst ? Math.max(0, Math.round((Number(s.principal) || 0) * 100) / 100) : 0,
     interestRate: inst ? Math.min(100, Math.max(0, Number(s.interestRate) || 0)) : 0,
-    usage: USAGE[s.usage] ? s.usage : "", yearlyAlt: inst ? 0 : Math.max(0, Number(s.yearlyAlt) || 0)
+    usage: USAGE[s.usage] ? s.usage : "", yearlyAlt: inst ? 0 : Math.max(0, Number(s.yearlyAlt) || 0),
+    updatedAt: Math.max(0, Number(s.updatedAt) || 0)                     // letzte Änderung (Abgleich zwischen Geräten)
   };
 }
 export function clean(list) { return (Array.isArray(list) ? list : []).map(normalizeSub).filter(Boolean); }

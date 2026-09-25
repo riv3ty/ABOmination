@@ -120,7 +120,8 @@ document.addEventListener("abo:pwchanged", () => { ach.pwChanged = true; saveAch
 // Beide Schlüssel liegen im Tresor; ein Fehlschlag beim (asynchronen) Verschlüsseln/Speichern meldet Vault.flush() selbst.
 function persist() { lsSet(KEY, subs); lsSet(META_KEY, meta); }
 function save() { meta.updatedAt = Date.now(); persist(); schedulePush(); }
-const saveSettings = () => lsSet(SET_KEY, settings);
+// changedAt: beim Zusammenführen zweier Stände (Server-Sync) gewinnt die zuletzt geänderte Seite
+const saveSettings = () => { settings.changedAt = Date.now(); return lsSet(SET_KEY, settings); };
 
 
 /* ================= Währungen ================= */
@@ -510,7 +511,7 @@ $("#bankBody").addEventListener("click", e => {
   $("#bankBody").querySelectorAll("input[type=checkbox]:checked").forEach(cb => {
     const i = +cb.dataset.i, f = bankFound[i];
     const name = $("#bankBody").querySelector(`[data-name="${i}"]`).value.trim() || f.name;
-    added.push(normalizeSub({ id: uid(), name, price: f.price, cycle: f.cycle, currency: settings.base, nextDate: f.nextDate,
+    added.push(normalizeSub({ id: uid(), updatedAt: Date.now(), name, price: f.price, cycle: f.cycle, currency: settings.base, nextDate: f.nextDate,
       category: f.category, status: "active", noticeDays: 0, payment: "", account, notes: "Aus Kontoauszug importiert" }));
   });
   if (added.length) { subs = [...subs, ...added]; ach.importedBank = true; saveAch(); save(); render(); }
@@ -586,6 +587,7 @@ form.addEventListener("submit", e => {
     }
   }
   const item = normalizeSub({
+    updatedAt: Date.now(),
     id: editId || uid(), name: f.name.trim(), price: parseFloat(f.price), cycle: f.cycle, currency: f.currency,
     nextDate: f.nextDate, category: f.category.trim(), status: f.status,
     noticeDays: parseInt(f.noticeDays), payment: f.payment.trim(), notes: f.notes.trim(), account: f.account.trim(),
@@ -659,7 +661,7 @@ function loadCfg() {
   cfg.gdrive = Object.assign({ clientId: "" }, cfg.gdrive);
   cfg.onenote = Object.assign({ clientId: "", pageId: "" }, cfg.onenote);
 }
-const saveCfg = () => lsSet(SYNC_KEY, cfg);
+const saveCfg = () => { cfg.changedAt = Date.now(); return lsSet(SYNC_KEY, cfg); };
 
 class AuthError extends Error {}
 const b64 = s => btoa(unescape(encodeURIComponent(s)));
@@ -1031,7 +1033,16 @@ async function initSync() {
 }
 
 /* ---- Oberfläche ---- */
+// Server-Konto: Status des Abgleichs mit dem ABOmination-Server
+const SRV_STATUS = { ok: ["Synchronisiert", "ok"], saving: ["Speichert …", ""], offline: ["Offline", "warn"], auth: ["Neu anmelden", "warn"], error: ["Sync-Fehler", "err"] };
+function renderServerSync() {
+  const st = Vault.store, [label, cls] = SRV_STATUS[st.status] || SRV_STATUS.ok, b = $("#btnSync");
+  b.hidden = false; b.className = "btn pill " + cls;
+  b.innerHTML = `<span class="ic">${ICON.cloud}</span><span>${label}</span>`;
+  b.title = st.message || (st.status === "ok" ? "Mit dem Server abgeglichen. Klicken = jetzt abgleichen." : "");
+}
 function renderSync() {
+  if (Vault.mode === "server") return renderServerSync();
   const L = { off: ["☁ Sync aus", ""], ok: ["☁ Sync aktiv", "ok"], "needs-permission": ["☁ Sync fortsetzen", "warn"], error: ["☁ Sync-Fehler", "err"] }[syncState];
   const b = $("#btnSync");
   b.hidden = false; b.innerHTML = `<span class="ic">${ICON.cloud}</span><span>${L[0].replace("☁ ", "")}</span>`; b.className = "btn pill " + L[1];
@@ -1086,7 +1097,14 @@ $("#syncPanel").addEventListener("click", e => {
   if (a === "connect") connectSelected(); else if (a === "resume") resumeSync();
   else if (a === "now") syncNow(); else if (a === "off") disconnectSync();
 });
-$("#btnSync").onclick = () => { if (syncState === "needs-permission") resumeSync(); else openSettings(); };
+$("#btnSync").onclick = () => {
+  if (Vault.mode === "server") {
+    if (Vault.store.status === "auth") { if (confirm("Die Sitzung ist abgelaufen. Jetzt sperren und neu anmelden? Nicht übertragene Änderungen bleiben in der Offline-Kopie erhalten.")) Vault.lock(); }
+    else Vault.flush().then(() => Vault.store.pull());
+    return;
+  }
+  if (syncState === "needs-permission") resumeSync(); else openSettings();
+};
 
 /* ================= Tabelle / Filter ================= */
 $("#rows").addEventListener("click", e => {
@@ -1109,6 +1127,7 @@ function removeSub(id) {
       saveAch();
     }
   } else if (s.status !== "cancelled") { trackCancel(s); saveAch(); }
+  meta.deleted = { ...meta.deleted, [id]: Date.now() };                   // Grabstein, damit der Abgleich die Löschung übernimmt
   subs = subs.filter(x => x.id !== id); save(); render();
 }
 document.querySelector("thead").addEventListener("click", e => {
@@ -1146,8 +1165,10 @@ $("#fileImport").addEventListener("change", async e => {
     const data = JSON.parse(await file.text());
     const list = Array.isArray(data) ? data : data.subs;
     if (!Array.isArray(list)) throw 0;
-    const c = clean(list);
+    const now = Date.now(), c = clean(list).map(s => ({ ...s, updatedAt: now }));
     if (!confirm(`${c.length} Abos importieren? Die aktuellen Daten (${subs.length}) werden ersetzt.`)) return;
+    const keep = new Set(c.map(s => s.id));                                // ersetzte Einträge als gelöscht markieren (Abgleich)
+    meta.deleted = { ...meta.deleted, ...Object.fromEntries(subs.filter(s => !keep.has(s.id)).map(s => [s.id, now])) };
     subs = c; save(); render(); maybeRefreshRates();
   } catch { alert("Datei konnte nicht gelesen werden. Erwartet wird eine JSON-Sicherung aus dieser App."); }
 });
@@ -1243,8 +1264,14 @@ export function startApp() {
   render();
   renderSync();
   maybeRefreshRates();
-  initSync();
   setInterval(checkReminders, 30 * 60 * 1000);
+  if (Vault.mode === "server") {
+    // Abgleich macht der ServerStore; hier nur neue Stände übernehmen und den Status anzeigen
+    document.addEventListener("abo:remote", () => { loadState(); render(); });
+    document.addEventListener("abo:serverstatus", renderServerSync);
+    return;
+  }
+  initSync();
   window.addEventListener("focus", () => { if (backend && syncState !== "needs-permission") syncNow(); });
   setInterval(() => { if (backend && (syncState === "ok" || syncState === "error") && !document.hidden) syncNow(); }, 60000);
 }

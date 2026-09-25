@@ -103,7 +103,8 @@
       <div class="empty" id="empty" hidden>Noch keine Abos. Klicke auf „Abo hinzufügen“ oder importiere einen Kontoauszug.</div>
     </div>
   </section>
-  <p class="muted small foot-note">Alle Daten werden lokal in diesem Browser gespeichert. Für Sicherung und Geräte-Sync: Einstellungen.</p>
+  <p class="muted small foot-note local-only">Alle Daten werden lokal in diesem Browser gespeichert. Für Sicherung und Geräte-Sync: Einstellungen.</p>
+  <p class="muted small foot-note srv-only">Deine Daten werden verschlüsselt mit dem Server abgeglichen und stehen auf all deinen Geräten bereit.</p>
 </div>
 
 <!-- Abo bearbeiten -->
@@ -201,7 +202,7 @@
 
     <section>
       <h3>Konto</h3>
-      <p class="small" style="margin-top:0">Angemeldet als <b id="acName"></b></p>
+      <p class="small" style="margin-top:0">Angemeldet als <b id="acName"></b> <span class="chip srv-only">☁ Server-Konto</span></p>
       <label>Automatisch sperren nach
         <select id="setAutoLock">
           <option value="0">Nie</option>
@@ -214,10 +215,12 @@
       <div class="row-btns">
         <button class="btn small" id="acLock">🔒 Sperren</button>
         <button class="btn small" id="acPw">Passwort ändern</button>
-        <button class="btn small" id="acRename">Name ändern</button>
-        <button class="btn small danger" id="acDelete">Profil löschen</button>
+        <button class="btn small local-only" id="acRename">Name ändern</button>
+        <button class="btn small srv-only" id="acLogout" title="Sitzung beenden und Offline-Kopie von diesem Gerät entfernen">Abmelden</button>
+        <button class="btn small danger" id="acDelete"><span class="local-only">Profil löschen</span><span class="srv-only">Konto löschen</span></button>
       </div>
-      <p class="muted small">Deine Daten sind in diesem Browser mit deinem Passwort verschlüsselt (AES-256). Es gibt <b>keinen Passwort-Reset</b>: Wer das Passwort vergisst, kann die Daten nicht wiederherstellen (außer aus einer Sicherung oder dem Cloud-Sync). JSON-Sicherungen und Cloud-Sync sind <b>nicht</b> verschlüsselt.</p>
+      <p class="muted small srv-only">Deine Daten werden auf diesem Gerät mit deinem Passwort verschlüsselt (AES-256), bevor sie zum Server gehen; der Server kann sie nicht lesen. Eine verschlüsselte Offline-Kopie bleibt auf diesem Gerät, bis du dich abmeldest. Es gibt <b>keinen Passwort-Reset</b>. JSON-Sicherungen sind <b>nicht</b> verschlüsselt.</p>
+      <p class="muted small local-only">Deine Daten sind in diesem Browser mit deinem Passwort verschlüsselt (AES-256). Es gibt <b>keinen Passwort-Reset</b>: Wer das Passwort vergisst, kann die Daten nicht wiederherstellen (außer aus einer Sicherung oder dem Cloud-Sync). JSON-Sicherungen und Cloud-Sync sind <b>nicht</b> verschlüsselt.</p>
     </section>
 
     <section>
@@ -242,7 +245,7 @@
       <div class="row-btns"><button class="btn small" id="btnIcs">📆 Kalender-Datei (.ics) exportieren</button></div>
     </section>
 
-    <section>
+    <section class="local-only">
       <h3>Cloud-Sync (Geräte abgleichen)</h3>
       <label>Anbieter
         <select id="syncProv">

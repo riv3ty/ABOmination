@@ -57,6 +57,7 @@ export async function buildApp({ config, db, logger = { level: config.logLevel }
     return payload;
   });
 
+  app.get("/favicon.ico", async (req, reply) => reply.code(204).send());      // Browser fragen danach; keine Datei nötig
   app.get("/api/health", async () => ({ ok: true, version: VERSION }));
   app.get("/api/config", async () => ({ version: VERSION, registration: config.registration, maxVaultBytes: config.maxVaultBytes, kdf: KDF }));
 

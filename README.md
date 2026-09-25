@@ -43,6 +43,8 @@ web/src/main.js         Einstieg
 web/src/vault.js        Profile + verschluesselter Tresor (PBKDF2/AES-GCM)
 web/src/auth.js         Anmelde-Oberflaeche, Konto-Funktionen
 web/src/app.js          App-Oberflaeche, Dialoge, Cloud-Sync (startet erst nach dem Entsperren)
+web/src/server/store.js Server-Konto: Anmeldung, Offline-Kopie, Abgleich
+web/src/cryptoutil.js   Schluesselableitung, AES-GCM
 web/src/lib/            reine Logik ohne DOM/Zustand (Datum, Kredit, Auswertung, Optimierung, ICS, Kontoauszug)
 web/tests/              Tests zu lib/
 server/src/             API-Server (app.js, routes/, db.js, cli.js)
@@ -59,7 +61,11 @@ npm run abo -- invite               # Einladungscode fuer die Registrierung
 COOKIE_SECURE=false npm start       # http://127.0.0.1:8080 (Konfiguration: .env.example)
 ```
 
-Die Web-App nutzt den Server noch nicht (folgt in Phase 2); Docker-Setup folgt in Phase 3.
+Laeuft die App ueber den Server, bietet die Anmeldung Server-Konten an (Anmelden, Registrieren, Uebernahme eines lokalen Profils). Die Daten werden im Browser verschluesselt, mit dem Server abgeglichen (Konflikte werden pro Eintrag zusammengefuehrt) und als verschluesselte Offline-Kopie auf dem Geraet gehalten. Lokale Profile funktionieren weiterhin, auch per Doppelklick ohne Server.
+
+Entwicklung mit Server: `npm run server:dev` (API auf :8080) und `npm run dev` (Vite auf :8765 leitet `/api` weiter).
+
+Docker-Setup folgt in Phase 3.
 
 ## Datenschutz
 Der Repo-Inhalt enthaelt nur Code. Alle Nutzerdaten liegen ausschliesslich im Browser (localStorage/IndexedDB) und sind nicht Teil dieses Repos. Exporte (`abos-*.json`), Sync-Dateien und `.ics` sind per `.gitignore` ausgeschlossen.
