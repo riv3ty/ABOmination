@@ -1,0 +1,2583 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ABOmination</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700&family=Playfair+Display:ital,wght@0,500;1,400&family=Roboto:wght@400;500;700&display=swap">
+<script>
+// Rücksprung-Seite der Microsoft-Anmeldung (Popup): Ergebnis ans Hauptfenster melden, App hier nicht starten
+(function(){var p=new URLSearchParams(location.search);if((p.get("state")||"").indexOf("aboms-")===0){window.__aboCb=true;try{if(window.opener)window.opener.postMessage({type:"aboms",href:location.href},location.origin);}catch(e){}document.addEventListener("DOMContentLoaded",function(){document.body.innerHTML='<p style="font:16px sans-serif;padding:24px">Anmeldung abgeschlossen. Dieses Fenster kann geschlossen werden.</p>';});}})();
+</script>
+<style>
+/* ============ Designsystem: Farben, Typografie, Basis ============
+   Primär #0f0f11 (Ink) · Sekundär #f4f4f5 (Paper) · Akzent/CTA #8b5cf6 (Neon-Violett)
+   Überschriften: Inter 700 · Fließtext: Roboto 400 · Display/Editorial: Serif */
+:root{
+  --ink:#0f0f11;--paper:#f4f4f5;--violet:#8b5cf6;
+  --bg:#f4f4f5;--text:#0f0f11;
+  --muted:rgba(15,15,17,.60);--line:rgba(15,15,17,.10);--line-strong:rgba(15,15,17,.20);
+  --card:#ffffff;--surface:rgba(255,255,255,.66);--glass:rgba(244,244,245,.70);--glass-line:rgba(255,255,255,.80);
+  --accent:#8b5cf6;--accent-ink:#6d28d9;--accent-text:#ffffff;--glow:rgba(139,92,246,.24);
+  --ok:#15803d;--warn:#b45309;--bad:#b91c1c;--warn-bg:rgba(180,83,9,.07);
+  --shadow:0 1px 2px rgba(15,15,17,.04),0 18px 44px -26px rgba(15,15,17,.28);
+  --orb-a:rgba(139,92,246,.16);--orb-b:rgba(99,102,241,.10);
+  --f-head:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-body:"Roboto",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-serif:"Playfair Display","Iowan Old Style",Georgia,"Times New Roman",serif;
+  --ease-spring:cubic-bezier(.34,1.56,.64,1);--ease-out:cubic-bezier(.2,.7,.2,1);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#0f0f11;--text:#f4f4f5;
+    --muted:rgba(244,244,245,.60);--line:rgba(244,244,245,.09);--line-strong:rgba(244,244,245,.20);
+    --card:#17171a;--surface:rgba(255,255,255,.035);--glass:rgba(22,22,26,.58);--glass-line:rgba(255,255,255,.10);
+    --accent-ink:#a78bfa;--glow:rgba(139,92,246,.34);
+    --ok:#5fd39a;--warn:#e0a458;--bad:#f07178;--warn-bg:rgba(224,164,88,.08);
+    --shadow:0 1px 0 rgba(255,255,255,.05) inset,0 24px 56px -30px rgba(0,0,0,.9);
+    --orb-a:rgba(139,92,246,.24);--orb-b:rgba(99,102,241,.13);
+    color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font:400 15px/1.6 var(--f-body);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+/* weiche Farbverläufe im Hintergrund (sehr langsame Drift) */
+body::before{content:"";position:fixed;inset:-25% -10% auto -10%;height:85vh;z-index:-1;pointer-events:none;
+  background:radial-gradient(38% 48% at 16% 22%,var(--orb-a),transparent 70%),radial-gradient(34% 44% at 84% 8%,var(--orb-b),transparent 70%);
+  filter:blur(24px);animation:drift 26s ease-in-out infinite alternate}
+@keyframes drift{from{transform:translate3d(0,0,0) scale(1)}to{transform:translate3d(3%,4%,0) scale(1.08)}}
+.wrap{max-width:1240px;margin:0 auto;padding:18px 28px 96px}
+h1,h2,h3{font-family:var(--f-head);font-weight:700;letter-spacing:-.02em;line-height:1.15;margin:0}
+h1{font-size:19px}
+h2{font-size:17px;margin:0 0 4px}
+h3{font-size:14px;margin:0 0 6px}
+b,strong{font-weight:700}
+.muted{color:var(--muted)}
+.small{font-size:12.5px}
+.eyebrow{font-family:var(--f-head);font-size:11.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+
+/* Navigation: Glassmorphism */
+.nav{position:sticky;top:14px;z-index:60;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;
+  padding:10px 12px 10px 16px;margin-bottom:44px;border-radius:22px;background:var(--glass);border:1px solid var(--glass-line);
+  -webkit-backdrop-filter:blur(14px) saturate(140%);backdrop-filter:blur(14px) saturate(140%);box-shadow:var(--shadow)}
+.brand{display:flex;align-items:center;gap:12px;font-size:17px}
+.brand-mark{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;color:#fff;background:linear-gradient(140deg,#a78bfa,#7c3aed);box-shadow:0 8px 22px -8px rgba(139,92,246,.8)}
+.brand-mark svg{width:19px;height:19px;stroke:#fff;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+
+/* Buttons: federnde, präzise Hover-Reaktion (nur transform, kein Layout-Sprung) */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:var(--f-head);font-weight:600;font-size:13.5px;letter-spacing:.005em;
+  border:1px solid var(--line-strong);background:var(--surface);color:var(--text);padding:9px 16px;border-radius:13px;cursor:pointer;
+  transition:transform .5s var(--ease-spring),box-shadow .3s ease,border-color .2s,background .2s;-webkit-tap-highlight-color:transparent;will-change:transform;backface-visibility:hidden}
+.btn svg{width:16px;height:16px;flex:none}
+@media (hover:hover){.btn:hover{transform:translateY(-2px) scale(1.035);border-color:var(--accent);box-shadow:0 12px 28px -14px var(--glow)}}
+.btn:active{transform:translateY(0) scale(.97);transition-duration:.12s}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-text);box-shadow:0 12px 30px -12px rgba(139,92,246,.75)}
+@media (hover:hover){.btn.primary:hover{background:#9b74f8;box-shadow:0 18px 40px -12px rgba(139,92,246,.9)}}
+.btn.danger{color:var(--bad)}
+.btn.small{padding:5px 11px;font-size:12.5px;border-radius:11px}
+.btn:disabled{opacity:.5;cursor:default;transform:none!important;box-shadow:none!important}
+.pill.ok{color:var(--ok);border-color:var(--ok)}
+.pill.warn{color:var(--warn);border-color:var(--warn)}
+.pill.err{color:var(--bad);border-color:var(--bad)}
+
+/* Kacheln / Karten: abgerundet, dezente Linie, halbtransparent */
+.card,.tile{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:26px;padding:30px;box-shadow:var(--shadow);
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+.banner{background:var(--glass);border:1px solid color-mix(in srgb,var(--warn) 45%,transparent);border-radius:20px;padding:14px 22px;margin-bottom:26px;
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);box-shadow:var(--shadow)}
+.banner div{padding:3px 0}
+.banner .b-body{color:var(--muted);font-size:13px}
+
+/* Balken (Kategorien): dünn und ruhig */
+.bar-row{display:grid;grid-template-columns:120px 1fr auto;gap:14px;align-items:center;margin:14px 0;font-size:14px}
+.bar-track{background:var(--bg);border-radius:6px;height:6px;overflow:hidden}
+.bar-fill{height:100%;border-radius:6px}
+.bar-row .amt{text-align:right;font-variant-numeric:tabular-nums;font-family:var(--f-head);font-weight:700;letter-spacing:-.01em}
+.up{display:flex;justify-content:space-between;gap:12px;padding:13px 0;border-bottom:1px solid var(--line)}
+.up:last-child{border:0}
+
+/* Formularfelder */
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px}
+input,select,textarea{font:inherit;color:var(--text);background:var(--surface);border:1px solid var(--line-strong);border-radius:12px;padding:10px 12px;width:100%;
+  transition:border-color .2s,box-shadow .25s,background .2s}
+input[type=checkbox]{width:auto}
+.toolbar input{flex:1;min-width:200px;width:auto}
+.toolbar select{width:auto}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px var(--glow)}
+
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+th{font-size:12.5px;color:var(--muted);font-weight:600;user-select:none;white-space:nowrap}
+th[data-sort]{cursor:pointer}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+tr:last-child td{border:0}
+.name{font-weight:600}
+.chip{display:inline-block;font-size:12px;padding:1px 8px;border-radius:99px;background:var(--bg);border:1px solid var(--line);color:var(--muted)}
+.chip.active{color:var(--ok);border-color:var(--ok)}
+.chip.paused{color:var(--warn);border-color:var(--warn)}
+.chip.cancelled{color:var(--bad);border-color:var(--bad)}
+.warn{color:var(--warn);font-size:12.5px}
+.rowbtns{display:flex;gap:6px;justify-content:flex-end}
+.empty{text-align:center;padding:36px 10px;color:var(--muted)}
+dialog{border:1px solid var(--line);border-radius:14px;background:var(--card);color:var(--text);padding:0;width:min(520px,94vw);max-height:92vh}
+dialog.wide{width:min(780px,96vw)}
+dialog::backdrop{background:rgba(10,12,20,.5)}
+form.f{padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+form.f h2{grid-column:1/-1;font-size:18px;margin:0}
+form.f label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}
+form.f .full{grid-column:1/-1}
+form.f .foot,.foot{grid-column:1/-1;display:flex;justify-content:flex-end;gap:8px;margin-top:4px}
+.box{padding:20px}
+.box .dhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.box .dhead h2{font-size:18px;margin:0}
+.box section{border-top:1px solid var(--line);padding:14px 0}
+.box section:first-of-type{border:0}
+.box label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted);margin:8px 0}
+.box label.check{flex-direction:row;align-items:center;gap:8px;color:var(--text)}
+.box p{margin:6px 0}
+.row-btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+#bankBody input[type=text]{padding:4px 8px}
+[hidden]{display:none!important}
+body.locked .wrap{display:none}
+#auth{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:16px;z-index:100;overflow:auto}
+.au-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px;width:min(420px,100%);box-shadow:var(--shadow)}
+.au-card h1{margin:0 0 4px}
+.au-card label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted);margin:12px 0}
+.au-users{display:grid;gap:8px;margin:14px 0}
+.au-user{display:flex;align-items:center;gap:12px;width:100%;text-align:left;font:inherit;color:var(--text);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer}
+.au-user:hover{border-color:var(--accent)}
+.au-av{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;flex:none}
+.au-err{color:var(--bad);font-size:13px;min-height:18px}
+.au-links{display:flex;justify-content:space-between;gap:8px;margin-top:14px}
+.au-links button{background:none;border:0;color:var(--muted);cursor:pointer;font:inherit;font-size:13px;padding:0;text-decoration:underline}
+.au-note{background:var(--bg);border-radius:8px;padding:8px 10px;font-size:13px;color:var(--muted);margin:10px 0}
+.prog{background:var(--bg);border-radius:6px;height:6px;overflow:hidden;margin-top:5px;max-width:240px}
+.prog div{height:100%;background:var(--accent);border-radius:6px}
+.chip.done{color:var(--ok);border-color:var(--ok)}
+.tip{display:flex;gap:10px;justify-content:space-between;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--line)}
+.tip:last-child{border:0}
+.tip .save{white-space:nowrap;font-weight:600;color:var(--ok);font-variant-numeric:tabular-nums}
+.opt-total{font-size:15px;margin-bottom:6px}
+.opt-total b{font-size:22px;color:var(--ok)}
+#syncPanel label{margin:8px 0}
+.loan-calc{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13.5px;line-height:1.6}
+.loan-calc b{font-variant-numeric:tabular-nums}
+input[readonly]{opacity:.75;cursor:default}
+.paid-row{display:flex;gap:6px}
+.paid-row input{flex:1;min-width:0}
+.paid-row select{width:auto}
+.inst-headline{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:12px}
+.inst-headline h2{margin:0}
+.seg-wrap{display:flex;gap:6px;flex-wrap:wrap}
+.seg{background:var(--bg);border:1px solid var(--line);color:var(--muted);border-radius:99px;padding:4px 12px;font:inherit;font-size:13px;cursor:pointer;transition:background .2s,color .2s,border-color .2s}
+.seg:hover:not(:disabled){border-color:var(--accent);color:var(--text)}
+.seg.active{background:var(--accent);border-color:var(--accent);color:var(--accent-text);font-weight:600}
+.seg:disabled{opacity:.4;cursor:default}
+.seg-n{opacity:.7;font-size:12px}
+.seg-replay{padding:4px 10px}
+.inst-sum{display:flex;flex-wrap:wrap;gap:20px;align-items:center;margin-bottom:6px}
+.donut{position:relative;width:118px;height:118px;flex:none}
+.donut svg{transform:rotate(-90deg);display:block}
+.ring-bg{stroke:var(--bg)}
+.ring-fg{stroke:var(--accent);transition:stroke-dashoffset 1.3s cubic-bezier(.2,.8,.2,1)}
+.donut-center{position:absolute;inset:0;display:grid;place-items:center;text-align:center;font-weight:700;font-size:20px;font-variant-numeric:tabular-nums}
+.inst-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px 18px;flex:1;min-width:260px}
+.inst-stats .lbl{color:var(--muted);font-size:12.5px}
+.inst-stats .val{font-weight:700;font-size:17px;font-variant-numeric:tabular-nums}
+.inst-stats .val.ok{color:var(--ok)}
+.inst-item{border:1px solid var(--line);border-radius:12px;margin-top:10px;background:var(--card);overflow:hidden;transition:border-color .2s,box-shadow .2s}
+.inst-item:hover{border-color:var(--accent)}
+.inst-item.open{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 15%,transparent)}
+.inst-head{display:block;width:100%;text-align:left;background:none;border:0;padding:12px 14px;font:inherit;color:var(--text);cursor:pointer}
+.inst-head:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.inst-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.inst-pct{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums;display:flex;align-items:center;gap:8px;white-space:nowrap}
+.chev{font-size:14px;color:var(--muted);transition:transform .25s}
+.inst-item.open .chev{transform:rotate(180deg)}
+.inst-bar{height:12px;background:var(--bg);border-radius:8px;overflow:hidden;margin:9px 0 7px}
+.inst-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,var(--accent),#22c55e);transition:width 1.2s cubic-bezier(.2,.8,.2,1)}
+.inst-fill.full{background:var(--ok)}
+.inst-meta{display:flex;flex-wrap:wrap;gap:4px 16px}
+.dots{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
+.dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--line);box-sizing:border-box;animation:dotIn .35s both calc(var(--i)*35ms + 350ms)}
+.dot.paid{background:var(--ok);border-color:var(--ok)}
+.dot.partial{background:linear-gradient(90deg,var(--ok) var(--p),transparent var(--p));border-color:var(--ok)}
+.dot.next{border-color:var(--accent);animation:dotIn .35s both calc(var(--i)*35ms + 350ms),pulse 1.8s ease-in-out infinite 1.4s}
+.inst-detail{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s ease}
+.inst-item.open .inst-detail{grid-template-rows:1fr}
+.inst-detail-in{overflow:hidden;min-height:0;padding:0 14px}
+.inst-item.open .inst-detail-in{padding:2px 14px 14px;border-top:1px solid var(--line)}
+.inst-detail-in p{margin:8px 0}
+.inst-actions{display:flex;gap:8px;margin-top:12px}
+.sim{background:var(--bg);border-radius:10px;padding:10px 12px;margin:10px 0}
+.sim input[type=range]{padding:0;border:0;background:none;accent-color:var(--accent);margin:8px 0 4px}
+.sim-out{font-size:13px}
+.sched-wrap{max-height:230px;overflow:auto;border:1px solid var(--line);border-radius:8px;margin-top:8px}
+.sched{font-size:12.5px}
+.sched th,.sched td{padding:5px 8px}
+.sched th{position:sticky;top:0;background:var(--card)}
+.sched tr.r-paid td{color:var(--muted)}
+.sched tr.r-next td{font-weight:600;background:color-mix(in srgb,var(--accent) 10%,transparent)}
+@keyframes dotIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 55%,transparent)}50%{box-shadow:0 0 0 5px transparent}}
+@media (prefers-reduced-motion:reduce){.inst-fill,.ring-fg,.inst-detail,.chev{transition:none!important}.dot,.dot.next{animation:none!important}}.acct{padding:10px 0;border-bottom:1px solid var(--line)}
+.acct:last-of-type{border:0}
+.acct-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.acct-name{background:none;border:0;padding:0;font:inherit;font-weight:600;color:var(--text);cursor:pointer;text-align:left}
+.acct-name:hover{color:var(--accent);text-decoration:underline}
+.acct-head .amt{margin-left:auto;font-weight:700;font-variant-numeric:tabular-nums}
+.stack{display:flex;height:12px;border-radius:6px;overflow:hidden;margin:7px 0 6px;background:var(--bg);min-width:40px}
+.stack div{min-width:2px}
+.acct-cats{display:flex;flex-wrap:wrap;gap:4px 14px}
+.acct-cats i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}
+.acct-total{padding-top:10px;text-align:right}
+.ach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.ach-card{border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;gap:10px;align-items:flex-start;background:var(--bg)}
+.ach-card.locked{opacity:.45}
+.ach-ic{font-size:22px;line-height:1.1;flex:none}
+.ach-card b{display:block;font-size:14px}
+.ach-card .muted{font-size:12.5px}
+.toast-wrap{position:fixed;right:16px;bottom:16px;display:flex;flex-direction:column;gap:8px;z-index:200;max-width:min(340px,calc(100vw - 32px))}
+.toast{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:10px 14px;box-shadow:var(--shadow);display:flex;gap:10px;align-items:center;animation:toastIn .25s ease-out}
+.toast .ach-ic{font-size:26px}
+.toast b{display:block;font-size:13px;color:var(--muted)}
+.toast span.big{font-size:15px;font-weight:600;color:var(--text)}
+@keyframes toastIn{from{transform:translateY(12px);opacity:0}to{transform:translateY(0);opacity:1}}
+@media (max-width:640px){
+  .hide-m{display:none}
+  form.f{grid-template-columns:1fr}
+  .bar-row{grid-template-columns:90px 1fr 74px}
+}
+
+/* ============ Bento-Layout ============ */
+.bento{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:18px;grid-auto-flow:dense;margin-bottom:110px}
+#stats{display:contents}
+.t-hero{grid-column:span 8;grid-row:span 2;min-height:430px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;padding:46px 46px 38px;
+  background:radial-gradient(120% 95% at 0% 0%,rgba(139,92,246,.24),transparent 56%),radial-gradient(90% 80% at 100% 100%,rgba(99,102,241,.14),transparent 62%),var(--surface)}
+.t-hero.tall{grid-row:span 3}
+.t-year,.t-30,.t-open{grid-column:span 4;display:flex;flex-direction:column;justify-content:space-between;gap:18px}
+.t-time{grid-column:span 12}
+.t-cats{grid-column:span 5}
+.t-accts{grid-column:span 7}
+.t-opt{grid-column:span 7}
+.t-ach{grid-column:span 5}
+.t-inst{grid-column:span 12}
+@media (max-width:1000px){
+  .t-hero,.t-cats,.t-accts,.t-opt,.t-ach{grid-column:span 12;grid-row:auto}
+  .t-year,.t-30,.t-open{grid-column:span 6}
+  .t-hero{min-height:0}
+}
+@media (max-width:640px){
+  .wrap{padding:12px 16px 72px}
+  .t-year,.t-30,.t-open{grid-column:span 12}
+  .card,.tile{padding:24px;border-radius:22px}
+  .t-hero{padding:30px 26px}
+  .nav .lbl{display:none}
+}
+@media (max-width:1100px){.nav .lbl{display:none}}
+
+/* Kachel-Köpfe, Icons, Info-Boxen */
+.ic svg,.ic-c svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;display:block}
+.ic{display:inline-flex}
+.ic-c{width:38px;height:38px;border-radius:13px;display:grid;place-items:center;flex:none;background:color-mix(in srgb,var(--accent) 15%,transparent);color:var(--accent-ink)}
+.tile-head{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+.tile-head h2{margin:0;font-size:16px}
+.tile-head .sub{margin-left:auto;color:var(--muted);font-size:13px}
+.tile-top{display:flex;justify-content:space-between;align-items:center}
+.iboxes{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.ibox{display:flex;gap:12px;align-items:center;padding:13px 15px;border:1px solid var(--line);border-radius:18px;background:var(--glass);
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.ibox .k{font-family:var(--f-head);font-weight:700;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.ibox .v{font-family:var(--f-head);font-weight:700;font-size:14.5px;letter-spacing:-.01em;line-height:1.3}
+
+/* Serifen-Display (übergroß) */
+.display{font-family:var(--f-serif);font-weight:500;font-size:clamp(54px,8.4vw,116px);line-height:.94;letter-spacing:-.035em;margin:12px 0 4px;font-variant-numeric:lining-nums}
+.num-serif{font-family:var(--f-serif);font-weight:500;font-size:clamp(38px,4.4vw,60px);line-height:1;letter-spacing:-.03em;font-variant-numeric:lining-nums}
+.h-display{font-family:var(--f-serif);font-weight:500;font-size:clamp(44px,6.4vw,84px);line-height:.98;letter-spacing:-.035em;margin:10px 0 30px}
+.lede{max-width:48ch;color:var(--muted);font-size:16.5px;line-height:1.7;margin:16px 0 30px}
+.lede em{font-family:var(--f-serif);font-style:italic;color:var(--text);font-size:1.14em}
+
+/* Glow beim Überfahren (folgt dem Mauszeiger) */
+.tile{transition:border-color .35s,box-shadow .5s var(--ease-out)}
+.tile::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .45s;
+  background:radial-gradient(480px circle at var(--mx,50%) var(--my,0%),var(--glow),transparent 62%)}
+@media (hover:hover){
+  .tile:hover{border-color:color-mix(in srgb,var(--accent) 50%,var(--line));
+    box-shadow:var(--shadow),0 0 0 1px color-mix(in srgb,var(--accent) 22%,transparent),0 34px 80px -34px var(--glow)}
+  .tile:hover::before{opacity:1}
+}
+.tile>*{position:relative;z-index:1}
+
+/* Scroll-Einblendung: Fade-in mit leichtem Versatz */
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .9s var(--ease-out) var(--d,0ms),transform .9s var(--ease-out) var(--d,0ms)}
+.reveal.in{opacity:1;transform:none}
+
+/* Zeitleiste */
+.tl-scroll{overflow-x:auto;padding:4px 0 2px}
+.tl{position:relative;height:224px;min-width:700px;margin:0 30px}
+.tl-line{position:absolute;left:0;right:0;top:112px;height:2px;border-radius:2px;background:linear-gradient(90deg,var(--accent),color-mix(in srgb,var(--accent) 12%,transparent))}
+.tl-tick{position:absolute;top:112px;width:0}
+.tl-tick i{position:absolute;left:0;top:-6px;width:1px;height:14px;background:var(--line-strong)}
+.tl-tick em{position:absolute;left:0;transform:translateX(-50%);top:84px;font-style:normal;font-size:11.5px;color:var(--muted);white-space:nowrap}
+.tl-mark{position:absolute;top:0;height:100%;width:0;outline:none}
+.tl-dot{position:absolute;left:0;top:112px;width:13px;height:13px;transform:translate(-50%,-50%);border-radius:50%;background:var(--card);border:2px solid var(--text);
+  transition:transform .45s var(--ease-spring),box-shadow .3s}
+.tl-mark.inst .tl-dot{border-color:var(--accent);background:var(--accent)}
+.tl-stem{position:absolute;left:0;width:1px;background:var(--line-strong)}
+.tl-card{position:absolute;left:0;transform:translateX(-50%);white-space:nowrap;padding:7px 12px;border-radius:13px;border:1px solid var(--line);background:var(--glass);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);font-size:12.5px;line-height:1.35;transition:border-color .2s,box-shadow .3s}
+.tl-card b{display:block;font-family:var(--f-head);font-weight:700;font-size:12.5px;max-width:150px;overflow:hidden;text-overflow:ellipsis}
+.tl-card small{color:var(--muted);font-size:11.5px}
+.lane0 .tl-card{top:60px}.lane0 .tl-stem{top:106px;height:6px}
+.lane1 .tl-card{top:6px}.lane1 .tl-stem{top:52px;height:60px}
+.lane2 .tl-card{top:138px}.lane2 .tl-stem{top:112px;height:26px}
+.edge-l .tl-card{transform:translateX(-14%)}
+.edge-r .tl-card{transform:translateX(-86%)}
+.tl-mark:hover .tl-dot,.tl-mark:focus-visible .tl-dot{transform:translate(-50%,-50%) scale(1.55);box-shadow:0 0 0 6px var(--glow)}
+.tl-mark:hover,.tl-mark:focus-visible{z-index:5}
+.tl-mark:hover .tl-card,.tl-mark:focus-visible .tl-card{border-color:var(--accent);box-shadow:0 14px 32px -16px var(--glow)}
+#upcoming{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:0 40px;margin-top:26px;border-top:1px solid var(--line);padding-top:6px}
+
+/* Errungenschaften-Kachel */
+.ach-tile-body{display:flex;flex-direction:column;gap:16px;height:calc(100% - 62px)}
+.ach-big{display:flex;align-items:baseline;gap:10px}
+.ach-big .num-serif{font-size:72px}
+.ach-bar{height:6px;border-radius:6px;background:var(--bg);overflow:hidden}
+.ach-bar i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,var(--accent),#c4b5fd);transition:width 1s var(--ease-out)}
+.ach-recent{display:flex;gap:8px;flex-wrap:wrap}
+.ach-pill{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border:1px solid var(--line);border-radius:99px;font-size:12.5px;background:var(--glass)}
+.ach-tile-body .btn{align-self:flex-start;margin-top:auto}
+.ach-next{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.ach-next li{display:flex;gap:14px;align-items:flex-start;padding:13px 15px;border:1px solid var(--line);border-radius:16px;background:var(--glass)}
+.ach-ic{font-size:19px;opacity:.5;line-height:1.3}
+.mix{margin:0 0 30px}
+.mix-bar{display:flex;gap:4px;height:10px;margin:14px 0 14px}
+.mix-bar i{border-radius:99px;min-width:6px;transition:transform .4s var(--ease-spring);transform-origin:center bottom}
+.mix-bar i:hover{transform:scaleY(1.7)}
+.mix-leg{display:flex;flex-wrap:wrap;gap:6px 20px;font-size:12.5px;color:var(--muted)}
+.mix-leg i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px}
+
+/* Optimierung: editorial */
+.opt-total{display:flex;flex-direction:column;gap:2px;margin-bottom:8px}
+.opt-total b{font-family:var(--f-serif);font-weight:500;font-size:clamp(42px,5.2vw,68px);color:var(--text);letter-spacing:-.035em;line-height:1.02}
+.opt-total span{color:var(--muted);font-size:13.5px}
+.tip{padding:18px 0;gap:24px}
+.tip strong{font-family:var(--f-head);font-weight:700;letter-spacing:-.01em}
+.tip .save{font-family:var(--f-head);font-weight:700}
+
+/* Konten & Kategorien */
+.acct{padding:16px 0}
+.acct-name{font-family:var(--f-head);font-weight:700;letter-spacing:-.01em}
+.stack{height:8px}
+.acct-head .amt{font-family:var(--f-head);letter-spacing:-.01em}
+.acct-total{padding-top:16px}
+
+/* Tabelle: ruhig, mit viel Luft */
+.section{margin-top:8px}
+.section-head{margin-bottom:8px}
+.table-card{padding:26px 28px}
+th{font-family:var(--f-head);font-size:11px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);font-weight:700;padding:14px 12px;user-select:none;white-space:nowrap}
+td{padding:20px 12px}
+tbody tr{transition:background .3s}
+@media (hover:hover){tbody tr:hover{background:color-mix(in srgb,var(--accent) 5%,transparent)}}
+.name{font-family:var(--f-head);font-weight:700;letter-spacing:-.01em}
+.chip{background:transparent}
+.foot-note{margin-top:28px;text-align:center}
+
+/* Dialoge: schwebende Glaskarten */
+dialog{border:1px solid var(--glass-line);border-radius:26px;background:var(--glass);color:var(--text);padding:0;width:min(560px,94vw);max-height:92vh;
+  -webkit-backdrop-filter:blur(22px) saturate(140%);backdrop-filter:blur(22px) saturate(140%);box-shadow:0 40px 120px -30px rgba(0,0,0,.6)}
+dialog.wide{width:min(800px,96vw)}
+dialog::backdrop{background:rgba(8,8,10,.55);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+dialog[open]{animation:dlgIn .45s var(--ease-out)}
+@keyframes dlgIn{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
+form.f{padding:28px;gap:16px}
+.box{padding:28px}
+.toast{background:var(--glass);border-radius:16px;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+
+/* Anmeldung */
+#auth{background:transparent}
+.au-card{background:var(--glass);border:1px solid var(--glass-line);border-radius:28px;padding:36px;box-shadow:var(--shadow);
+  -webkit-backdrop-filter:blur(18px) saturate(140%);backdrop-filter:blur(18px) saturate(140%)}
+.au-card h1{font-family:var(--f-serif);font-weight:500;font-size:40px;letter-spacing:-.03em;margin:0 0 6px}
+.au-user{background:var(--surface);border-radius:16px}
+
+/* bestehende Widgets an das neue Design angleichen */
+.inst-item{border-radius:20px;background:var(--surface)}
+.inst-fill{background:linear-gradient(90deg,var(--accent),#c4b5fd)}
+.inst-fill.full{background:var(--ok)}
+.inst-headline{margin-bottom:22px}
+.seg{border-radius:99px}
+.chip.active,.chip.done,.chip.paused,.chip.cancelled{background:transparent}
+.opt-total b,.tip .save{color:var(--text)}
+.tip .save{color:var(--ok)}
+.prog div{background:linear-gradient(90deg,var(--accent),#c4b5fd)}
+
+@media (prefers-reduced-motion:reduce){
+  body::before{animation:none}
+  .reveal{opacity:1;transform:none;transition:none}
+  .btn,.tile,.tl-dot{transition:none!important}
+  dialog[open]{animation:none}
+  .btn:hover{transform:none!important}
+}
+</style>
+</head>
+<body class="locked">
+<div id="auth" hidden></div>
+<div class="wrap">
+  <header class="nav">
+    <h1 class="brand"><span class="brand-mark" data-ic="calendar"></span>ABOmination</h1>
+    <div class="actions">
+      <button class="btn" id="btnLock" title="Sperren und abmelden"><span class="ic" data-ic="lock"></span><span id="userName"></span></button>
+      <button class="btn" id="btnAch" title="Errungenschaften"><span class="ic" data-ic="trophy"></span><span id="achCount"></span></button>
+      <button class="btn pill" id="btnSync" hidden></button>
+      <button class="btn" id="btnBank"><span class="ic" data-ic="bank"></span><span class="lbl">Kontoauszug importieren</span></button>
+      <button class="btn" id="btnSettings"><span class="ic" data-ic="gear"></span><span class="lbl">Einstellungen</span></button>
+      <button class="btn primary" id="btnAdd"><span class="ic" data-ic="plus"></span>Abo hinzufügen</button>
+    </div>
+  </header>
+
+  <div id="reminders"></div>
+
+  <main class="bento">
+    <div id="stats">
+      <article class="tile t-hero reveal" id="tHero"></article>
+      <article class="tile t-year reveal" id="tYear"></article>
+      <article class="tile t-30 reveal" id="t30"></article>
+      <article class="tile t-open reveal" id="tOpen" hidden></article>
+    </div>
+
+    <article class="tile t-time reveal">
+      <div class="tile-head"><span class="ic-c" data-ic="calendar"></span><h2>Zeitleiste · nächste 30 Tage</h2></div>
+      <div class="tl-scroll"><div id="timeline"></div></div>
+      <div id="upcoming"></div>
+    </article>
+
+    <article class="tile t-cats reveal">
+      <div class="tile-head"><span class="ic-c" data-ic="pie"></span><h2>Kosten nach Kategorie</h2><span class="sub">pro Monat</span></div>
+      <div id="cats"></div>
+    </article>
+
+    <article class="tile t-accts reveal">
+      <div class="tile-head"><span class="ic-c" data-ic="bank"></span><h2>Abgänge pro Bankkonto</h2><span class="sub">pro Monat</span></div>
+      <div id="accts"></div>
+    </article>
+
+    <article class="tile t-opt reveal" id="optTile">
+      <div class="tile-head"><span class="ic-c" data-ic="bulb"></span><h2>Optimierung</h2></div>
+      <div id="opt"></div>
+    </article>
+
+    <article class="tile t-ach reveal" id="achTile"></article>
+
+    <article class="tile t-inst reveal" id="instCard" hidden>
+      <div class="inst-headline"><div class="tile-head" style="margin:0"><span class="ic-c" data-ic="receipt"></span><h2>Ratenkäufe</h2></div><div class="seg-wrap" id="instTabs"></div></div>
+      <div id="instSummary"></div><div id="instList"></div>
+    </article>
+  </main>
+
+  <section class="section reveal" id="verwalten">
+    <div class="section-head"><div class="eyebrow">Verwalten</div><h2 class="h-display">Alle Abos</h2></div>
+    <div class="card table-card">
+      <div class="toolbar">
+        <input id="q" type="search" placeholder="Suchen …">
+        <select id="fStatus">
+          <option value="active">Aktiv</option>
+          <option value="">Alle</option>
+          <option value="done">Abbezahlt</option>
+          <option value="paused">Pausiert</option>
+          <option value="cancelled">Gekündigt</option>
+        </select>
+        <select id="fKind">
+          <option value="">Abos &amp; Raten</option>
+          <option value="subscription">Nur Abos</option>
+          <option value="installment">Nur Ratenzahlungen</option>
+        </select>
+        <select id="fCat"><option value="">Alle Kategorien</option></select>
+        <select id="fAcc"><option value="">Alle Bankkonten</option></select>
+      </div>
+      <div style="overflow-x:auto">
+        <table>
+          <thead><tr>
+            <th data-sort="name">Abo</th>
+            <th data-sort="price" class="num">Preis</th>
+            <th data-sort="monthly" class="num hide-m">/ Monat</th>
+            <th data-sort="next">Nächste Zahlung</th>
+            <th data-sort="status" class="hide-m">Status</th>
+            <th></th>
+          </tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+      <div class="empty" id="empty" hidden>Noch keine Abos. Klicke auf „Abo hinzufügen“ oder importiere einen Kontoauszug.</div>
+    </div>
+  </section>
+  <p class="muted small foot-note">Alle Daten werden lokal in diesem Browser gespeichert. Für Sicherung und Geräte-Sync: Einstellungen.</p>
+</div>
+
+<!-- Abo bearbeiten -->
+<dialog id="dlg">
+  <form class="f" id="form" method="dialog">
+    <h2 id="dlgTitle">Abo hinzufügen</h2>
+    <label class="full">Name
+      <input name="name" required placeholder="z. B. Netflix" maxlength="80">
+    </label>
+    <label>Art
+      <select name="kind">
+        <option value="subscription">Abo</option>
+        <option value="installment">Ratenzahlung</option>
+      </select>
+    </label>
+    <label>Abrechnung / Rhythmus
+      <select name="cycle">
+        <option value="monthly">Monatlich</option>
+        <option value="quarterly">Vierteljährlich</option>
+        <option value="yearly">Jährlich</option>
+        <option value="weekly">Wöchentlich</option>
+      </select>
+    </label>
+    <label><span id="lblPrice">Preis</span>
+      <input name="price" type="number" step="0.01" min="0" required>
+    </label>
+    <label>Währung
+      <select name="currency"></select>
+    </label>
+    <label class="inst-only" hidden>Gesamtpreis (Kaufpreis)
+      <input name="principal" type="number" min="0" step="0.01" placeholder="z. B. 1200">
+    </label>
+    <label class="inst-only" hidden>Zinssatz p. a. (%)
+      <input name="interestRate" type="number" min="0" max="100" step="0.01" placeholder="0 = zinslos">
+    </label>
+    <label class="inst-only" hidden>Raten insgesamt
+      <input name="totalPayments" type="number" min="1" step="1" placeholder="z. B. 12">
+    </label>
+    <label class="inst-only" hidden>Davon bereits gezahlt (bis zur nächsten Rate)
+      <span class="paid-row">
+        <input name="paidValue" type="number" min="0" step="1" placeholder="0">
+        <select name="paidUnit" aria-label="Einheit"><option value="count">Raten</option><option value="amount">Betrag</option></select>
+      </span>
+    </label>
+    <div class="loan-calc full" id="loanCalc" hidden></div>
+    <label><span id="lblNext">Nächste Zahlung</span>
+      <input name="nextDate" type="date" required>
+    </label>
+    <label>Kategorie
+      <input name="category" list="catList" placeholder="z. B. Streaming">
+      <datalist id="catList"></datalist>
+    </label>
+    <label>Status
+      <select name="status">
+        <option value="active">Aktiv</option>
+        <option value="paused">Pausiert</option>
+        <option value="cancelled">Gekündigt</option>
+      </select>
+    </label>
+    <label class="sub-only">Kündigungsfrist (Tage)
+      <input name="noticeDays" type="number" min="0" step="1" placeholder="0">
+    </label>
+    <label class="sub-only">Nutzung
+      <select name="usage">
+        <option value="">Keine Angabe</option>
+        <option value="often">Oft</option>
+        <option value="sometimes">Manchmal</option>
+        <option value="rarely">Selten</option>
+      </select>
+    </label>
+    <label class="sub-only">Jahrespreis (falls es einen gibt)
+      <input name="yearlyAlt" type="number" step="0.01" min="0" placeholder="z. B. 99">
+    </label>
+    <label>Bankkonto
+      <input name="account" list="accList" placeholder="z. B. Girokonto Sparkasse" maxlength="60">
+      <datalist id="accList"></datalist>
+    </label>
+    <label>Zahlungsart
+      <input name="payment" placeholder="z. B. PayPal, Visa …" maxlength="60">
+    </label>
+    <label class="full">Notizen
+      <textarea name="notes" rows="2" maxlength="500"></textarea>
+    </label>
+    <div class="foot">
+      <button type="button" class="btn" id="btnCancel">Abbrechen</button>
+      <button type="submit" class="btn primary">Speichern</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Einstellungen -->
+<dialog id="dlgSet">
+  <div class="box">
+    <div class="dhead"><h2>Einstellungen</h2><button class="btn small" id="setClose">Schließen</button></div>
+
+    <section>
+      <h3>Konto</h3>
+      <p class="small" style="margin-top:0">Angemeldet als <b id="acName"></b></p>
+      <label>Automatisch sperren nach
+        <select id="setAutoLock">
+          <option value="0">Nie</option>
+          <option value="5">5 Minuten Inaktivität</option>
+          <option value="15">15 Minuten Inaktivität</option>
+          <option value="30">30 Minuten Inaktivität</option>
+          <option value="60">60 Minuten Inaktivität</option>
+        </select>
+      </label>
+      <div class="row-btns">
+        <button class="btn small" id="acLock">🔒 Sperren</button>
+        <button class="btn small" id="acPw">Passwort ändern</button>
+        <button class="btn small" id="acRename">Name ändern</button>
+        <button class="btn small danger" id="acDelete">Profil löschen</button>
+      </div>
+      <p class="muted small">Deine Daten sind in diesem Browser mit deinem Passwort verschlüsselt (AES-256). Es gibt <b>keinen Passwort-Reset</b>: Wer das Passwort vergisst, kann die Daten nicht wiederherstellen (außer aus einer Sicherung oder dem Cloud-Sync). JSON-Sicherungen und Cloud-Sync sind <b>nicht</b> verschlüsselt.</p>
+    </section>
+
+    <section>
+      <h3>Währung</h3>
+      <label>Hauptwährung (für alle Summen)
+        <select id="setBase"></select>
+      </label>
+      <div class="muted small" id="rateInfo"></div>
+      <div class="row-btns"><button class="btn small" id="btnRates">Wechselkurse aktualisieren</button></div>
+    </section>
+
+    <section>
+      <h3>Erinnerungen</h3>
+      <label>Zahlungen ankündigen (Tage vorher)
+        <input id="setRemind" type="number" min="0" max="30">
+      </label>
+      <label>Kündigungsfristen ankündigen (Tage vorher)
+        <input id="setNoticeRemind" type="number" min="0" max="60">
+      </label>
+      <label class="check"><input type="checkbox" id="setNotif"> Browser-Benachrichtigungen aktivieren</label>
+      <p class="muted small">Hinweise erscheinen immer oben in der App. Benachrichtigungen kommen nur, solange die App im Browser geöffnet ist. Für Erinnerungen im Hintergrund exportiere die Kalender-Datei und öffne sie in Outlook, Google Kalender oder Apple Kalender.</p>
+      <div class="row-btns"><button class="btn small" id="btnIcs">📆 Kalender-Datei (.ics) exportieren</button></div>
+    </section>
+
+    <section>
+      <h3>Cloud-Sync (Geräte abgleichen)</h3>
+      <label>Anbieter
+        <select id="syncProv">
+          <option value="">Aus</option>
+          <option value="file">Datei im Cloud-Ordner (OneDrive, Dropbox, Nextcloud-Client …)</option>
+          <option value="nextcloud">Nextcloud (WebDAV)</option>
+          <option value="gdrive">Google Drive</option>
+          <option value="onenote">OneNote</option>
+        </select>
+      </label>
+      <div id="syncPanel"></div>
+    </section>
+
+    <section>
+      <h3>Daten</h3>
+      <div class="row-btns">
+        <button class="btn small" id="btnExport">Sicherung (JSON)</button>
+        <button class="btn small" id="btnImport">Sicherung einlesen</button>
+        <button class="btn small" id="btnCsv">Liste als CSV</button>
+        <input type="file" id="fileImport" accept=".json,application/json" hidden>
+      </div>
+    </section>
+  </div>
+</dialog>
+
+<!-- Errungenschaften -->
+<dialog id="dlgAch" class="wide">
+  <div class="box">
+    <div class="dhead"><h2>🏆 Errungenschaften</h2><button class="btn small" id="achClose">Schließen</button></div>
+    <p class="muted small" id="achProgress" style="margin-top:0"></p>
+    <div class="ach-grid" id="achList"></div>
+  </div>
+</dialog>
+<div id="toasts" class="toast-wrap"></div>
+
+<!-- Passwort ändern / Profil löschen -->
+<dialog id="dlgPw">
+  <form class="box" id="formPw" method="dialog">
+    <div class="dhead"><h2 id="pwTitle"></h2></div>
+    <label>Aktuelles Passwort<input type="password" id="pwOld" autocomplete="current-password" required></label>
+    <label class="pw-new">Neues Passwort (mind. 8 Zeichen)<input type="password" id="pwNew" autocomplete="new-password" minlength="8"></label>
+    <label class="pw-new">Neues Passwort wiederholen<input type="password" id="pwNew2" autocomplete="new-password"></label>
+    <div class="au-err" id="pwErr"></div>
+    <div class="foot">
+      <button type="button" class="btn" id="pwCancel">Abbrechen</button>
+      <button type="submit" class="btn primary" id="pwOk">OK</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Kontoauszug-Import -->
+<input type="file" id="fileBank" accept=".csv,.txt,text/csv" hidden>
+<dialog id="dlgBank" class="wide">
+  <div class="box">
+    <div class="dhead"><h2>Abos im Kontoauszug</h2><button class="btn small" id="bankClose">Abbrechen</button></div>
+    <div id="bankBody"></div>
+  </div>
+</dialog>
+
+<script id="authsrc">
+// ===== Login, Profile und verschlüsselter Tresor (läuft vor der eigentlichen App) =====
+(function () {
+"use strict";
+if (window.__aboCb) return;                 // Rücksprung-Seite der Microsoft-Anmeldung: nichts starten
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+const USERS_KEY = "abo-users", BLOB_PREFIX = "abo-user-";
+const PRIVATE = ["abo-manager-v1", "abo-manager-meta", "abo-manager-settings", "abo-manager-sync"];
+const ITER = 600000;
+const COLORS = ["#4f46e5", "#0ea5e9", "#10b981", "#f59e0b", "#ef4444", "#ec4899", "#8b5cf6", "#14b8a6"];
+const te = new TextEncoder(), td = new TextDecoder();
+const toB64 = u8 => { let s = ""; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode(...u8.subarray(i, i + 0x8000)); return btoa(s); };
+const fromB64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+const rget = (k, fb) => { try { const v = JSON.parse(localStorage.getItem(k)); return v ?? fb; } catch { return fb; } };
+const rset = (k, v) => localStorage.setItem(k, JSON.stringify(v));
+const clone = v => JSON.parse(JSON.stringify(v));
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+/* ---------- Kryptografie: PBKDF2-SHA256 -> AES-256-GCM ---------- */
+async function derive(pw, salt, iter) {
+  const base = await crypto.subtle.importKey("raw", te.encode(pw), "PBKDF2", false, ["deriveKey"]);
+  return crypto.subtle.deriveKey({ name: "PBKDF2", salt, iterations: iter, hash: "SHA-256" }, base,
+    { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]);
+}
+async function seal(key, obj) {
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const ct = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, te.encode(JSON.stringify(obj))));
+  return { iv: toB64(iv), ct: toB64(ct) };
+}
+async function openBlob(key, blob) {
+  const pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv: fromB64(blob.iv) }, key, fromB64(blob.ct));
+  return JSON.parse(td.decode(pt));
+}
+function idbDelete(key) {                    // Sync-Datei-Zugriff eines gelöschten Profils entfernen (best effort)
+  return new Promise(res => {
+    try {
+      const r = indexedDB.open("abo-manager", 1);
+      r.onupgradeneeded = () => r.result.createObjectStore("kv");
+      r.onsuccess = () => { try { const tx = r.result.transaction("kv", "readwrite"); tx.objectStore("kv").delete(key); tx.oncomplete = tx.onerror = () => res(); } catch { res(); } };
+      r.onerror = () => res();
+    } catch { res(); }
+  });
+}
+const nameTaken = (name, exceptId) => rget(USERS_KEY, []).some(u => u.id !== exceptId && u.name.toLowerCase() === name.toLowerCase());
+function checkName(name) {
+  if (!name || name.length > 40) throw new Error("Bitte einen Namen mit 1–40 Zeichen eingeben.");
+}
+
+/* ---------- Tresor: entschlüsselte Daten des angemeldeten Profils ---------- */
+let idle = null;
+const Vault = window.Vault = {
+  uid: null, name: null, data: {}, key: null, blob: null, timer: null, dirty: false,
+  get(k, fb) { return k in this.data ? clone(this.data[k]) : fb; },
+  set(k, v) { this.data[k] = clone(v); this.dirty = true; clearTimeout(this.timer); this.timer = setTimeout(() => this.flush(), 150); return true; },
+  async flush() {
+    if (!this.key || !this.dirty) return;
+    this.dirty = false;
+    try { rset(BLOB_PREFIX + this.uid, { ...this.blob, ...(await seal(this.key, this.data)) }); }
+    catch (e) { this.dirty = true; console.error(e); alert("Speichern fehlgeschlagen: " + (e.message || e)); }
+  },
+  async create(name, pw, initial) {
+    name = name.trim(); checkName(name);
+    if (nameTaken(name)) throw new Error("Dieser Name ist schon vergeben.");
+    const salt = crypto.getRandomValues(new Uint8Array(16)), key = await derive(pw, salt, ITER);
+    const blob = { v: 1, salt: toB64(salt), iter: ITER }, id = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    rset(BLOB_PREFIX + id, { ...blob, ...(await seal(key, initial || {})) });
+    const users = rget(USERS_KEY, []);
+    users.push({ id, name, color: COLORS[users.length % COLORS.length], created: Date.now() });
+    rset(USERS_KEY, users);
+    Object.assign(this, { uid: id, name, key, blob, data: initial || {}, dirty: false, created: users[users.length - 1].created });
+  },
+  async unlock(id, pw) {
+    const user = rget(USERS_KEY, []).find(u => u.id === id), blob = rget(BLOB_PREFIX + id, null);
+    if (!user || !blob) throw new Error("Profil nicht gefunden.");
+    const key = await derive(pw, fromB64(blob.salt), blob.iter);
+    let data;
+    try { data = await openBlob(key, blob); } catch { throw new Error("Falsches Passwort."); }
+    Object.assign(this, { uid: id, name: user.name, key, blob: { v: blob.v, salt: blob.salt, iter: blob.iter }, data, dirty: false, created: user.created || Date.now() });
+  },
+  async verify(pw) {
+    const blob = rget(BLOB_PREFIX + this.uid, null);
+    try { await openBlob(await derive(pw, fromB64(blob.salt), blob.iter), blob); return true; } catch { return false; }
+  },
+  async changePassword(oldPw, newPw) {
+    if (!(await this.verify(oldPw))) throw new Error("Aktuelles Passwort ist falsch.");
+    await this.flush();
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    this.key = await derive(newPw, salt, ITER);
+    this.blob = { v: 1, salt: toB64(salt), iter: ITER };
+    this.dirty = true; await this.flush();
+  },
+  rename(name) {
+    name = name.trim(); checkName(name);
+    if (nameTaken(name, this.uid)) throw new Error("Dieser Name ist schon vergeben.");
+    rset(USERS_KEY, rget(USERS_KEY, []).map(u => u.id === this.uid ? { ...u, name } : u));
+    this.name = name;
+  },
+  async removeProfile(id) {
+    localStorage.removeItem(BLOB_PREFIX + id);
+    rset(USERS_KEY, rget(USERS_KEY, []).filter(u => u.id !== id));
+    await idbDelete("handle:" + id);
+  },
+  async deleteProfile(pw) {
+    if (!(await this.verify(pw))) throw new Error("Passwort ist falsch.");
+    const id = this.uid; this.key = null; this.dirty = false; clearTimeout(this.timer);
+    await this.removeProfile(id);
+  },
+  async lock() { clearTimeout(idle); await this.flush(); location.reload(); },   // Neuladen löscht Schlüssel und Daten aus dem Speicher
+  bump() {                                                                      // Inaktivitäts-Timer neu starten
+    clearTimeout(idle);
+    const m = Number((this.data["abo-manager-settings"] || {}).autoLock ?? 15);
+    if (this.key && m > 0) idle = setTimeout(() => this.lock(), m * 60000);
+  }
+};
+["pointerdown", "keydown", "wheel", "touchstart"].forEach(ev => addEventListener(ev, () => Vault.bump(), { passive: true }));
+document.addEventListener("visibilitychange", () => { if (document.hidden) Vault.flush(); });
+
+/* ---------- Anmelde-Oberfläche ---------- */
+const root = $("#auth");
+let view = { mode: "list" }, busy = false, fails = 0;
+const legacyData = () => {                    // unverschlüsselte Daten aus früheren Versionen
+  const d = {}; for (const k of PRIVATE) { const v = rget(k, undefined); if (v !== undefined) d[k] = v; }
+  return Object.keys(d).length ? d : null;
+};
+const avatar = u => `<span class="au-av" style="background:${esc(u.color)}">${esc([...u.name][0].toUpperCase())}</span>`;
+
+function render() {
+  const users = rget(USERS_KEY, []);
+  if (!users.length) view = { mode: "create" };
+  if (view.mode === "login" && !users.find(u => u.id === view.id)) view = { mode: "list" };
+  if (view.mode === "list") root.innerHTML = `<div class="au-card"><h1>ABOmination</h1><p class="muted" style="margin:0">Wer bist du?</p>
+    <div class="au-users">${users.map(u => `<button class="au-user" data-login="${esc(u.id)}">${avatar(u)}<span>${esc(u.name)}</span></button>`).join("")}</div>
+    <button class="btn" data-mode="create">＋ Neues Profil</button></div>`;
+  else if (view.mode === "login") {
+    const u = users.find(x => x.id === view.id);
+    root.innerHTML = `<form class="au-card" id="auLogin"><div style="display:flex;align-items:center;gap:12px">${avatar(u)}<h1 style="margin:0">${esc(u.name)}</h1></div>
+      <label>Passwort<input type="password" id="auPw" autocomplete="current-password"></label>
+      <div class="au-err" id="auErr"></div>
+      <button class="btn primary" style="width:100%" id="auGo">Entsperren</button>
+      <div class="au-links">${users.length > 1 ? `<button type="button" data-mode="list">← Anderes Profil</button>` : "<span></span>"}<button type="button" data-forgot="1">Passwort vergessen?</button></div></form>`;
+  } else {
+    const first = !users.length, legacy = first && legacyData();
+    root.innerHTML = `<form class="au-card" id="auCreate"><h1>${first ? "Willkommen" : "Neues Profil"}</h1>
+      ${legacy ? `<div class="au-note">Deine bisherigen Abos in diesem Browser werden in dieses Profil übernommen und ab jetzt verschlüsselt gespeichert.</div>` : ""}
+      <label>Name<input id="auName" maxlength="40" autocomplete="username" placeholder="z. B. Maciej"></label>
+      <label>Passwort (mind. 8 Zeichen)<input type="password" id="auPw" autocomplete="new-password"></label>
+      <label>Passwort wiederholen<input type="password" id="auPw2" autocomplete="new-password"></label>
+      <div class="au-note">Es gibt keinen Passwort-Reset. Wer das Passwort vergisst, kann die Daten des Profils nicht wiederherstellen.</div>
+      <div class="au-err" id="auErr"></div>
+      <button class="btn primary" style="width:100%" id="auGo">Profil anlegen</button>
+      ${first ? "" : `<div class="au-links"><button type="button" data-mode="list">← Zurück</button></div>`}</form>`;
+  }
+  root.querySelector("input")?.focus();
+}
+function setBusy(on) {
+  busy = on;
+  const b = $("#auGo"); if (!b) return;
+  b.disabled = on; b.dataset.label ??= b.textContent; b.textContent = on ? "Bitte warten …" : b.dataset.label;
+}
+async function doLogin() {
+  const pw = $("#auPw").value;
+  if (!pw) return;
+  setBusy(true);
+  try { await Vault.unlock(view.id, pw); enter(); }
+  catch (e) { fails++; $("#auErr").textContent = e.message; await sleep(Math.min(fails, 6) * 600); setBusy(false); $("#auPw").select(); }
+}
+async function doCreate() {
+  const name = $("#auName").value.trim(), pw = $("#auPw").value, err = $("#auErr");
+  err.textContent = "";
+  if (!name) return (err.textContent = "Bitte einen Namen eingeben.");
+  if (pw.length < 8) return (err.textContent = "Das Passwort braucht mindestens 8 Zeichen.");
+  if (pw !== $("#auPw2").value) return (err.textContent = "Die Passwörter stimmen nicht überein.");
+  const first = !rget(USERS_KEY, []).length, initial = first ? legacyData() : null;
+  setBusy(true);
+  try {
+    await Vault.create(name, pw, initial || {});
+    if (initial) for (const k of PRIVATE) localStorage.removeItem(k);      // Klartext-Reste entfernen
+    enter();
+  } catch (e) { err.textContent = e.message; setBusy(false); }
+}
+function forgot(id) {
+  const u = rget(USERS_KEY, []).find(x => x.id === id); if (!u) return;
+  const t = prompt(`Ohne Passwort lassen sich die Daten von „${u.name}“ nicht wiederherstellen.\nProfil endgültig löschen? Zur Bestätigung den Profilnamen eingeben:`);
+  if (t !== null && t.trim() === u.name) Vault.removeProfile(id).then(() => { view = { mode: "list" }; render(); });
+}
+root.addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b || busy) return;
+  if (b.dataset.login) { view = { mode: "login", id: b.dataset.login }; fails = 0; render(); }
+  else if (b.dataset.mode) { view = { mode: b.dataset.mode }; render(); }
+  else if (b.dataset.forgot) forgot(view.id);
+});
+root.addEventListener("submit", e => {
+  e.preventDefault(); if (busy) return;
+  if (e.target.id === "auLogin") doLogin(); else if (e.target.id === "auCreate") doCreate();
+});
+
+function enter() {                            // Tresor offen: App-Code jetzt erst ausführen
+  root.hidden = true; document.body.classList.remove("locked");
+  $("#userName").textContent = Vault.name;
+  const s = document.createElement("script");
+  s.textContent = $("#appsrc").textContent;
+  document.body.appendChild(s);
+  Vault.bump();
+}
+
+/* ---------- Konto-Funktionen (Einstellungen) ---------- */
+$("#btnLock").onclick = $("#acLock").onclick = () => Vault.lock();
+$("#acRename").onclick = () => {
+  const n = prompt("Neuer Profilname:", Vault.name); if (n === null) return;
+  try { Vault.rename(n); $("#userName").textContent = $("#acName").textContent = Vault.name; } catch (e) { alert(e.message); }
+};
+let pwMode = null;
+function openPw(mode) {
+  pwMode = mode;
+  const change = mode === "change";
+  $("#formPw").reset();
+  $("#pwTitle").textContent = change ? "Passwort ändern" : "Profil löschen";
+  document.querySelectorAll(".pw-new").forEach(e => e.hidden = !change);
+  $("#pwNew").required = $("#pwNew2").required = change;
+  $("#pwOk").textContent = change ? "Ändern" : "Endgültig löschen";
+  $("#pwOk").className = "btn " + (change ? "primary" : "danger");
+  $("#pwErr").textContent = change ? "" : "Alle Daten dieses Profils in diesem Browser werden unwiderruflich gelöscht.";
+  $("#dlgPw").showModal();
+}
+$("#acPw").onclick = () => openPw("change");
+$("#acDelete").onclick = () => openPw("delete");
+$("#pwCancel").onclick = () => $("#dlgPw").close();
+$("#formPw").addEventListener("submit", async e => {
+  e.preventDefault();
+  const err = $("#pwErr"), ok = $("#pwOk"), old = $("#pwOld").value;
+  err.textContent = "";
+  try {
+    if (pwMode === "change") {
+      const n = $("#pwNew").value;
+      if (n.length < 8) throw new Error("Neues Passwort: mindestens 8 Zeichen.");
+      if (n !== $("#pwNew2").value) throw new Error("Die neuen Passwörter stimmen nicht überein.");
+      ok.disabled = true;
+      await Vault.changePassword(old, n);
+      document.dispatchEvent(new Event("abo:pwchanged"));
+      $("#dlgPw").close(); alert("Passwort geändert.");
+    } else {
+      if (!confirm(`Profil „${Vault.name}“ wirklich endgültig löschen?`)) return;
+      ok.disabled = true;
+      await Vault.deleteProfile(old);
+      location.reload();
+    }
+  } catch (x) { err.textContent = x.message; }
+  finally { ok.disabled = false; }
+});
+
+/* ---------- Start ---------- */
+if (!(window.crypto && crypto.subtle)) {
+  root.hidden = false;
+  root.innerHTML = `<div class="au-card"><h1>Nicht unterstützt</h1><p>Dieser Browser bzw. diese Adresse erlaubt keine Verschlüsselung (crypto.subtle). Öffne die App über <b>Abo-Manager-starten.cmd</b> (http://localhost:8765) oder per https.</p></div>`;
+} else { root.hidden = false; render(); }
+})();
+
+</script>
+<script type="text/plain" id="appsrc">
+"use strict";
+if (window.__aboCb) throw "Rücksprung-Seite der Anmeldung – App wird hier nicht gestartet";
+/* ================= Konstanten ================= */
+const KEY = "abo-manager-v1", META_KEY = "abo-manager-meta", SET_KEY = "abo-manager-settings",
+      RATES_KEY = "abo-manager-rates", NOTIF_KEY = "abo-manager-notified", ACH_KEY = "abo-manager-achievements";
+// Ratenkredit (Annuität, Zahlung am Periodenende): Zinssatz p. a. wird auf den Ratenrhythmus umgelegt
+const PERIODS = { weekly: 52, monthly: 12, quarterly: 4, yearly: 1 };
+function calcRate(principal, n, annualPct, cycle) {
+  const i = annualPct / 100 / PERIODS[cycle];
+  const r = i > 0 ? principal * i / (1 - Math.pow(1 + i, -n)) : principal / n;
+  return Math.round(r * 100) / 100;
+}
+// Restschuld (Kapital) nach m gezahlten Raten
+function loanBalance(principal, rate, annualPct, cycle, m) {
+  const i = annualPct / 100 / PERIODS[cycle];
+  return Math.max(0, i > 0 ? principal * Math.pow(1 + i, m) - rate * (Math.pow(1 + i, m) - 1) / i : principal - rate * m);
+}
+const CYCLES = {
+  weekly:    { label: "Wöchentlich",     perMonth: 52 / 12, months: 0 },
+  monthly:   { label: "Monatlich",       perMonth: 1,       months: 1 },
+  quarterly: { label: "Vierteljährlich", perMonth: 1 / 3,   months: 3 },
+  yearly:    { label: "Jährlich",        perMonth: 1 / 12,  months: 12 }
+};
+const STATUS = { active: "Aktiv", paused: "Pausiert", cancelled: "Gekündigt", done: "Abbezahlt" };
+const USAGE = { often: "Oft", sometimes: "Manchmal", rarely: "Selten" };
+// Kategorie-Farben: gedämpft, auf Violett und Neutraltöne beschränkt (passt zum strengen Farbschema)
+const PALETTE = ["#8b5cf6","#c4b5fd","#71717a","#a78bfa","#a1a1aa","#6d28d9","#52525b","#7c3aed","#d8b4fe","#78716c"];
+const CURRENCIES = ["EUR","USD","GBP","CHF","PLN","CZK","SEK","NOK","DKK","HUF","CAD","AUD","JPY","TRY"];
+// Näherungswerte, falls keine Live-Kurse geladen werden konnten (1 EUR = x Fremdwährung)
+const FALLBACK_RATES = { EUR:1, USD:1.17, GBP:0.86, CHF:0.94, PLN:4.25, CZK:24.3, SEK:11, NOK:11.7, DKK:7.46, HUF:395, CAD:1.61, AUD:1.78, JPY:172, TRY:48 };
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+const uid = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
+
+/* ================= Speicher ================= */
+// Private Daten (Abos, Einstellungen, Sync-Zugang) liegen verschlüsselt im Profil-Tresor (Vault),
+// alles andere (Wechselkurse, Benachrichtigungs-Merker) unverschlüsselt im localStorage.
+const PRIVATE_KEYS = ["abo-manager-v1", "abo-manager-meta", "abo-manager-settings", "abo-manager-sync", "abo-manager-achievements"];
+const lsGet = (k, fb) => {
+  if (PRIVATE_KEYS.includes(k)) return Vault.get(k, fb);
+  try { const v = JSON.parse(localStorage.getItem(k)); return v ?? fb; } catch { return fb; }
+};
+const lsSet = (k, v) => {
+  if (PRIVATE_KEYS.includes(k)) return Vault.set(k, v);
+  try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; }
+};
+
+let subs = clean(lsGet(KEY, []));
+let meta = Object.assign({ updatedAt: 0 }, lsGet(META_KEY, {}));
+let settings = Object.assign({ base: "EUR", remindDays: 3, noticeRemind: 7, notif: false, autoLock: 15 }, lsGet(SET_KEY, {}));
+let ratesInfo = lsGet(RATES_KEY, null);       // { date, rates, fetchedAt }
+let rates = ratesInfo?.rates || FALLBACK_RATES;
+let sort = { key: "next", dir: 1 };
+let editId = null;
+
+/* ================= Errungenschaften ================= */
+let ach = Object.assign({
+  unlocked: {}, maxSubs: 0, cancelled: 0, cycleUpgrades: 0, installmentsPaid: 0, doneInstallmentIds: [],
+  savedYearly: 0, optimizerActed: false, importedBank: false, exportedIcs: false, exportedJson: false,
+  syncConnected: false, pwChanged: false
+}, lsGet(ACH_KEY, {}));
+const saveAch = () => lsSet(ACH_KEY, ach);
+let lastOptFlagged = new Set();     // IDs, die zuletzt in der Optimierung als Spar-Tipp auftauchten
+const ACHIEVEMENTS = [
+  { id: "first-sub", icon: "🎉", title: "Erste Schritte", desc: "Das erste Abo oder die erste Ratenzahlung angelegt.", test: c => c.a.maxSubs >= 1 },
+  { id: "collector-5", icon: "📚", title: "Sammler", desc: "5 Abos gleichzeitig verwaltet.", test: c => c.a.maxSubs >= 5 },
+  { id: "collector-10", icon: "🗂️", title: "Großverwalter", desc: "10 Abos gleichzeitig verwaltet.", test: c => c.a.maxSubs >= 10 },
+  { id: "first-cancel", icon: "✂️", title: "Aufgeräumt", desc: "Das erste Abo gekündigt.", test: c => c.a.cancelled >= 1 },
+  { id: "cancel-5", icon: "🥷", title: "Serienkündiger", desc: "5 Abos gekündigt.", test: c => c.a.cancelled >= 5 },
+  { id: "debt-free", icon: "🏁", title: "Schuldenfrei", desc: "Eine Ratenzahlung vollständig abbezahlt.", test: c => c.a.installmentsPaid >= 1 },
+  { id: "debt-free-3", icon: "💪", title: "Frei und ledig", desc: "3 Ratenzahlungen vollständig abbezahlt.", test: c => c.a.installmentsPaid >= 3 },
+  { id: "yearly-switch", icon: "📅", title: "Jahresplaner", desc: "Von monatlicher auf jährliche Zahlung gewechselt.", test: c => c.a.cycleUpgrades >= 1 },
+  { id: "optimizer", icon: "💡", title: "Optimierer", desc: "Einen Tipp aus der Optimierung umgesetzt und gekündigt.", test: c => c.a.optimizerActed },
+  { id: "saver-100", icon: "💰", title: "Sparfuchs", desc: "Durch Kündigungen mindestens 100 € pro Jahr gespart.", test: c => c.a.savedYearly >= 100 },
+  { id: "all-categorized", icon: "🏷️", title: "Alles sortiert", desc: "Jedem Abo eine Kategorie gegeben.", test: c => c.allCategorized },
+  { id: "all-usage", icon: "🔍", title: "Selbsterkenntnis", desc: "Bei jedem aktiven Abo die Nutzung eingetragen.", test: c => c.allUsageSet },
+  { id: "bank-import", icon: "🏦", title: "Kontodetektiv", desc: "Abos aus einem Kontoauszug erkannt.", test: c => c.a.importedBank },
+  { id: "ics-export", icon: "📆", title: "Gut geplant", desc: "Die Kalender-Datei exportiert.", test: c => c.a.exportedIcs },
+  { id: "json-export", icon: "💾", title: "Vorsorge getroffen", desc: "Eine Sicherung erstellt.", test: c => c.a.exportedJson },
+  { id: "sync", icon: "☁️", title: "Vernetzt", desc: "Cloud-Sync eingerichtet.", test: c => c.a.syncConnected },
+  { id: "foreign-currency", icon: "🌍", title: "Weltbürger", desc: "Ein Abo in einer Fremdwährung angelegt.", test: c => c.foreignCurrency },
+  { id: "pw-changed", icon: "🔐", title: "Sicherheitsbewusst", desc: "Das Passwort geändert.", test: c => c.a.pwChanged },
+  { id: "one-year", icon: "🕰️", title: "Ein Jahr dabei", desc: "Seit einem Jahr im ABOmination angemeldet.", test: c => c.profileAgeDays >= 365 }
+];
+function trackCancel(s) {
+  ach.cancelled++;
+  ach.savedYearly += convert(s.price * CYCLES[s.cycle].perMonth, s.currency) * 12;
+  if (lastOptFlagged.has(s.id)) ach.optimizerActed = true;
+}
+// wird am Ende von render() mit den aktuellen Abos aufgerufen: leitet Fortschritt ab und schaltet ggf. neu frei
+function checkAchievements(rawSubs, viewSubs) {
+  let changed = false;
+  const activeCount = rawSubs.filter(s => s.status !== "cancelled").length;
+  if (activeCount > ach.maxSubs) { ach.maxSubs = activeCount; changed = true; }
+  for (const s of viewSubs) if (s.inst && s.state === "done" && !ach.doneInstallmentIds.includes(s.id)) {
+    ach.doneInstallmentIds.push(s.id); ach.installmentsPaid++; changed = true;
+  }
+  const nonInstActive = rawSubs.filter(s => s.status !== "cancelled" && s.kind !== "installment");
+  const ctx = {
+    a: ach,
+    allCategorized: rawSubs.length > 0 && rawSubs.every(s => s.category.trim()),
+    allUsageSet: nonInstActive.length > 0 && nonInstActive.every(s => s.usage),
+    foreignCurrency: rawSubs.some(s => s.currency !== settings.base),
+    profileAgeDays: Vault.created ? (Date.now() - Vault.created) / 86400000 : 0
+  };
+  const newly = [];
+  for (const def of ACHIEVEMENTS) if (!ach.unlocked[def.id] && def.test(ctx)) { ach.unlocked[def.id] = Date.now(); newly.push(def); changed = true; }
+  if (changed) saveAch();
+  const badge = $("#achCount"); if (badge) badge.textContent = `${Object.keys(ach.unlocked).length}/${ACHIEVEMENTS.length}`;
+  renderAchTile();
+  if (newly.length) showAchToasts(newly);
+}
+function renderAch() {
+  const n = Object.keys(ach.unlocked).length;
+  $("#achProgress").textContent = `${n} von ${ACHIEVEMENTS.length} freigeschaltet`;
+  $("#achList").innerHTML = ACHIEVEMENTS.map(a => {
+    const ts = ach.unlocked[a.id];
+    return `<div class="ach-card${ts ? "" : " locked"}"><span class="ach-ic">${ts ? a.icon : "🔒"}</span>
+      <div><b>${esc(a.title)}</b><div class="muted">${esc(a.desc)}</div>${ts ? `<div class="muted" style="margin-top:3px">${fmtDate(new Date(ts))}</div>` : ""}</div></div>`;
+  }).join("");
+}
+function showAchToasts(list) {
+  const wrap = $("#toasts");
+  list.forEach((a, i) => setTimeout(() => {
+    const el = document.createElement("div");
+    el.className = "toast";
+    el.innerHTML = `<span class="ach-ic">${a.icon}</span><div><b>Errungenschaft freigeschaltet</b><span class="big">${esc(a.title)}</span></div>`;
+    wrap.appendChild(el);
+    setTimeout(() => el.remove(), 6000);
+  }, i * 400));
+}
+$("#btnAch").onclick = () => { renderAch(); $("#dlgAch").showModal(); };
+$("#achClose").onclick = () => $("#dlgAch").close();
+document.addEventListener("abo:pwchanged", () => { ach.pwChanged = true; saveAch(); checkAchievements(subs, view()); });
+
+function normalizeSub(s) {
+  if (!s || !s.name || !s.nextDate || !CYCLES[s.cycle]) return null;
+  const inst = s.kind === "installment" && Number(s.totalPayments) >= 1;
+  const total = inst ? Math.floor(Number(s.totalPayments)) : 0;
+  return {
+    id: s.id || uid(), name: String(s.name), price: Math.max(0, Number(s.price) || 0), cycle: s.cycle,
+    currency: CURRENCIES.includes(s.currency) ? s.currency : "EUR",
+    nextDate: String(s.nextDate), category: String(s.category || ""),
+    status: ["active", "paused", "cancelled"].includes(s.status) ? s.status : "active",
+    noticeDays: inst ? 0 : Math.max(0, Number(s.noticeDays) || 0), payment: String(s.payment || ""), notes: String(s.notes || ""),
+    account: String(s.account || "").trim().slice(0, 60),
+    kind: inst ? "installment" : "subscription", totalPayments: total,
+    // Bereits gezahlt: entweder als Anzahl Raten (paidCount) oder als exakter Betrag (paidAmount, dann ist paidCount nur abgeleitet)
+    paidAmount: inst && s.paidAmount !== null && s.paidAmount !== undefined && s.paidAmount !== "" && Number.isFinite(Number(s.paidAmount))
+      ? Math.min(total * Math.max(0, Number(s.price) || 0), Math.max(0, Math.round(Number(s.paidAmount) * 100) / 100)) : null,
+    paidCount: inst ? Math.min(total, Math.max(0, Math.floor(Number(s.paidCount) || 0))) : 0,
+    // Kaufpreis und Zinssatz p. a.: wenn gesetzt, ergibt sich der Betrag pro Rate (price) daraus
+    principal: inst ? Math.max(0, Math.round((Number(s.principal) || 0) * 100) / 100) : 0,
+    interestRate: inst ? Math.min(100, Math.max(0, Number(s.interestRate) || 0)) : 0,
+    usage: USAGE[s.usage] ? s.usage : "", yearlyAlt: inst ? 0 : Math.max(0, Number(s.yearlyAlt) || 0)
+  };
+}
+function clean(list) { return (Array.isArray(list) ? list : []).map(normalizeSub).filter(Boolean); }
+
+function persist() {
+  const ok = lsSet(KEY, subs) & lsSet(META_KEY, meta);
+  if (!ok) alert("Speichern im Browser nicht möglich. Bitte eine Sicherung (JSON) exportieren.");
+}
+function save() { meta.updatedAt = Date.now(); persist(); schedulePush(); }
+const saveSettings = () => lsSet(SET_KEY, settings);
+
+/* ================= Datum ================= */
+const parseISO = s => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
+const toISO = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+const fmtDate = d => d.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" });
+const today = () => { const t = new Date(); return new Date(t.getFullYear(), t.getMonth(), t.getDate()); };
+const daysBetween = (a, b) => Math.round((b - a) / 86400000);
+const addDays = (d, n) => { const r = new Date(d); r.setDate(r.getDate() + n); return r; };
+const whenText = n => n === 0 ? "heute" : n === 1 ? "morgen" : n < 0 ? `vor ${-n} Tagen` : `in ${n} Tagen`;
+
+// k-te Wiederholung ab Ankerdatum (verhindert Drift bei Monatsenden)
+function addCycle(anchor, cycle, k) {
+  if (cycle === "weekly") return addDays(anchor, 7 * k);
+  const n = CYCLES[cycle].months * k;
+  const y = anchor.getFullYear(), m = anchor.getMonth() + n;
+  const last = new Date(y, m + 1, 0).getDate();
+  return new Date(y, m, Math.min(anchor.getDate(), last));
+}
+// k = Anzahl der Termine, die seit dem gespeicherten Datum bereits verstrichen sind
+function nextInfo(s) {
+  const anchor = parseISO(s.nextDate), t = today();
+  let k = 0, d = anchor;
+  while (d < t && k < 5000) d = addCycle(anchor, s.cycle, ++k);
+  return { date: d, k };
+}
+const nextPayment = s => nextInfo(s).date;
+
+/* ================= Währungen ================= */
+const nfCache = {};
+const money = (v, c = "EUR") => (nfCache[c] ||= new Intl.NumberFormat("de-DE", { style: "currency", currency: c })).format(v);
+const mb = v => money(v, settings.base);
+function convert(amount, from, to = settings.base) {
+  if (from === to || !rates[from] || !rates[to]) return amount;
+  return amount / rates[from] * rates[to];
+}
+async function refreshRates(manual) {
+  try {
+    const r = await fetch("https://api.frankfurter.dev/v1/latest?base=EUR");
+    if (!r.ok) throw new Error(r.status);
+    const j = await r.json();
+    rates = { EUR: 1, ...j.rates };
+    ratesInfo = { date: j.date, rates, fetchedAt: Date.now() };
+    lsSet(RATES_KEY, ratesInfo);
+    render(); renderSettingsInfo();
+  } catch {
+    if (manual) alert("Wechselkurse konnten nicht geladen werden (keine Internetverbindung?). Es werden gespeicherte bzw. Näherungswerte verwendet.");
+  }
+}
+function needRates() { return settings.base !== "EUR" || subs.some(s => s.currency !== "EUR"); }
+function maybeRefreshRates() {
+  const stale = !ratesInfo || Date.now() - ratesInfo.fetchedAt > 86400000;
+  if (stale && needRates()) refreshRates(false);
+}
+
+/* ================= Auswertung ================= */
+function view() {
+  const t = today();
+  return subs.map(s => {
+    const { date: next, k } = nextInfo(s);
+    const inst = s.kind === "installment";
+    // Ratenzahlung: verstrichene Termine zählen automatisch als bezahlt.
+    // Mit exaktem Betrag (paidAmount) wird in Geld gerechnet, sonst in ganzen Raten (bisheriges Verhalten).
+    const byAmount = inst && s.paidAmount !== null;
+    const totalAmt = inst ? s.totalPayments * s.price : 0;
+    let remaining = 0, paidAmt = 0;
+    if (inst && byAmount) {
+      paidAmt = Math.min(totalAmt, s.paidAmount + k * s.price);
+      remaining = s.price > 0 ? Math.max(0, Math.ceil((totalAmt - paidAmt) / s.price - 1e-9)) : 0;
+    } else if (inst) {
+      remaining = Math.max(0, s.totalPayments - s.paidCount - k);
+      paidAmt = (s.totalPayments - remaining) * s.price;
+    }
+    const remainingAmt = inst ? Math.max(0, Math.round((totalAmt - paidAmt) * 100) / 100) : 0;
+    const done = inst && remaining <= 0;
+    const priceBase = convert(s.price, s.currency);
+    // Kredit-Kennzahlen (nur wenn Kaufpreis angegeben): Gesamtkosten = Rate × Anzahl, Zinsen = Gesamtkosten − Kaufpreis
+    const loan = inst && s.principal > 0 ? { total: totalAmt, interest: Math.max(0, Math.round((totalAmt - s.principal) * 100) / 100) } : null;
+    return { ...s, next, inDays: daysBetween(t, next), inst, remaining, byAmount, totalAmt, paidAmt, remainingAmt, loan,
+      state: done ? "done" : s.status,
+      paid: inst ? s.totalPayments - remaining : 0,
+      due: inst ? Math.min(s.price, remainingAmt) : s.price,      // letzte Rate kann kleiner sein
+      endDate: inst && !done ? addCycle(parseISO(s.nextDate), s.cycle, remaining + k - 1) : null,
+      monthly: convert(s.price * CYCLES[s.cycle].perMonth, s.currency),
+      priceBase, remainingBase: convert(remainingAmt, s.currency) };
+  });
+}
+const catName = s => s.category?.trim() || "Ohne Kategorie";
+const catColor = name => {
+  let h = 0; for (const c of name) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  return PALETTE[h % PALETTE.length];
+};
+
+function render() {
+  const all = view();
+  const active = all.filter(s => s.state === "active");
+  const insts = active.filter(s => s.inst);
+  const openRates = insts.reduce((a, s) => a + s.remainingBase, 0);
+  const lastEnd = insts.reduce((a, s) => (!a || s.endDate > a ? s.endDate : a), null);
+  const perMonth = active.reduce((a, s) => a + s.monthly, 0);
+  const soon = active.filter(s => s.inDays <= 30).sort((a, b) => a.next - b.next);
+  const soonSum = soon.reduce((a, s) => a + convert(s.due, s.currency), 0);
+  const first = soon[0];
+
+  // Kennzahlen als Bento-Kacheln (statische Kacheln, damit die Einblend-Animation nicht bei jedem Rendern neu startet)
+  const top = [...active].sort((a, b) => b.monthly - a.monthly)[0];
+  const optTotal = optimize(all).total;
+  const mixMap = {}; active.forEach(s => { const c = catName(s); mixMap[c] = (mixMap[c] || 0) + s.monthly; });
+  const mix = Object.entries(mixMap).sort((a, b) => b[1] - a[1]), mixTotal = mix.reduce((a, [, v]) => a + v, 0);
+  const mixTop = mix.slice(0, 4), mixRest = mixTotal - mixTop.reduce((a, [, v]) => a + v, 0);
+  const dateLong = new Date().toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+  $("#tHero").innerHTML = `
+    <div>
+      <div class="eyebrow">Übersicht · ${esc(dateLong)}</div>
+      <div class="eyebrow" style="margin-top:34px;color:var(--accent-ink)">Pro Monat</div>
+      <div class="display">${mb(perMonth)}</div>
+      <p class="lede">${active.length
+        ? `${active.length} aktive Abos und Ratenkäufe – zusammen <em>${mb(perMonth * 12)}</em> im Jahr.${top ? ` Der größte Posten ist ${esc(top.name)} mit ${mb(top.monthly)} pro Monat.` : ""}`
+        : "Noch nichts erfasst. Lege dein erstes Abo an – ab dann siehst du hier, was wirklich jeden Monat abgeht."}</p>
+    </div>
+    ${mixTotal > 0 ? `<div class="mix"><div class="eyebrow">Verteilung nach Kategorie</div>
+      <div class="mix-bar">${mixTop.map(([c, v]) => `<i style="flex:${v};background:${catColor(c)}" title="${esc(c)}: ${esc(mb(v))}"></i>`).join("")}${mixRest > 0.005 ? `<i style="flex:${mixRest};background:var(--line-strong)" title="Weitere: ${esc(mb(mixRest))}"></i>` : ""}</div>
+      <div class="mix-leg">${mixTop.map(([c, v]) => `<span><i style="background:${catColor(c)}"></i>${esc(c)} ${Math.round(v / mixTotal * 100)} %</span>`).join("")}${mixRest > 0.005 ? `<span><i style="background:var(--line-strong)"></i>Weitere ${Math.round(mixRest / mixTotal * 100)} %</span>` : ""}</div></div>` : "<div></div>"}
+    <div class="iboxes">
+      <div class="ibox"><span class="ic-c">${ICON.wallet}</span><div><div class="k">Aktive Abos</div><div class="v">${active.length}</div></div></div>
+      <div class="ibox"><span class="ic-c">${ICON.clock}</span><div><div class="k">Nächste Zahlung</div><div class="v">${first ? `${esc(first.name)} · ${whenText(first.inDays)}` : "keine anstehend"}</div></div></div>
+      <div class="ibox"><span class="ic-c">${ICON.bulb}</span><div><div class="k">Sparpotenzial</div><div class="v">${optTotal > 0 ? `bis zu ${mb(optTotal)}/Jahr` : "keine Hinweise"}</div></div></div>
+    </div>`;
+  $("#tHero").classList.toggle("tall", insts.length > 0);
+  $("#tYear").innerHTML = `<div class="tile-top"><span class="eyebrow">Pro Jahr</span><span class="ic-c">${ICON.trend}</span></div>
+    <div><div class="num-serif">${mb(perMonth * 12)}</div><div class="muted small" style="margin-top:8px">hochgerechnet</div></div>`;
+  $("#t30").innerHTML = `<div class="tile-top"><span class="eyebrow">Nächste 30 Tage</span><span class="ic-c">${ICON.calendar}</span></div>
+    <div><div class="num-serif">${mb(soonSum)}</div><div class="muted small" style="margin-top:8px">${soon.length} Zahlung${soon.length === 1 ? "" : "en"}</div></div>`;
+  $("#tOpen").hidden = !insts.length;
+  if (insts.length) $("#tOpen").innerHTML = `<div class="tile-top"><span class="eyebrow">Offene Raten</span><span class="ic-c">${ICON.receipt}</span></div>
+    <div><div class="num-serif">${mb(openRates)}</div><div class="muted small" style="margin-top:8px">${insts.length} Ratenzahlung${insts.length > 1 ? "en" : ""} · letzte Rate ${lastEnd.toLocaleDateString("de-DE", { month: "2-digit", year: "numeric" })}</div></div>`;
+
+  const byCat = {};
+  active.forEach(s => { const c = catName(s); byCat[c] = (byCat[c] || 0) + s.monthly; });
+  const entries = Object.entries(byCat).sort((a, b) => b[1] - a[1]);
+  const max = entries[0]?.[1] || 1;
+  $("#cats").innerHTML = entries.length ? entries.map(([c, v]) => `
+    <div class="bar-row"><span title="${esc(c)}" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(c)}</span>
+    <div class="bar-track"><div class="bar-fill" style="width:${(v / max * 100).toFixed(1)}%;background:${catColor(c)}"></div></div>
+    <span class="amt">${mb(v)}</span></div>`).join("") : `<div class="muted">Keine Daten.</div>`;
+
+  $("#upcoming").innerHTML = soon.length ? soon.map(s => `
+    <div class="up"><div><div class="name">${esc(s.name)}</div><div class="muted" style="font-size:13px">${fmtDate(s.next)} · ${whenText(s.inDays)}</div></div>
+    <div style="font-variant-numeric:tabular-nums;font-family:var(--f-head);font-weight:700">${money(s.due, s.currency)}</div></div>`).join("") : `<div class="muted">Keine Zahlungen in den nächsten 30 Tagen.</div>`;
+  renderTimeline(soon);
+
+  const cats = [...new Set(subs.map(catName))].sort((a, b) => a.localeCompare(b, "de"));
+  const cur = $("#fCat").value;
+  $("#fCat").innerHTML = `<option value="">Alle Kategorien</option>` + cats.map(c => `<option${c === cur ? " selected" : ""}>${esc(c)}</option>`).join("");
+  $("#catList").innerHTML = cats.map(c => `<option value="${esc(c)}">`).join("");
+
+  const accs = [...new Map(subs.filter(s => s.account).map(s => [s.account.toLowerCase(), s.account])).values()].sort((a, b) => a.localeCompare(b, "de"));
+  const curAcc = $("#fAcc").value;
+  $("#fAcc").innerHTML = `<option value="">Alle Bankkonten</option>` + accs.map(a => `<option${a === curAcc ? " selected" : ""}>${esc(a)}</option>`).join("")
+    + (subs.some(s => !s.account) && accs.length ? `<option value="${NO_ACC_FILTER}"${curAcc === NO_ACC_FILTER ? " selected" : ""}>Ohne Bankkonto</option>` : "");
+  $("#accList").innerHTML = accs.map(a => `<option value="${esc(a)}">`).join("");
+  renderAccounts(active);
+  renderInstallments(all);
+
+  const q = $("#q").value.trim().toLowerCase(), fs = $("#fStatus").value, fc = $("#fCat").value, fk = $("#fKind").value, fa = $("#fAcc").value;
+  const list = all.filter(s =>
+    (!fs || s.state === fs) && (!fc || catName(s) === fc) && (!fk || s.kind === fk) &&
+    (!fa || (fa === NO_ACC_FILTER ? !s.account : s.account.toLowerCase() === fa.toLowerCase())) &&
+    (!q || [s.name, s.category, s.payment, s.account, s.notes].some(x => (x || "").toLowerCase().includes(q))));
+  const get = { name: s => s.name.toLowerCase(), price: s => s.priceBase, monthly: s => s.monthly, next: s => +s.next, status: s => s.state };
+  list.sort((a, b) => { const x = get[sort.key](a), y = get[sort.key](b); return (x > y ? 1 : x < y ? -1 : 0) * sort.dir; });
+
+  $("#empty").hidden = subs.length > 0;
+  renderOpt(all);
+  $("#rows").innerHTML = list.map(s => {
+    const deadline = s.state === "active" && !s.inst && s.noticeDays > 0 ? addDays(s.next, -s.noticeDays) : null;
+    const pct = s.totalAmt > 0 ? Math.min(100, s.paidAmt / s.totalAmt * 100) : 100;
+    const prog = s.inst ? `<div class="prog"><div style="width:${pct.toFixed(0)}%"></div></div>
+      <div class="muted small">${s.byAmount ? `${money(s.paidAmt, s.currency)} von ${money(s.totalAmt, s.currency)} bezahlt` : `${s.paid} von ${s.totalPayments} Raten bezahlt`}${s.remaining ? ` · noch ${money(s.remainingAmt, s.currency)}${s.byAmount ? ` (${s.remaining} Rate${s.remaining > 1 ? "n" : ""})` : ""} · letzte Rate ${fmtDate(s.endDate)}` : ""}</div>`
+      + (s.loan ? `<div class="muted small">Kaufpreis ${money(s.principal, s.currency)}${s.interestRate > 0 ? ` · ${String(s.interestRate).replace(".", ",")} % p. a.` : " · zinslos"} · Gesamtkosten ${money(s.loan.total, s.currency)}${s.loan.interest > 0 ? ` (davon Zinsen ${money(s.loan.interest, s.currency)})` : ""}</div>` : "") : "";
+    const dl = deadline ? daysBetween(today(), deadline) : null;
+    const warn = dl !== null && dl >= 0 && dl <= 14 ? `<div class="warn">⚠ Kündigen bis ${fmtDate(deadline)} (${whenText(dl)})</div>` : "";
+    const foreign = s.currency !== settings.base ? `<div class="muted small">≈ ${mb(s.priceBase)}</div>` : "";
+    return `<tr>
+      <td><div class="name">${esc(s.name)}</div>
+        <div class="muted small"><span class="chip" style="border-color:${catColor(catName(s))}">${esc(catName(s))}</span>${s.inst ? ` <span class="chip">Ratenzahlung</span>` : ""}${s.account ? ` <span class="chip">🏦 ${esc(s.account)}</span>` : ""}${s.payment ? " · " + esc(s.payment) : ""}</div>${prog}${warn}</td>
+      <td class="num">${money(s.price, s.currency)}<div class="muted small">${CYCLES[s.cycle].label}</div>${foreign}</td>
+      <td class="num hide-m">${mb(s.monthly)}</td>
+      <td>${s.state === "active" ? `${fmtDate(s.next)}<div class="muted small">${whenText(s.inDays)}</div>` : "–"}</td>
+      <td class="hide-m"><span class="chip ${s.state}">${STATUS[s.state]}</span></td>
+      <td><div class="rowbtns">
+        <button class="btn small" data-edit="${s.id}">Bearbeiten</button>
+        <button class="btn small danger" data-del="${s.id}" aria-label="Löschen">✕</button>
+      </div></td></tr>`;
+  }).join("");
+
+  checkReminders();
+  checkAchievements(subs, all);
+}
+
+/* ================= Bankkonten ================= */
+const NO_ACC_FILTER = "__none__";
+// Monatliche Abgänge je Bankkonto (nur aktive Abos/Raten), unterteilt nach Kategorie
+function renderAccounts(active) {
+  const groups = new Map();
+  for (const s of active) {
+    const key = (s.account || "").toLowerCase();
+    if (!groups.has(key)) groups.set(key, { name: s.account || "", total: 0, count: 0, cats: {} });
+    const g = groups.get(key), c = catName(s);
+    g.total += s.monthly; g.count++; g.cats[c] = (g.cats[c] || 0) + s.monthly;
+  }
+  const el = $("#accts");
+  if (!groups.size) { el.innerHTML = `<div class="muted">Keine Daten.</div>`; return; }
+  if (groups.size === 1 && groups.has("")) {
+    el.innerHTML = `<div class="muted">Noch kein Bankkonto zugeordnet. Trage bei „Bearbeiten“ ein Bankkonto ein, dann siehst du hier, wie viel monatlich von welchem Konto abgeht.</div>`;
+    return;
+  }
+  const list = [...groups.values()].sort((a, b) => (a.name === "") - (b.name === "") || b.total - a.total);   // „Ohne Bankkonto“ zuletzt
+  const grand = list.reduce((a, g) => a + g.total, 0), max = Math.max(...list.map(g => g.total));
+  el.innerHTML = list.map(g => {
+    const cats = Object.entries(g.cats).sort((a, b) => b[1] - a[1]);
+    const filterVal = g.name || NO_ACC_FILTER;
+    return `<div class="acct">
+      <div class="acct-head"><button class="acct-name" data-acc="${esc(filterVal)}" title="Abos dieses Kontos anzeigen">${g.name ? "🏦 " + esc(g.name) : "Ohne Bankkonto"}</button>
+        <span class="muted small">${g.count} Abo${g.count > 1 ? "s" : ""} · ${Math.round(g.total / grand * 100)} %</span>
+        <span class="amt">${mb(g.total)}</span></div>
+      <div class="stack" style="width:${Math.max(6, g.total / max * 100).toFixed(1)}%">${cats.map(([c, v]) =>
+        `<div style="flex:${v};background:${catColor(c)}" title="${esc(c)}: ${esc(mb(v))}"></div>`).join("")}</div>
+      <div class="acct-cats muted small">${cats.map(([c, v]) => `<span><i style="background:${catColor(c)}"></i>${esc(c)} ${mb(v)}</span>`).join("")}</div>
+    </div>`;
+  }).join("") + `<div class="acct-total muted small">Gesamt pro Monat: <b>${mb(grand)}</b></div>`;
+}
+$("#accts").addEventListener("click", e => {
+  const b = e.target.closest("[data-acc]"); if (!b) return;
+  $("#fAcc").value = b.dataset.acc; $("#fStatus").value = "active";
+  render();
+  $("#rows").scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
+/* ================= Ratenkäufe-Widget ================= */
+let instFilter = "run", instSig = "";
+const instOpen = new Set(), simExtra = {}, instData = new Map();
+const reducedMotion = () => !!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
+const RING_C = 2 * Math.PI * 42;
+const INST_STATE = { active: "Läuft", paused: "Pausiert", cancelled: "Gekündigt", done: "Abbezahlt" };
+
+// Tilgungsplan, Zinsen und Restschuld einer Ratenzahlung
+function instModel(s) {
+  const n = s.totalPayments, price = s.price, i = s.interestRate / 100 / PERIODS[s.cycle];
+  const base0 = s.byAmount ? Math.floor(s.paidAmount / price + 1e-9) : s.paidCount;     // beim gespeicherten Termin bereits bezahlte Raten
+  const fullPaid = price > 0 ? Math.min(n, Math.floor(s.paidAmt / price + 1e-9)) : 0;
+  const frac = price > 0 && fullPaid < n ? Math.max(0, s.paidAmt / price - fullPaid) : 0;   // angezahlter Teil der nächsten Rate
+  const hasLoan = s.principal > 0 && s.interestRate > 0;
+  const anchor = parseISO(s.nextDate);
+  const rows = []; let bal = s.principal, intPaid = 0, intTotal = 0;
+  for (let j = 1; j <= n; j++) {
+    let interest = 0, princ = 0, pay = price;
+    if (hasLoan) {
+      interest = bal * i;
+      if (j === n) pay = bal + interest;                                                 // letzte Rate gleicht Rundung aus
+      princ = pay - interest; bal = Math.max(0, bal - princ);
+      intTotal += interest; if (j <= fullPaid) intPaid += interest;
+    }
+    const status = j <= fullPaid ? "paid" : (j === fullPaid + 1 && s.state !== "done") ? (frac > 0.005 ? "partial" : "next") : "open";
+    rows.push({ j, date: addCycle(anchor, s.cycle, j - base0 - 1), pay, interest, princ, bal, status });
+  }
+  const balNow = hasLoan ? loanBalance(s.principal, price, s.interestRate, s.cycle, fullPaid + frac) : s.remainingAmt;
+  return { rows, fullPaid, frac, hasLoan, i, balNow, intTotal, intPaid, intOpen: Math.max(0, intTotal - intPaid) };
+}
+// Restlaufzeit und Zinsen, wenn pro Rate zusätzlich `extra` gezahlt wird
+function simulate(balance, rate, i, extra) {
+  let n = 0, interest = 0, bal = balance;
+  while (bal > 0.005 && n < 1200) {
+    const it = bal * i, pay = Math.min(rate + extra, bal + it);
+    bal = bal + it - pay; interest += it; n++;
+  }
+  return { n, interest };
+}
+function simHtml(s, mdl, extra) {
+  if (extra <= 0) return `Schiebe den Regler, um zu sehen, was zusätzliche Zahlungen bringen.`;
+  const b = simulate(mdl.balNow, s.price, mdl.i, 0), e = simulate(mdl.balNow, s.price, mdl.i, extra), saved = b.interest - e.interest;
+  return `Mit <b>+${money(extra, s.currency)}</b> pro Rate bist du nach <b>${e.n}</b> statt ${b.n} Raten fertig (${b.n - e.n} früher)`
+    + (saved > 0.005 ? ` und sparst etwa <b>${money(saved, s.currency)}</b> Zinsen.` : ".");
+}
+
+function instCardHtml(s, idx) {
+  const mdl = instModel(s); instData.set(s.id, { s, mdl });
+  const pct = s.totalAmt > 0 ? Math.min(100, s.paidAmt / s.totalAmt * 100) : 100;
+  const cur = s.currency, done = s.state === "done", n = s.totalPayments;
+  const stateChip = `<span class="chip ${done ? "done" : s.state}">${done ? "✅ " : ""}${INST_STATE[s.state]}</span>`;
+  const nextLine = s.state === "active"
+    ? `Nächste Rate: <b>${fmtDate(s.next)}</b> (${whenText(s.inDays)}) · ${money(s.due, cur)}` : done ? "Alle Raten bezahlt 🎉" : "";
+  const dots = n <= 60 ? `<div class="dots">${mdl.rows.map(r => {
+      const tip = `Rate ${r.j} · ${fmtDate(r.date)} · ${money(r.pay, cur)} · ${{ paid: "bezahlt", partial: "angezahlt", next: "als Nächstes fällig", open: "offen" }[r.status]}`;
+      return `<span class="dot ${r.status}" style="--i:${r.j};--p:${(mdl.frac * 100).toFixed(0)}%" title="${esc(tip)}"></span>`;
+    }).join("")}</div>` : "";
+  const loanLine = s.loan
+    ? `Kaufpreis ${money(s.principal, cur)}${s.interestRate > 0 ? ` · ${String(s.interestRate).replace(".", ",")} % p. a.` : " · zinslos"}` : "";
+  const cols = mdl.hasLoan;
+  const sched = `<div class="sched-wrap"><table class="sched"><thead><tr><th>#</th><th>Datum</th><th class="num">Rate</th>${cols ? `<th class="num">Zinsen</th><th class="num">Tilgung</th><th class="num">Restschuld</th>` : ""}<th></th></tr></thead><tbody>`
+    + mdl.rows.map(r => `<tr class="r-${r.status}"><td>${r.j}</td><td>${fmtDate(r.date)}</td><td class="num">${money(r.pay, cur)}</td>${cols ? `<td class="num">${money(r.interest, cur)}</td><td class="num">${money(r.princ, cur)}</td><td class="num">${money(r.bal, cur)}</td>` : ""}`
+      + `<td>${{ paid: "✅", partial: "◐", next: "➡️", open: "" }[r.status]}</td></tr>`).join("") + `</tbody></table></div>`;
+  const facts = [];
+  if (mdl.hasLoan) {
+    facts.push(`Zinsen bisher gezahlt: <b>${money(mdl.intPaid, cur)}</b> · noch offen: <b>${money(mdl.intOpen, cur)}</b> · insgesamt ${money(mdl.intTotal, cur)}`);
+    if (s.remaining > 0) facts.push(`Heute komplett ablösen: Restschuld <b>${money(mdl.balNow, cur)}</b> statt noch ${money(s.remainingAmt, cur)} in Raten – etwa <b>${money(Math.max(0, s.remainingAmt - mdl.balNow), cur)}</b> Zinsersparnis (ohne Vorfälligkeitsentschädigung deines Anbieters).`);
+  } else if (s.loan) facts.push(`Gesamtkosten ${money(s.loan.total, cur)} bei zinslosem Kauf.`);
+  const step = s.price >= 100 ? 10 : s.price >= 20 ? 5 : 1, max = Math.max(step, Math.round(s.price * 2 / step) * step), extra = Math.min(max, simExtra[s.id] || 0);
+  const sim = s.remaining > 0 && s.state === "active"
+    ? `<div class="sim"><div class="sim-top">Was wäre wenn: zusätzlich pro Rate zahlen <b class="sim-val">+${money(extra, cur)}</b></div>
+       <input type="range" class="sim-range" data-id="${esc(s.id)}" min="0" max="${max}" step="${step}" value="${extra}" aria-label="Zusätzliche Zahlung pro Rate">
+       <div class="sim-out">${simHtml(s, mdl, extra)}</div></div>` : "";
+  const open = instOpen.has(s.id);
+  return `<div class="inst-item${open ? " open" : ""}${done ? " is-done" : ""}" data-id="${esc(s.id)}">
+    <button class="inst-head" aria-expanded="${open}">
+      <div class="inst-top">
+        <div><span class="name">${esc(s.name)}</span> ${stateChip}${s.account ? ` <span class="chip">🏦 ${esc(s.account)}</span>` : ""}
+          <div class="muted small">${[loanLine, catName(s) !== "Ohne Kategorie" ? esc(catName(s)) : ""].filter(Boolean).join(" · ")}</div></div>
+        <div class="inst-pct"><span data-count="${pct.toFixed(2)}" data-kind="pct">0 %</span><span class="chev">▾</span></div>
+      </div>
+      <div class="inst-bar"><div class="inst-fill${done ? " full" : ""}" data-w="${pct.toFixed(2)}" style="width:0;transition-delay:${idx * 90}ms"></div></div>
+      <div class="inst-meta small"><span><b>${money(s.paidAmt, cur)}</b> <span class="muted">von ${money(s.totalAmt, cur)} bezahlt</span></span>
+        ${s.remaining > 0 ? `<span><b>noch ${money(s.remainingAmt, cur)}</b> <span class="muted">(${s.remaining} Rate${s.remaining > 1 ? "n" : ""})</span></span>` : ""}
+        ${s.endDate ? `<span class="muted">letzte Rate ${fmtDate(s.endDate)}</span>` : ""}</div>
+      ${nextLine ? `<div class="small" style="margin-top:4px">${nextLine}</div>` : ""}
+      ${dots}
+    </button>
+    <div class="inst-detail"><div class="inst-detail-in">
+      ${facts.map(f => `<p class="small">${f}</p>`).join("")}${sim}${sched}
+      <div class="inst-actions"><button class="btn small" data-edit-inst="${esc(s.id)}">Bearbeiten</button> <button class="btn small danger" data-del-inst="${esc(s.id)}">Ratenkauf entfernen</button></div>
+    </div></div>
+  </div>`;
+}
+
+function renderInstallments(all) {
+  const card = $("#instCard"), items = all.filter(s => s.inst);
+  card.hidden = !items.length;
+  if (!items.length) { instSig = ""; return; }
+  const isRun = s => s.state === "active" || s.state === "paused";
+  const counts = { run: items.filter(isRun).length, done: items.filter(s => s.state === "done").length, all: items.length };
+  if (!counts[instFilter]) instFilter = counts.run ? "run" : "all";
+  const rank = { active: 0, paused: 1, done: 2, cancelled: 3 };
+  const list = items.filter(s => instFilter === "all" || (instFilter === "run" ? isRun(s) : s.state === "done"))
+    .sort((a, b) => rank[a.state] - rank[b.state] || a.next - b.next || a.name.localeCompare(b.name, "de"));
+  const sig = JSON.stringify([instFilter, settings.base, list.map(s => [s.id, s.name, s.price, s.currency, s.paidAmt, s.remaining, s.state, +s.next, s.principal, s.interestRate, s.account, s.totalPayments, s.category])]);
+  if (sig === instSig && $("#instList").children.length) return;                       // nichts geändert: Anzeige und Animation nicht neu starten
+  instSig = sig; instData.clear();
+
+  $("#instTabs").innerHTML = [["run", "Laufend"], ["done", "Abbezahlt"], ["all", "Alle"]].map(([k, l]) =>
+    `<button class="seg${instFilter === k ? " active" : ""}" data-f="${k}"${counts[k] ? "" : " disabled"}>${l} <span class="seg-n">${counts[k]}</span></button>`).join("")
+    + `<button class="seg seg-replay" title="Animation erneut abspielen" aria-label="Animation erneut abspielen">↻</button>`;
+
+  const sumBase = f => list.reduce((a, s) => a + convert(f(s), s.currency), 0);
+  const total = sumBase(s => s.totalAmt), paid = sumBase(s => s.paidAmt), open = sumBase(s => s.remainingAmt);
+  const interest = sumBase(s => s.loan ? s.loan.interest : 0);
+  const monthly = list.filter(s => s.state === "active").reduce((a, s) => a + s.monthly, 0);
+  const nextS = list.filter(s => s.state === "active").sort((a, b) => a.next - b.next)[0];
+  const pct = total > 0 ? Math.min(100, paid / total * 100) : 0;
+  $("#instSummary").innerHTML = `<div class="inst-sum">
+    <div class="donut"><svg viewBox="0 0 100 100" width="118" height="118" aria-hidden="true"><circle class="ring-bg" cx="50" cy="50" r="42" fill="none" stroke-width="10"/>
+      <circle class="ring-fg" cx="50" cy="50" r="42" fill="none" stroke-width="10" stroke-linecap="round" stroke-dasharray="${RING_C.toFixed(2)}" stroke-dashoffset="${RING_C.toFixed(2)}" data-off="${(RING_C * (1 - pct / 100)).toFixed(2)}"/></svg>
+      <div class="donut-center"><div><span data-count="${pct.toFixed(2)}" data-kind="pct">0 %</span><div class="muted" style="font-size:11px;font-weight:400">bezahlt</div></div></div></div>
+    <div class="inst-stats">
+      <div><div class="lbl">Gesamtkosten</div><div class="val" data-count="${total.toFixed(2)}" data-kind="base">0</div></div>
+      <div><div class="lbl">Bereits bezahlt</div><div class="val ok" data-count="${paid.toFixed(2)}" data-kind="base">0</div></div>
+      <div><div class="lbl">Noch offen</div><div class="val" data-count="${open.toFixed(2)}" data-kind="base">0</div></div>
+      <div><div class="lbl">Zinsen insgesamt</div><div class="val" data-count="${interest.toFixed(2)}" data-kind="base">0</div></div>
+      <div><div class="lbl">Belastung pro Monat</div><div class="val" data-count="${monthly.toFixed(2)}" data-kind="base">0</div></div>
+      <div><div class="lbl">Nächste Rate</div><div class="val" style="font-size:14px">${nextS ? `${esc(nextS.name)}<div class="muted small" style="font-weight:400">${fmtDate(nextS.next)} · ${money(nextS.due, nextS.currency)}</div>` : "–"}</div></div>
+    </div></div>`;
+  $("#instList").innerHTML = list.map(instCardHtml).join("");
+  animateInst();
+}
+
+// Balken, Ring und Zähler animieren (bei „reduzierte Bewegung“ sofort fertig)
+function animateInst() {
+  const root = $("#instCard"), quick = reducedMotion();
+  const ease = t => 1 - Math.pow(1 - t, 3);
+  root.querySelectorAll("[data-count]").forEach(el => {
+    const target = parseFloat(el.dataset.count), kind = el.dataset.kind;
+    const fmt = v => kind === "pct" ? Math.round(v) + " %" : mb(v);
+    if (quick) { el.textContent = fmt(target); return; }
+    const t0 = performance.now(), dur = 1200;
+    const step = () => { const p = Math.min(1, (performance.now() - t0) / dur); el.textContent = fmt(target * ease(p)); if (p < 1) setTimeout(step, 16); };
+    el.textContent = fmt(0); step();
+  });
+  void root.offsetWidth;                                   // Startzustand festschreiben, damit die CSS-Übergänge laufen
+  root.querySelectorAll(".inst-fill").forEach(el => { el.style.width = el.dataset.w + "%"; });
+  const ring = root.querySelector(".ring-fg"); if (ring) ring.style.strokeDashoffset = ring.dataset.off;
+}
+
+$("#instCard").addEventListener("click", e => {
+  const seg = e.target.closest(".seg");
+  if (seg) {
+    if (seg.classList.contains("seg-replay")) instSig = "";
+    else if (seg.dataset.f && !seg.disabled) instFilter = seg.dataset.f;
+    renderInstallments(view()); return;
+  }
+  const del = e.target.closest("[data-del-inst]"), edit = e.target.closest("[data-edit-inst]");
+  if (del) { removeSub(del.dataset.delInst); return; }
+  if (edit) { openDlg(edit.dataset.editInst); return; }
+  const head = e.target.closest(".inst-head");
+  if (head) {
+    const item = head.closest(".inst-item"), open = !item.classList.contains("open");
+    item.classList.toggle("open", open); head.setAttribute("aria-expanded", open);
+    open ? instOpen.add(item.dataset.id) : instOpen.delete(item.dataset.id);
+  }
+});
+$("#instCard").addEventListener("input", e => {
+  const r = e.target.closest(".sim-range"); if (!r) return;
+  const d = instData.get(r.dataset.id); if (!d) return;
+  const extra = Number(r.value) || 0; simExtra[r.dataset.id] = extra;
+  const box = r.closest(".sim");
+  box.querySelector(".sim-val").textContent = "+" + money(extra, d.s.currency);
+  box.querySelector(".sim-out").innerHTML = simHtml(d.s, d.mdl, extra);
+});
+
+/* ================= Optimierung ================= */
+const OVERLAP = /^(streaming|video|musik|music|cloud|news|zeitung|fitness|gaming|audio|hörbuch)/i;
+function optimize(all) {
+  const active = all.filter(s => s.state === "active");
+  const subsA = active.filter(s => !s.inst);
+  const tips = [], save = new Map();
+  const note = (id, v) => { if (v > 0.005) save.set(id, Math.max(save.get(id) || 0, v)); };   // pro Abo nur einmal zählen
+  const yr = s => s.monthly * 12;
+  const cheapest = list => [...list].sort((a, b) => a.monthly - b.monthly)[0];
+
+  for (const s of subsA.filter(x => x.usage === "rarely")) {
+    tips.push({ icon: "😴", title: `${s.name} nutzt du selten`, text: `Kündigen oder pausieren spart ${mb(yr(s))} pro Jahr.`, saving: yr(s) });
+    note(s.id, yr(s));
+  }
+  const groups = new Map();
+  for (const s of subsA) { const c = catName(s); if (OVERLAP.test(c)) { if (!groups.has(c)) groups.set(c, []); groups.get(c).push(s); } }
+  for (const [c, list] of groups) {
+    if (list.length < 2) continue;
+    const sum = list.reduce((a, s) => a + s.monthly, 0), cheap = cheapest(list);
+    tips.push({ icon: "🔁", title: `${list.length} Abos in „${c}“`, saving: yr(cheap),
+      text: `Zusammen ${mb(sum)} pro Monat. Kündigst du „${cheap.name}“ oder nutzt die Dienste abwechselnd, sparst du bis zu ${mb(yr(cheap))} pro Jahr. Prüfe auch Familien- oder Duo-Tarife.` });
+    note(cheap.id, yr(cheap));
+  }
+  const byName = new Map();
+  for (const s of subsA) { const k = normKey(s.name); if (k.length >= 3) { if (!byName.has(k)) byName.set(k, []); byName.get(k).push(s); } }
+  for (const list of byName.values()) if (list.length > 1) {
+    const cheap = cheapest(list);
+    tips.push({ icon: "👯", title: `„${list[0].name}“ ist mehrfach erfasst`, saving: yr(cheap),
+      text: `Doppelt abgeschlossen? Das günstigere zu kündigen spart ${mb(yr(cheap))} pro Jahr.` });
+    note(cheap.id, yr(cheap));
+  }
+  for (const s of subsA) {
+    if (!(s.yearlyAlt > 0) || s.cycle === "yearly") continue;
+    const alt = convert(s.yearlyAlt, s.currency), diff = yr(s) - alt;
+    if (diff > 0.5) {
+      tips.push({ icon: "📅", title: `${s.name}: Jahrespreis ist günstiger`, saving: diff,
+        text: `Jährlich ${mb(alt)} statt ${mb(yr(s))} (−${Math.round(diff / yr(s) * 100)} %). Bedenke die längere Bindung.` });
+      note(s.id, diff);
+    }
+  }
+  for (const s of subsA.filter(x => x.usage === "sometimes" && x.monthly >= 10))
+    tips.push({ icon: "🤔", title: `${s.name}: ${mb(s.monthly)} pro Monat bei gelegentlicher Nutzung`, saving: 0,
+      text: "Prüfe einen günstigeren oder werbefinanzierten Tarif, oder pausiere in Monaten ohne Nutzung." });
+  if (subsA.length >= 4) {
+    const top = [...subsA].sort((a, b) => b.monthly - a.monthly).slice(0, 3);
+    const share = top.reduce((a, s) => a + s.monthly, 0) / subsA.reduce((a, s) => a + s.monthly, 0);
+    tips.push({ icon: "📊", title: `Deine 3 teuersten Abos machen ${Math.round(share * 100)} % der Kosten aus`, saving: 0,
+      text: `${top.map(s => `${s.name} (${mb(s.monthly)}/Monat)`).join(", ")}. Hier lohnt sich der Preisvergleich am meisten.` });
+  }
+  for (const s of active.filter(x => x.inst && x.loan && x.interestRate > 0 && x.remaining > 0)) {
+    // Restzinsen = noch zu zahlende Raten − offenes Kapital (Restschuld nach den bisher bezahlten Raten)
+    const rest = Math.max(0, s.remaining * s.price - loanBalance(s.principal, s.price, s.interestRate, s.cycle, s.paid));
+    if (rest >= 1) tips.push({ icon: "📉", title: `Ratenzahlung „${s.name}“: noch ${mb(convert(rest, s.currency))} Zinsen`, saving: 0,
+      text: "So viel Zinsen zahlst du bei planmäßiger Rückzahlung noch. Eine vorzeitige Ablösung oder Sondertilgung (falls dein Anbieter das erlaubt) spart einen Teil davon." });
+  }
+  for (const s of active.filter(x => x.inst && x.endDate && daysBetween(today(), x.endDate) <= 183))
+    tips.push({ icon: "🏁", title: `Ratenzahlung „${s.name}“ endet am ${fmtDate(s.endDate)}`, saving: 0,
+      text: `Danach werden ${mb(s.monthly)} pro Monat (${mb(s.monthly * 12)} pro Jahr) frei.` });
+
+  tips.sort((a, b) => b.saving - a.saving);
+  return { tips, total: [...save.values()].reduce((a, v) => a + v, 0), unknown: subsA.filter(s => !s.usage).length, flagged: new Set(save.keys()) };
+}
+function renderOpt(all) {
+  const { tips, total, unknown, flagged } = optimize(all);
+  lastOptFlagged = flagged;
+  $("#opt").innerHTML =
+    (total > 0 ? `<div class="opt-total"><span class="eyebrow">Sparpotenzial · bis zu</span><b>${mb(total)}</b><span>pro Jahr</span></div>` : "")
+    + (tips.length ? tips.map(t => `<div class="tip"><div>${t.icon} <strong>${esc(t.title)}</strong><div class="muted small">${esc(t.text)}</div></div>${t.saving > 0 ? `<div class="save">−${mb(t.saving)}/Jahr</div>` : ""}</div>`).join("")
+      : `<div class="muted">Keine Auffälligkeiten gefunden.</div>`)
+    + (unknown ? `<p class="muted small" style="margin-bottom:0">Für gezieltere Tipps: trage bei „Bearbeiten“ die Nutzung ein (${unknown} Abo${unknown > 1 ? "s" : ""} ohne Angabe).</p>` : "");
+}
+
+/* ================= Erinnerungen ================= */
+function computeReminders() {
+  const t = today(), out = [];
+  for (const s of view()) {
+    if (s.state !== "active") continue;
+    if (s.inDays <= settings.remindDays)
+      out.push({ key: `${s.id}|${toISO(s.next)}|pay`, icon: "🔔", days: s.inDays,
+        title: `${s.name}: ${s.inst ? "Rate" : "Zahlung"} ${whenText(s.inDays)}`,
+        body: `${money(s.due, s.currency)} am ${fmtDate(s.next)}${s.inst ? ` (Rate ${s.paid + 1} von ${s.totalPayments})` : ""}` });
+    if (!s.inst && s.noticeDays > 0) {
+      const dl = addDays(s.next, -s.noticeDays), d = daysBetween(t, dl);
+      if (d >= 0 && d <= settings.noticeRemind)
+        out.push({ key: `${s.id}|${toISO(dl)}|cancel`, icon: "⚠️", days: d,
+          title: `${s.name}: Kündigungsfrist endet ${whenText(d)}`,
+          body: `Bis ${fmtDate(dl)} kündigen, sonst wird am ${fmtDate(s.next)} erneut ${money(s.price, s.currency)} fällig.` });
+    }
+  }
+  return out.sort((a, b) => a.days - b.days);
+}
+function checkReminders() {
+  const rem = computeReminders();
+  $("#reminders").innerHTML = rem.length
+    ? `<div class="banner">${rem.map(r => `<div>${r.icon} <strong>${esc(r.title)}</strong><div class="b-body">${esc(r.body)}</div></div>`).join("")}</div>` : "";
+  if (settings.notif && "Notification" in window && Notification.permission === "granted") {
+    const done = lsGet(NOTIF_KEY, {}), now = Date.now();
+    for (const k in done) if (now - done[k] > 90 * 86400000) delete done[k];
+    for (const r of rem) if (!done[r.key]) {
+      try { new Notification(r.title, { body: r.body }); } catch {}
+      done[r.key] = now;
+    }
+    lsSet(NOTIF_KEY, done);
+  }
+}
+setInterval(checkReminders, 30 * 60 * 1000);
+
+/* ================= Kalender-Export (.ics) ================= */
+function exportIcs() {
+  const t2 = s => String(s).replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n");
+  const fold = l => { if (l.length <= 73) return l; let o = l.slice(0, 73); for (let i = 73; i < l.length; i += 72) o += "\r\n " + l.slice(i, i + 72); return o; };
+  const ymd = d => toISO(d).replace(/-/g, "");
+  const stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d+/, "");
+  const RR = { weekly: "FREQ=WEEKLY", monthly: "FREQ=MONTHLY", quarterly: "FREQ=MONTHLY;INTERVAL=3", yearly: "FREQ=YEARLY" };
+  // Ganztagstermin beginnt um 00:00 → Erinnerung um 09:00 Uhr, n Tage vorher
+  const trig = n => n <= 0 ? "PT9H" : `-P${n - 1}DT15H`;
+  const ev = (uidPart, date, cycle, summary, desc, days, count) => [
+    "BEGIN:VEVENT", `UID:${uidPart}@abo-manager`, `DTSTAMP:${stamp}`, `DTSTART;VALUE=DATE:${ymd(date)}`,
+    `RRULE:${RR[cycle]}${count ? ";COUNT=" + count : ""}`, `SUMMARY:${t2(summary)}`, `DESCRIPTION:${t2(desc)}`, "TRANSP:TRANSPARENT",
+    "BEGIN:VALARM", "ACTION:DISPLAY", `DESCRIPTION:${t2(summary)}`, `TRIGGER:${trig(days)}`, "END:VALARM", "END:VEVENT"];
+  const lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//ABOmination//DE", "CALSCALE:GREGORIAN", "X-WR-CALNAME:Abos"];
+  for (const s of view().filter(x => x.state === "active")) {
+    const next = s.next;
+    lines.push(...ev(s.id + "-pay", next, s.cycle, `💳 ${s.name} – ${money(s.due, s.currency)}`,
+      `${s.inst ? `Ratenzahlung, noch ${s.remaining} Raten` : CYCLES[s.cycle].label}${s.payment ? " · " + s.payment : ""}${s.notes ? "\n" + s.notes : ""}`,
+      settings.remindDays, s.inst ? s.remaining : 0));
+    if (!s.inst && s.noticeDays > 0)
+      lines.push(...ev(s.id + "-cancel", addDays(next, -s.noticeDays), s.cycle, `⚠️ Kündigungsfrist: ${s.name}`,
+        `Bis heute kündigen, sonst verlängert sich das Abo (${money(s.price, s.currency)}).`, settings.noticeRemind));
+  }
+  lines.push("END:VCALENDAR");
+  download("abos-kalender.ics", lines.map(fold).join("\r\n") + "\r\n", "text/calendar;charset=utf-8");
+}
+
+/* ================= Kontoauszug-Import ================= */
+function parseCsv(text) {
+  const head = text.split(/\r?\n/).slice(0, 30).join("\n");
+  const cnt = { ";": 0, ",": 0, "\t": 0 };
+  for (const ch of head) if (ch in cnt) cnt[ch]++;
+  const delim = Object.entries(cnt).sort((a, b) => b[1] - a[1])[0][0];
+  const rows = []; let row = [], cell = "", q = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (q) {
+      if (c === '"') { if (text[i + 1] === '"') { cell += '"'; i++; } else q = false; }
+      else cell += c;
+    } else if (c === '"') q = true;
+    else if (c === delim) { row.push(cell); cell = ""; }
+    else if (c === "\n" || c === "\r") {
+      if (c === "\r" && text[i + 1] === "\n") i++;
+      row.push(cell); cell = ""; rows.push(row); row = [];
+    } else cell += c;
+  }
+  if (cell || row.length) { row.push(cell); rows.push(row); }
+  return rows.filter(r => r.some(x => x.trim()));
+}
+const COLS = {
+  date:   /^(buchungstag|buchungsdatum|buchung\b|datum|date|booking date|started date|completed date|wertstellung|valuta)/,
+  amount: /^(betrag|umsatz|amount)/,
+  payee:  /(beg[uü]e?nstigter|zahlungspflichtiger|auftraggeber|empf[aä]nger|zahlungsbeteiligter|payee)|^name$/,
+  text:   /(verwendungszweck|buchungstext|buchungsdetails|beschreibung|description|zweck|payment reference|reference)/
+};
+function findColumns(row) {
+  const h = row.map(x => x.trim().toLowerCase());
+  const idx = re => h.map((x, i) => re.test(x) ? i : -1).filter(i => i >= 0);
+  const dates = idx(COLS.date);
+  return {
+    date: dates.find(i => !/valuta|wertstellung/.test(h[i])) ?? dates[0] ?? -1,
+    amount: idx(COLS.amount)[0] ?? -1,
+    payee: idx(COLS.payee)[0] ?? -1,
+    text: idx(COLS.text)[0] ?? -1
+  };
+}
+function parseAmount(s) {
+  s = String(s ?? "").trim();
+  const neg = /-\s*$/.test(s) || /^\(.*\)$/.test(s);
+  s = s.replace(/[^\d,.\-+]/g, "");
+  if (!/\d/.test(s)) return NaN;
+  const lc = s.lastIndexOf(","), ld = s.lastIndexOf(".");
+  if (lc > ld) s = s.replace(/\./g, "").replace(",", ".");
+  else s = s.replace(/,/g, "");
+  let v = parseFloat(s.replace(/-+$/, ""));
+  if (neg && v > 0) v = -v;
+  return v;
+}
+function parseDate(s) {
+  s = String(s ?? "").trim(); let m;
+  if ((m = s.match(/(\d{1,2})\.(\d{1,2})\.(\d{2,4})/))) return new Date(+m[3] < 100 ? 2000 + +m[3] : +m[3], m[2] - 1, +m[1]);
+  if ((m = s.match(/(\d{4})-(\d{2})-(\d{2})/))) return new Date(+m[1], m[2] - 1, +m[3]);
+  if ((m = s.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/))) return new Date(+m[3], m[2] - 1, +m[1]);
+  return null;
+}
+const median = a => { const b = [...a].sort((x, y) => x - y), m = b.length >> 1; return b.length % 2 ? b[m] : (b[m - 1] + b[m]) / 2; };
+const LEGAL = /\b(gmbh|ag|ltd|limited|inc|sa|se|co|kg|ug|llc|bv|b\.v|sarl|europe|deutschland|germany|international|sepa|lastschrift)\b/g;
+const normKey = s => String(s).toLowerCase().replace(LEGAL, " ").replace(/[^a-zäöüß\s]/g, " ").replace(/\s+/g, " ").trim().split(" ").slice(0, 3).join(" ");
+function niceName(s) {
+  s = String(s).replace(/\s+/g, " ").trim().slice(0, 40);
+  return s === s.toUpperCase() ? s.toLowerCase().replace(/(^|\s)\S/g, x => x.toUpperCase()) : s;
+}
+const CAT_HINTS = [
+  ["Streaming", /netflix|disney|prime video|dazn|sky|wow|paramount|apple tv|youtube|rtl\+|joyn|crunchyroll/],
+  ["Musik", /spotify|deezer|tidal|apple music|amazon music|soundcloud/],
+  ["Cloud", /icloud|google one|dropbox|onedrive|ionos|strato|hetzner/],
+  ["Software", /adobe|microsoft|jetbrains|github|openai|chatgpt|anthropic|notion|1password|nordvpn|canva/],
+  ["Gaming", /playstation|xbox|nintendo|steam|ea play|ubisoft/],
+  ["Fitness", /fitx|mcfit|urban sports|fitness|gym|clever fit|john reed/],
+  ["Mobilfunk/Internet", /telekom|vodafone|o2|1&1|congstar|otelo|freenet|mobilcom|1und1|drillisch/],
+  ["Versicherung", /versicherung|allianz|huk|axa|ergo|debeka|generali/],
+  ["News", /spiegel|zeit|faz|bild|handelsblatt|sz\.de|süddeutsche|medium/]
+];
+const guessCategory = name => (CAT_HINTS.find(([, re]) => re.test(name.toLowerCase())) || [""])[0];
+
+const CYCLE_RULES = [
+  { cycle: "weekly",    lo: 6,   hi: 8,   days: 7,   min: 3 },
+  { cycle: "monthly",   lo: 26,  hi: 35,  days: 30,  min: 2 },
+  { cycle: "quarterly", lo: 84,  hi: 98,  days: 91,  min: 2 },
+  { cycle: "yearly",    lo: 350, hi: 380, days: 365, min: 2 }
+];
+function analyzeStatement(text) {
+  const rows = parseCsv(text);
+  let hi = -1, cols;
+  for (let i = 0; i < Math.min(rows.length, 60); i++) {
+    const c = findColumns(rows[i]);
+    if (c.date >= 0 && c.amount >= 0 && rows[i].length >= 3) { hi = i; cols = c; break; }
+  }
+  if (hi < 0) return { error: "Keine Spalten für Datum und Betrag gefunden. Erwartet wird ein CSV-Export deiner Bank (z. B. mit „Buchungstag“ und „Betrag“)." };
+
+  const txs = []; let outgoing = 0;
+  for (const r of rows.slice(hi + 1)) {
+    const date = parseDate(r[cols.date]), amt = parseAmount(r[cols.amount]);
+    if (!date || isNaN(amt) || amt >= 0) continue;
+    outgoing++;
+    const payee = (r[cols.payee] || "").trim(), text2 = (r[cols.text] || "").trim();
+    const src = payee && !/paypal/i.test(payee) ? payee : (text2 || payee);
+    const key = normKey(src);
+    if (key.length >= 3) txs.push({ date, amount: -amt, key, label: payee && !/paypal/i.test(payee) ? payee : text2.split(/[,;]| {2,}/)[0] });
+  }
+
+  const groups = new Map();
+  for (const t of txs) { if (!groups.has(t.key)) groups.set(t.key, []); groups.get(t.key).push(t); }
+  const found = [];
+  for (const [key, list] of groups) {
+    list.sort((a, b) => a.date - b.date);
+    const latest = list[list.length - 1].amount;
+    const same = list.filter(t => Math.abs(t.amount - latest) <= Math.max(0.5, latest * 0.15));
+    if (same.length < 2) continue;
+    const gaps = [];
+    for (let i = 1; i < same.length; i++) { const g = daysBetween(same[i - 1].date, same[i].date); if (g > 0) gaps.push(g); }
+    if (!gaps.length) continue;
+    const med = median(gaps), rule = CYCLE_RULES.find(r => med >= r.lo && med <= r.hi);
+    if (!rule || same.length < rule.min) continue;
+    if (gaps.filter(g => g >= rule.lo - 2 && g <= rule.hi + 2).length / gaps.length < 0.7) continue;
+    const last = same[same.length - 1].date;
+    if (daysBetween(last, today()) > rule.days * 1.6) continue;       // vermutlich gekündigt
+    const freq = {}; same.forEach(t => freq[t.label] = (freq[t.label] || 0) + 1);
+    const name = niceName(Object.entries(freq).sort((a, b) => b[1] - a[1])[0][0] || key);
+    const exists = subs.some(s => { const k = normKey(s.name); return k.length >= 3 && (k === key || key.startsWith(k) || k.startsWith(key)); });
+    found.push({ name, price: Math.round(latest * 100) / 100, cycle: rule.cycle, nextDate: toISO(addCycle(last, rule.cycle, 1)),
+      count: same.length, category: guessCategory(name + " " + key), exists });
+  }
+  found.sort((a, b) => b.price * CYCLES[b.cycle].perMonth - a.price * CYCLES[a.cycle].perMonth);
+  return { found, outgoing };
+}
+async function readText(file) {
+  const buf = await file.arrayBuffer();
+  try { return new TextDecoder("utf-8", { fatal: true }).decode(buf); }
+  catch { return new TextDecoder("windows-1252").decode(buf); }
+}
+let bankFound = [];
+function showBankDialog(res) {
+  const body = $("#bankBody");
+  if (res.error) body.innerHTML = `<p>${esc(res.error)}</p>`;
+  else if (!res.found.length) body.innerHTML = `<p>${res.outgoing} Ausgaben gelesen, aber keine regelmäßig wiederkehrenden Zahlungen erkannt. Der Auszug sollte mindestens 2–3 Monate umfassen.</p>`;
+  else {
+    bankFound = res.found;
+    body.innerHTML = `<p class="muted small">${res.outgoing} Ausgaben gelesen, ${res.found.length} wiederkehrende Zahlungen erkannt. Prüfe die Vorschläge und passe Namen bei Bedarf an. Beträge werden in ${settings.base} angenommen.</p>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted);margin:8px 0 12px">Von welchem Bankkonto stammt dieser Auszug? (optional)
+        <input type="text" id="bankAcc" list="accList" placeholder="z. B. Girokonto Sparkasse" maxlength="60"></label>
+      <div style="overflow-x:auto"><table><thead><tr><th></th><th>Name</th><th class="num">Betrag</th><th>Intervall</th><th>Nächste</th><th class="num">Buchungen</th></tr></thead><tbody>
+      ${res.found.map((f, i) => `<tr>
+        <td><input type="checkbox" data-i="${i}" ${f.exists ? "" : "checked"}></td>
+        <td><input type="text" data-name="${i}" value="${esc(f.name)}" maxlength="80">${f.exists ? '<div class="muted small">bereits vorhanden?</div>' : ""}</td>
+        <td class="num">${mb(f.price)}</td><td>${CYCLES[f.cycle].label}</td><td>${fmtDate(parseISO(f.nextDate))}</td><td class="num">${f.count}</td></tr>`).join("")}
+      </tbody></table></div>
+      <div class="foot"><button class="btn primary" id="bankAdd">Ausgewählte hinzufügen</button></div>`;
+  }
+  $("#dlgBank").showModal();
+}
+$("#btnBank").onclick = () => $("#fileBank").click();
+$("#fileBank").addEventListener("change", async e => {
+  const f = e.target.files[0]; e.target.value = "";
+  if (!f) return;
+  try { showBankDialog(analyzeStatement(await readText(f))); }
+  catch (err) { console.error(err); alert("Die Datei konnte nicht gelesen werden."); }
+});
+$("#bankBody").addEventListener("click", e => {
+  if (e.target.id !== "bankAdd") return;
+  const added = [], account = ($("#bankAcc")?.value || "").trim();
+  $("#bankBody").querySelectorAll("input[type=checkbox]:checked").forEach(cb => {
+    const i = +cb.dataset.i, f = bankFound[i];
+    const name = $("#bankBody").querySelector(`[data-name="${i}"]`).value.trim() || f.name;
+    added.push(normalizeSub({ id: uid(), name, price: f.price, cycle: f.cycle, currency: settings.base, nextDate: f.nextDate,
+      category: f.category, status: "active", noticeDays: 0, payment: "", account, notes: "Aus Kontoauszug importiert" }));
+  });
+  if (added.length) { subs = [...subs, ...added]; ach.importedBank = true; saveAch(); save(); render(); }
+  $("#dlgBank").close();
+});
+$("#bankClose").onclick = () => $("#dlgBank").close();
+
+/* ================= Abo-Dialog ================= */
+const dlg = $("#dlg"), form = $("#form");
+function openDlg(id) {
+  editId = id || null;
+  const s = subs.find(x => x.id === id);
+  $("#dlgTitle").textContent = s ? "Abo bearbeiten" : "Abo hinzufügen";
+  form.reset();
+  const v = s || { kind: "subscription", cycle: "monthly", status: "active", currency: settings.base, nextDate: toISO(today()) };
+  for (const el of form.elements) if (el.name && v[el.name] !== undefined) el.value = v[el.name];
+  if (v.kind === "installment") {
+    const byAmount = v.paidAmount !== null && v.paidAmount !== undefined;
+    form.elements.paidUnit.value = byAmount ? "amount" : "count";
+    form.elements.paidValue.value = byAmount ? v.paidAmount : v.paidCount;
+  } else form.elements.totalPayments.value = form.elements.paidValue.value = "";   // 0 wäre bei „Raten insgesamt“ ungültig
+  if (!(v.principal > 0)) form.elements.principal.value = "";
+  if (!(v.interestRate > 0)) form.elements.interestRate.value = "";
+  syncFormKind();
+  dlg.showModal();
+  form.elements.name.focus();
+}
+function syncFormKind() {
+  const inst = form.elements.kind.value === "installment";
+  // Ausgeblendete Felder deaktivieren: sie werden dann nicht validiert (ein unsichtbares ungültiges Feld würde das Speichern still blockieren)
+  form.querySelectorAll(".inst-only").forEach(e => { e.hidden = !inst; e.querySelectorAll("input,select").forEach(i => i.disabled = !inst); });
+  form.querySelectorAll(".sub-only").forEach(e => { e.hidden = inst; e.querySelectorAll("input,select").forEach(i => i.disabled = inst); });
+  form.elements.totalPayments.required = inst;
+  $("#lblNext").textContent = inst ? "Nächste Rate am" : "Nächste Zahlung";
+  syncPaidUnit();
+  updateLoanCalc();
+}
+// Kaufpreis + Anzahl Raten (+ Zinssatz) => Rate, Gesamt- und Zinskosten live berechnen
+function updateLoanCalc() {
+  const fe = form.elements, box = $("#loanCalc"), inst = fe.kind.value === "installment";
+  const P = parseFloat(fe.principal.value), n = parseInt(fe.totalPayments.value), r = parseFloat(fe.interestRate.value) || 0, cur = fe.currency.value;
+  const on = inst && P > 0 && n >= 1;
+  fe.price.readOnly = on;                                  // berechneter Wert; Kaufpreis leeren = Rate manuell eingeben
+  $("#lblPrice").textContent = !inst ? "Preis" : on ? "Betrag pro Rate (berechnet)" : "Betrag pro Rate";
+  if (!on) { box.hidden = true; return; }
+  const rate = calcRate(P, n, r, fe.cycle.value), total = Math.round(rate * n * 100) / 100, interest = Math.round((total - P) * 100) / 100;
+  fe.price.value = rate.toFixed(2);
+  box.hidden = false;
+  box.innerHTML = `Rate: <b>${money(rate, cur)}</b> × ${n} = <b>${money(total, cur)}</b> Gesamtkosten`
+    + (r > 0 ? `<br>Zinskosten: <b>${money(interest, cur)}</b> (${(interest / P * 100).toFixed(1).replace(".", ",")} % des Kaufpreises) bei ${String(r).replace(".", ",")} % p. a.`
+             : `<br>Zinslos: Rate = Kaufpreis ÷ Anzahl der Raten.`);
+}
+["principal", "interestRate", "totalPayments", "cycle", "currency"].forEach(n => form.elements[n].addEventListener("input", updateLoanCalc));
+// „Raten“ = ganze Zahl, „Betrag“ = exakter Wert mit Cent
+function syncPaidUnit() {
+  const amount = form.elements.paidUnit.value === "amount";
+  form.elements.paidValue.step = amount ? "0.01" : "1";
+  form.elements.paidValue.placeholder = amount ? "z. B. 286,60" : "0";
+}
+form.elements.kind.addEventListener("change", syncFormKind);
+form.elements.paidUnit.addEventListener("change", syncPaidUnit);
+form.addEventListener("submit", e => {
+  e.preventDefault();
+  const f = Object.fromEntries(new FormData(form));
+  // Bei Kaufpreis + Raten ergibt sich die Rate aus der Berechnung (nicht aus dem Feld)
+  const loanOn = f.kind === "installment" && parseFloat(f.principal) > 0 && parseInt(f.totalPayments) >= 1;
+  if (loanOn) f.price = String(calcRate(parseFloat(f.principal), parseInt(f.totalPayments), parseFloat(f.interestRate) || 0, f.cycle));
+  if (f.kind === "installment" && f.paidUnit === "amount" && f.paidValue !== "") {
+    const maxAmt = parseInt(f.totalPayments) * parseFloat(f.price);
+    if (parseFloat(f.paidValue) > maxAmt + 0.005) {
+      alert(`Der bereits gezahlte Betrag (${money(parseFloat(f.paidValue), f.currency)}) ist höher als Raten × Betrag pro Rate (${money(maxAmt, f.currency)}). Bitte Anzahl der Raten oder den Betrag pro Rate prüfen.`);
+      return;
+    }
+  }
+  const item = normalizeSub({
+    id: editId || uid(), name: f.name.trim(), price: parseFloat(f.price), cycle: f.cycle, currency: f.currency,
+    nextDate: f.nextDate, category: f.category.trim(), status: f.status,
+    noticeDays: parseInt(f.noticeDays), payment: f.payment.trim(), notes: f.notes.trim(), account: f.account.trim(),
+    kind: f.kind, totalPayments: parseInt(f.totalPayments),
+    paidCount: f.paidUnit === "amount" ? 0 : parseInt(f.paidValue),
+    paidAmount: f.paidUnit === "amount" && f.paidValue !== "" ? parseFloat(f.paidValue) : null,
+    principal: parseFloat(f.principal), interestRate: parseFloat(f.interestRate),
+    usage: f.usage, yearlyAlt: parseFloat(f.yearlyAlt)
+  });
+  if (!item) return;
+  const old = editId ? subs.find(s => s.id === editId) : null;
+  if (old) {
+    if (old.status !== "cancelled" && item.status === "cancelled") trackCancel(old);
+    if (old.cycle !== "yearly" && item.cycle === "yearly" && old.kind !== "installment") ach.cycleUpgrades++;
+    saveAch();
+  }
+  subs = editId ? subs.map(s => s.id === editId ? item : s) : [...subs, item];
+  save(); dlg.close(); render(); maybeRefreshRates();
+});
+$("#btnCancel").onclick = () => dlg.close();
+$("#btnAdd").onclick = () => openDlg();
+const curOptions = CURRENCIES.map(c => `<option>${c}</option>`).join("");
+form.elements.currency.innerHTML = curOptions;
+$("#setBase").innerHTML = curOptions;
+
+/* ================= Einstellungen ================= */
+const dlgSet = $("#dlgSet");
+function renderSettingsInfo() {
+  $("#rateInfo").textContent = ratesInfo
+    ? `Wechselkurse (EZB) vom ${ratesInfo.date}, geladen am ${new Date(ratesInfo.fetchedAt).toLocaleDateString("de-DE")}.`
+    : "Es werden Näherungswerte verwendet. Live-Kurse werden automatisch geladen, sobald du Abos in Fremdwährung anlegst.";
+  renderSync();
+}
+function openSettings() {
+  $("#setBase").value = settings.base;
+  $("#setRemind").value = settings.remindDays;
+  $("#setNoticeRemind").value = settings.noticeRemind;
+  $("#setNotif").checked = settings.notif && "Notification" in window && Notification.permission === "granted";
+  selProv = cfg.provider || ""; draft = {};
+  $("#setAutoLock").value = String(settings.autoLock);
+  $("#acName").textContent = Vault.name;
+  renderSettingsInfo();
+  dlgSet.showModal();
+}
+$("#btnSettings").onclick = openSettings;
+$("#setClose").onclick = () => dlgSet.close();
+$("#setBase").onchange = e => { settings.base = e.target.value; saveSettings(); render(); if (needRates()) refreshRates(false); };
+$("#setRemind").onchange = e => { settings.remindDays = Math.max(0, parseInt(e.target.value) || 0); saveSettings(); render(); };
+$("#setNoticeRemind").onchange = e => { settings.noticeRemind = Math.max(0, parseInt(e.target.value) || 0); saveSettings(); render(); };
+$("#setNotif").onchange = async e => {
+  if (!e.target.checked) { settings.notif = false; saveSettings(); return; }
+  let p = "denied";
+  try { p = "Notification" in window ? await Notification.requestPermission() : "denied"; } catch {}
+  settings.notif = p === "granted"; saveSettings();
+  if (!settings.notif) {
+    e.target.checked = false;
+    alert("Der Browser erlaubt keine Benachrichtigungen für diese Seite (bei lokal geöffneten Dateien oft gesperrt). Nutze stattdessen die Kalender-Datei (.ics) für Erinnerungen.");
+  } else checkReminders();
+};
+$("#setAutoLock").onchange = e => { settings.autoLock = Number(e.target.value) || 0; saveSettings(); Vault.bump(); };
+$("#btnRates").onclick = () => refreshRates(true);
+$("#btnIcs").onclick = () => { exportIcs(); ach.exportedIcs = true; saveAch(); checkAchievements(subs, view()); };
+
+/* ================= Cloud-Sync (Datei, Nextcloud, Google Drive, OneNote) ================= */
+const SYNC_KEY = "abo-manager-sync";
+const PROV_LABEL = { file: "Datei im Cloud-Ordner", nextcloud: "Nextcloud", gdrive: "Google Drive", onenote: "OneNote" };
+let cfg = Object.assign({ provider: null }, lsGet(SYNC_KEY, {}));
+cfg.nextcloud = Object.assign({ url: "", user: "", pass: "", path: "abo-manager-sync.json" }, cfg.nextcloud);
+cfg.gdrive = Object.assign({ clientId: "" }, cfg.gdrive);
+cfg.onenote = Object.assign({ clientId: "", pageId: "" }, cfg.onenote);
+const saveCfg = () => lsSet(SYNC_KEY, cfg);
+
+class AuthError extends Error {}
+const b64 = s => btoa(unescape(encodeURIComponent(s)));
+const unb64 = s => decodeURIComponent(escape(atob(s)));
+const b64url = bytes => btoa(String.fromCharCode(...bytes)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+const scripts = new Map();
+function loadScript(src) {
+  if (!scripts.has(src)) scripts.set(src, new Promise((res, rej) => {
+    const s = document.createElement("script");
+    s.src = src; s.async = true; s.onload = res;
+    s.onerror = () => { scripts.delete(src); rej(new Error("Skript konnte nicht geladen werden (offline?).")); };
+    document.head.appendChild(s);
+  }));
+  return scripts.get(src);
+}
+function parsePayload(text) {
+  if (!text || !text.trim()) return null;
+  const j = JSON.parse(text);
+  return Array.isArray(j) ? { subs: j, updatedAt: 0 } : { subs: j.subs || [], updatedAt: Number(j.updatedAt) || 0 };
+}
+const payload = () => ({ app: "abo-manager", version: 2, updatedAt: meta.updatedAt, subs });
+
+// Zugriff auf Web-APIs mit Bearer-Token; abgelaufenes Token => AuthError => "Sync fortsetzen"
+async function bearer(ts, url, opt = {}, who = "Dienst") {
+  if (!ts.token || Date.now() > ts.exp) throw new AuthError(`${who}-Anmeldung abgelaufen.`);
+  let r;
+  try { r = await fetch(url, { ...opt, headers: { Authorization: "Bearer " + ts.token, ...(opt.headers || {}) } }); }
+  catch { throw new Error(`${who} nicht erreichbar (offline?).`); }
+  if (r.status === 401) { ts.token = null; throw new AuthError(`${who}-Anmeldung abgelaufen.`); }
+  return r;
+}
+
+const idb = {
+  db: null,
+  open() { return this.db ||= new Promise((res, rej) => { const r = indexedDB.open("abo-manager", 1); r.onupgradeneeded = () => r.result.createObjectStore("kv"); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); },
+  async run(mode, fn) { const db = await this.open(); return new Promise((res, rej) => { const q = fn(db.transaction("kv", mode).objectStore("kv")); q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); }); },
+  get(k) { return this.run("readonly", s => s.get(k)); },
+  set(k, v) { return this.run("readwrite", s => s.put(v, k)); },
+  del(k) { return this.run("readwrite", s => s.delete(k)); }
+};
+const syncSupported = "showSaveFilePicker" in window;
+const HANDLE_KEY = () => "handle:" + Vault.uid;      // Sync-Datei-Zugriff pro Profil getrennt
+
+/* ---- Anbieter 1: Datei in einem Cloud-Ordner (File System Access API) ---- */
+function fileBackend() {
+  let handle = null;
+  return {
+    name: "file",
+    async init() {
+      if (!syncSupported) throw new Error("Dieser Browser unterstützt keine Sync-Datei (Chrome oder Edge nutzen).");
+      handle = await idb.get(HANDLE_KEY());
+      if (!handle) throw new Error("Sync-Datei nicht mehr gespeichert – bitte neu auswählen.");
+      return (await handle.queryPermission({ mode: "readwrite" })) === "granted" ? "ok" : "needs-permission";
+    },
+    async connect() {
+      if (!syncSupported) throw new Error("Dieser Browser unterstützt keine Sync-Datei (Chrome oder Edge nutzen).");
+      handle = await showSaveFilePicker({ suggestedName: "abo-manager-sync.json", types: [{ description: "ABOmination Sync-Datei", accept: { "application/json": [".json"] } }] });
+      await idb.set(HANDLE_KEY(), handle);
+    },
+    async authorize() { if (await handle.requestPermission({ mode: "readwrite" }) !== "granted") throw new AuthError("Zugriff nicht erlaubt."); },
+    async read() { return parsePayload(await (await handle.getFile()).text()); },
+    async write(p) { const w = await handle.createWritable(); await w.write(JSON.stringify(p, null, 2)); await w.close(); return true; },
+    async disconnect() { await idb.del(HANDLE_KEY()); },
+    describe() { return handle ? `Datei „${handle.name}“` : "Sync-Datei"; }
+  };
+}
+
+/* ---- Anbieter 2: Nextcloud über WebDAV (App-Passwort, CORS-Freigabe nötig) ---- */
+function nextcloudBackend(c) {
+  const parts = String(c.path || "").split("/").filter(Boolean);
+  const base = String(c.url || "").replace(/\/+$/, "");
+  const dav = `${base}/remote.php/dav/files/${encodeURIComponent(c.user)}`;
+  const url = `${dav}/${parts.map(encodeURIComponent).join("/")}`;
+  const auth = "Basic " + b64(`${c.user}:${c.pass}`);
+  let etag = null, missing = false;
+  const req = async (u, opt = {}) => {
+    let r;
+    try { r = await fetch(u, { cache: "no-store", ...opt, headers: { Authorization: auth, ...(opt.headers || {}) } }); }
+    catch { throw new Error("Nextcloud nicht erreichbar: Adresse falsch oder CORS nicht freigegeben (siehe SYNC-EINRICHTEN.md)."); }
+    if (r.status === 401) throw new AuthError("Benutzername oder App-Passwort falsch.");
+    return r;
+  };
+  return {
+    name: "nextcloud",
+    async init() { return "ok"; },
+    async connect() { await this.read(); },
+    async authorize() { await this.read(); },
+    async read() {
+      const r = await req(url);
+      if (r.status === 404) { etag = null; missing = true; return null; }
+      if (!r.ok) throw new Error("Nextcloud: HTTP " + r.status);
+      missing = false; etag = r.headers.get("ETag");
+      return parsePayload(await r.text());
+    },
+    async write(p) {
+      const headers = { "Content-Type": "application/json" };
+      if (etag) headers["If-Match"] = etag; else if (missing) headers["If-None-Match"] = "*";
+      const body = JSON.stringify(p, null, 2);
+      let r = await req(url, { method: "PUT", headers, body });
+      if (r.status === 409 && parts.length > 1) {     // Zielordner fehlt
+        for (let i = 1; i < parts.length; i++) await req(`${dav}/${parts.slice(0, i).map(encodeURIComponent).join("/")}`, { method: "MKCOL" });
+        r = await req(url, { method: "PUT", headers, body });
+      }
+      if (r.status === 412) return false;             // zwischenzeitlich geändert
+      if (!r.ok) throw new Error("Nextcloud: HTTP " + r.status);
+      etag = r.headers.get("ETag"); missing = false;
+      return true;
+    },
+    async disconnect() { c.pass = ""; },
+    describe() { return `${base} (${c.user})`; }
+  };
+}
+
+/* ---- Anbieter 3: Google Drive (versteckter App-Ordner, Scope drive.appdata) ---- */
+function gdriveBackend(c) {
+  const ts = { token: null, exp: 0 };
+  const FILE = "abo-manager.json";
+  let fileId = null;
+  const gf = (url, opt) => bearer(ts, url, opt, "Google");
+  const find = async () => {
+    if (fileId) return fileId;
+    const q = encodeURIComponent(`name='${FILE}' and trashed=false`);
+    const r = await gf(`https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=${q}&fields=files(id)&pageSize=1`);
+    if (!r.ok) throw new Error("Google Drive: HTTP " + r.status);
+    fileId = (await r.json()).files?.[0]?.id || null;
+    return fileId;
+  };
+  return {
+    name: "gdrive",
+    async init() { loadScript("https://accounts.google.com/gsi/client").catch(() => {}); return "needs-permission"; },
+    async connect() { await this.authorize(); await this.read(); },
+    async authorize() {
+      if (!c.clientId) throw new Error("Client-ID fehlt.");
+      if (location.protocol === "file:") throw new Error("Für Google Drive muss die App über http://localhost laufen (Abo-Manager-starten.cmd).");
+      await loadScript("https://accounts.google.com/gsi/client");
+      await new Promise((res, rej) => {
+        const tc = google.accounts.oauth2.initTokenClient({
+          client_id: c.clientId, scope: "https://www.googleapis.com/auth/drive.appdata",
+          callback: r => {
+            if (r.error) return rej(new AuthError(r.error_description || r.error));
+            ts.token = r.access_token; ts.exp = Date.now() + (Number(r.expires_in) - 60) * 1000; res();
+          },
+          error_callback: e => rej(new AuthError(e.type === "popup_closed" ? "Anmeldung abgebrochen."
+            : e.type === "popup_failed_to_open" ? "Popup blockiert – bitte Popups für diese Seite erlauben."
+            : (e.message || "Anmeldung fehlgeschlagen.")))
+        });
+        tc.requestAccessToken();
+      });
+    },
+    async read() {
+      const id = await find();
+      if (!id) return null;
+      const r = await gf(`https://www.googleapis.com/drive/v3/files/${id}?alt=media`);
+      if (r.status === 404) { fileId = null; return null; }
+      if (!r.ok) throw new Error("Google Drive: HTTP " + r.status);
+      return parsePayload(await r.text());
+    },
+    async write(p) {
+      const json = JSON.stringify(p), id = await find();
+      let r;
+      if (id) {
+        r = await gf(`https://www.googleapis.com/upload/drive/v3/files/${id}?uploadType=media`,
+          { method: "PATCH", headers: { "Content-Type": "application/json; charset=UTF-8" }, body: json });
+        if (r.status === 404) { fileId = null; return this.write(p); }
+      } else {
+        const bd = "abo" + Math.random().toString(36).slice(2);
+        const body = `--${bd}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify({ name: FILE, parents: ["appDataFolder"] })}\r\n`
+          + `--${bd}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${json}\r\n--${bd}--`;
+        r = await gf("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id",
+          { method: "POST", headers: { "Content-Type": `multipart/related; boundary=${bd}` }, body });
+        if (r.ok) fileId = (await r.json()).id;
+      }
+      if (!r.ok) throw new Error("Google Drive: HTTP " + r.status);
+      return true;
+    },
+    async disconnect() {
+      try { if (ts.token) google.accounts.oauth2.revoke(ts.token); } catch {}
+      ts.token = null;
+    },
+    describe() { return "Google Drive (App-Ordner)"; }
+  };
+}
+
+/* ---- Microsoft-Anmeldung (OAuth-Code-Flow mit PKCE im Popup) ---- */
+async function msAuthorize(clientId) {
+  if (!clientId) throw new Error("Anwendungs-ID fehlt.");
+  if (location.protocol === "file:") throw new Error("Für OneNote muss die App über http://localhost laufen (Abo-Manager-starten.cmd).");
+  const rnd = n => b64url(crypto.getRandomValues(new Uint8Array(n)));
+  const win = window.open("", "aboms", "width=520,height=700");   // sofort öffnen (Popup-Blocker), URL folgt
+  if (!win) throw new AuthError("Popup blockiert – bitte Popups für diese Seite erlauben.");
+  const verifier = rnd(48), state = "aboms-" + rnd(12), redirect = location.origin + location.pathname;
+  const challenge = b64url(new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier))));
+  win.location.href = "https://login.microsoftonline.com/common/oauth2/v2.0/authorize?" + new URLSearchParams({
+    client_id: clientId, response_type: "code", redirect_uri: redirect, response_mode: "query",
+    scope: "Notes.ReadWrite", state, code_challenge: challenge, code_challenge_method: "S256"
+  });
+  const params = await new Promise((resolve, reject) => {
+    const done = fn => v => { clearInterval(timer); window.removeEventListener("message", onMsg); try { win.close(); } catch {} fn(v); };
+    const ok = done(resolve), fail = done(reject);
+    const onMsg = e => { if (e.origin === location.origin && e.data?.type === "aboms") ok(new URL(e.data.href).searchParams); };
+    window.addEventListener("message", onMsg);
+    const timer = setInterval(() => {
+      let href = "";
+      try { href = win.location.href; } catch {}          // solange die Login-Seite offen ist: fremde Origin
+      if (href.startsWith(redirect) && href.includes("state=")) return ok(new URL(href).searchParams);
+      if (win.closed) fail(new AuthError("Anmeldung abgebrochen."));
+    }, 300);
+  });
+  if (params.get("state") !== state) throw new AuthError("Anmeldung ungültig (State).");
+  if (params.get("error")) throw new AuthError(params.get("error_description") || params.get("error"));
+  const r = await fetch("https://login.microsoftonline.com/common/oauth2/v2.0/token", {
+    method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({ client_id: clientId, grant_type: "authorization_code", code: params.get("code"),
+      redirect_uri: redirect, code_verifier: verifier, scope: "Notes.ReadWrite" })
+  });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok || !j.access_token) throw new AuthError(j.error_description || "Token konnte nicht abgerufen werden (Redirect-URI als „Single-Page-Anwendung“ registriert?).");
+  return { token: j.access_token, exp: Date.now() + (Number(j.expires_in) - 60) * 1000 };
+}
+
+/* ---- Anbieter 4: OneNote (Microsoft Graph) – Daten liegen auf einer Notizbuch-Seite ---- */
+function onenoteBackend(c) {
+  const ts = { token: null, exp: 0 };
+  const TITLE = "ABOmination Sync", G = "https://graph.microsoft.com/v1.0/me/onenote/pages";
+  let pageId = c.pageId || null;
+  const gf = (url, opt) => bearer(ts, url, opt, "Microsoft");
+  const summary = p => p.subs.length
+    ? p.subs.map(s => `<p>${esc(s.name)} – ${esc(money(s.price, s.currency))} ${esc(CYCLES[s.cycle]?.label || "")}`
+        + `${s.kind === "installment" ? ` (Ratenzahlung, ${s.totalPayments} Raten)` : ""} – nächste Zahlung ${esc(s.nextDate)}</p>`).join("")
+    : "<p>Keine Abos.</p>";
+  const dataBlock = p => `<p>ABO-DATEN-BEGIN ${b64(JSON.stringify(p))} ABO-DATEN-ENDE</p>`;
+  const pageHtml = p => `<!DOCTYPE html><html><head><title>${TITLE}</title></head><body>`
+    + `<p>Diese Seite wird automatisch vom ABOmination verwaltet. Bitte nicht bearbeiten.</p>`
+    + `<div data-id="abo-summary">${summary(p)}</div><div data-id="abo-data">${dataBlock(p)}</div></body></html>`;
+  const remember = id => { pageId = id; c.pageId = id || ""; saveCfg(); };
+  const find = async () => {
+    if (pageId) return pageId;
+    const r = await gf(`${G}?$filter=${encodeURIComponent(`title eq '${TITLE}'`)}&$select=id&$top=1`);
+    if (!r.ok) throw new Error("OneNote: HTTP " + r.status);
+    remember((await r.json()).value?.[0]?.id || null);
+    return pageId;
+  };
+  const create = async p => {
+    const r = await gf(G, { method: "POST", headers: { "Content-Type": "text/html" }, body: pageHtml(p) });
+    if (!r.ok) throw new Error("OneNote: HTTP " + r.status);
+    remember((await r.json()).id);
+  };
+  return {
+    name: "onenote",
+    async init() { return "needs-permission"; },
+    async connect() { await this.authorize(); await this.read(); },
+    async authorize() { Object.assign(ts, await msAuthorize(c.clientId)); },
+    async read() {
+      const id = await find();
+      if (!id) return null;
+      const r = await gf(`${G}/${id}/content`);
+      if (r.status === 404) { remember(null); return null; }
+      if (!r.ok) throw new Error("OneNote: HTTP " + r.status);
+      const text = new DOMParser().parseFromString(await r.text(), "text/html").body.textContent;
+      const m = /ABO-DATEN-BEGIN\s+([A-Za-z0-9+/=\s]+?)\s+ABO-DATEN-ENDE/.exec(text);
+      return m ? parsePayload(unb64(m[1].replace(/\s+/g, ""))) : null;
+    },
+    async write(p) {
+      const id = await find();
+      if (!id) { await create(p); return true; }
+      const cmds = [
+        { target: "#abo-summary", action: "replace", content: `<div data-id="abo-summary">${summary(p)}</div>` },
+        { target: "#abo-data", action: "replace", content: `<div data-id="abo-data">${dataBlock(p)}</div>` }];
+      const r = await gf(`${G}/${id}/content`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(cmds) });
+      if (r.ok) return true;
+      if (r.status === 400 || r.status === 404) {       // Seite verändert/gelöscht: neu anlegen, alte entfernen
+        await create(p);
+        await gf(`${G}/${id}`, { method: "DELETE" }).catch(() => {});
+        return true;
+      }
+      throw new Error("OneNote: HTTP " + r.status);
+    },
+    async disconnect() { ts.token = null; },
+    describe() { return "OneNote (Seite „" + TITLE + "“)"; }
+  };
+}
+const BACKENDS = { file: fileBackend, nextcloud: nextcloudBackend, gdrive: gdriveBackend, onenote: onenoteBackend };
+const makeBackend = name => BACKENDS[name](cfg[name] || {});
+
+/* ---- Sync-Steuerung ---- */
+let backend = null, syncState = "off", syncMsg = "", pushTimer = null, syncing = false, syncAgain = false;
+let selProv = cfg.provider || "", draft = {};
+
+// Neuere Version gewinnt (ganzer Datenbestand); bei Konflikt (Anbieter meldet false) erneut lesen
+async function syncNow() {
+  if (!backend || syncState === "needs-permission") return;
+  if (syncing) { syncAgain = true; return; }
+  syncing = true;
+  try {
+    for (let i = 0; i < 3; i++) {
+      syncAgain = false;
+      const r = await backend.read();
+      let conflict = false;
+      if (r && r.updatedAt > meta.updatedAt) { subs = clean(r.subs); meta.updatedAt = r.updatedAt; persist(); render(); }
+      else if (!r || r.updatedAt < meta.updatedAt) conflict = (await backend.write(payload())) === false;
+      if (!conflict && !syncAgain) break;
+    }
+    syncState = "ok"; syncMsg = "";
+  } catch (err) {
+    if (err instanceof AuthError) { syncState = "needs-permission"; syncMsg = err.message; }
+    else { console.error(err); syncState = "error"; syncMsg = err.message || String(err); }
+  } finally { syncing = false; }
+  renderSync();
+}
+function schedulePush() { if (backend) { clearTimeout(pushTimer); pushTimer = setTimeout(syncNow, 600); } }
+
+async function initialMerge() {
+  const r = await backend.read();
+  if (r && r.subs.length) {
+    const remote = clean(r.subs);
+    let useRemote = !subs.length;
+    if (subs.length && r.updatedAt !== meta.updatedAt)
+      useRemote = confirm(`Am Ziel liegen bereits ${remote.length} Abos (lokal: ${subs.length}).\n\nOK = Daten vom Ziel laden (lokale Daten werden ersetzt)\nAbbrechen = lokale Daten dorthin schreiben`);
+    if (useRemote) { subs = remote; meta.updatedAt = r.updatedAt || Date.now(); }
+    else meta.updatedAt = Date.now();
+    persist();
+  } else if (!meta.updatedAt) { meta.updatedAt = Date.now(); persist(); }
+}
+
+async function connectSelected() {
+  const name = selProv, val = id => ($("#" + id)?.value ?? draft[id] ?? "").trim();
+  if (name === "nextcloud") {
+    cfg.nextcloud = { url: val("ncUrl"), user: val("ncUser"), pass: $("#ncPass")?.value ?? draft.ncPass ?? "", path: val("ncPath") || "abo-manager-sync.json" };
+    if (!/^https?:\/\//.test(cfg.nextcloud.url) || !cfg.nextcloud.user || !cfg.nextcloud.pass) return alert("Bitte Adresse (mit https://), Benutzername und App-Passwort eingeben.");
+  } else if (name === "gdrive") {
+    cfg.gdrive.clientId = val("gdId");
+    if (!cfg.gdrive.clientId) return alert("Bitte die Google-Client-ID eingeben.");
+  } else if (name === "onenote") {
+    cfg.onenote.clientId = val("onId");
+    if (!cfg.onenote.clientId) return alert("Bitte die Anwendungs-(Client-)ID eingeben.");
+  }
+  const nb = makeBackend(name);
+  try { await nb.connect(); }                    // Nutzeraktion: Dateiauswahl, Anmeldung bzw. Verbindungstest
+  catch (e) { if (e.name !== "AbortError") alert("Verbindung fehlgeschlagen: " + (e.message || e)); return; }
+  const old = backend;
+  backend = nb; cfg.provider = name; saveCfg(); draft = {};
+  ach.syncConnected = true; saveAch();
+  if (old && old.name !== nb.name) old.disconnect?.().catch(() => {});
+  try { await initialMerge(); syncState = "ok"; syncMsg = ""; await syncNow(); render(); }
+  catch (e) { console.error(e); syncState = "error"; syncMsg = e.message || String(e); }
+  renderSync();
+}
+async function resumeSync() {
+  try { await backend.authorize(); syncState = "ok"; syncMsg = ""; await syncNow(); }
+  catch (e) { if (e.name !== "AbortError") { syncMsg = e.message || String(e); alert("Anmeldung fehlgeschlagen: " + syncMsg); } }
+  renderSync();
+}
+async function disconnectSync() {
+  if (backend) { try { await backend.disconnect?.(); } catch {} }
+  backend = null; cfg.provider = null; syncState = "off"; syncMsg = ""; saveCfg(); renderSync();
+}
+async function initSync() {
+  try {
+    if (!cfg.provider && syncSupported) {          // Übernahme einer früheren Sync-Datei
+      try { if (await idb.get(HANDLE_KEY())) { cfg.provider = "file"; selProv = "file"; saveCfg(); } } catch {}
+    }
+    if (cfg.provider) {
+      backend = makeBackend(cfg.provider);
+      syncState = await backend.init();
+      if (syncState === "ok") await syncNow();
+    }
+  } catch (e) { console.error(e); syncState = "error"; syncMsg = e.message || String(e); }
+  renderSync();
+}
+
+/* ---- Oberfläche ---- */
+function renderSync() {
+  const L = { off: ["☁ Sync aus", ""], ok: ["☁ Sync aktiv", "ok"], "needs-permission": ["☁ Sync fortsetzen", "warn"], error: ["☁ Sync-Fehler", "err"] }[syncState];
+  const b = $("#btnSync");
+  b.hidden = false; b.innerHTML = `<span class="ic">${ICON.cloud}</span><span>${L[0].replace("☁ ", "")}</span>`; b.className = "btn pill " + L[1];
+  renderSyncPanel();
+}
+function syncForm(sel) {
+  const d = (id, def) => esc(draft[id] ?? def ?? "");
+  const local = location.protocol === "file:";
+  const redirect = esc(location.origin + location.pathname);
+  const warn = local && sel !== "file"
+    ? `<p class="warn">Die App ist gerade als Datei geöffnet. Für ${PROV_LABEL[sel]} bitte über <b>Abo-Manager-starten.cmd</b> starten (http://localhost:8765) – siehe SYNC-EINRICHTEN.md.</p>` : "";
+  if (sel === "file") return `<p class="muted small">Wähle eine Datei in einem Ordner, den ein Sync-Programm abgleicht (OneDrive, Google Drive für Desktop, Nextcloud-Client, Dropbox …). Die App hält sie automatisch aktuell. Auf dem zweiten Gerät wählst du dieselbe Datei. Funktioniert in Chrome und Edge.</p>
+    <div class="row-btns"><button class="btn small primary" data-sync="connect"${syncSupported ? "" : " disabled"}>Sync-Datei wählen …</button></div>`;
+  if (sel === "nextcloud") return warn + `
+    <label>Server-Adresse<input id="ncUrl" placeholder="https://cloud.example.com" value="${d("ncUrl", cfg.nextcloud.url)}"></label>
+    <label>Benutzername<input id="ncUser" autocomplete="off" value="${d("ncUser", cfg.nextcloud.user)}"></label>
+    <label>App-Passwort<input id="ncPass" type="password" autocomplete="new-password" value="${d("ncPass", cfg.nextcloud.pass)}"></label>
+    <label>Dateipfad in deiner Nextcloud<input id="ncPath" value="${d("ncPath", cfg.nextcloud.path)}"></label>
+    <p class="muted small">App-Passwort erzeugst du in Nextcloud unter Einstellungen → Sicherheit (es wird in diesem Browser gespeichert und lässt sich dort jederzeit widerrufen). Dein Server muss die Herkunft <b>${esc(location.origin)}</b> per CORS erlauben.</p>
+    <div class="row-btns"><button class="btn small primary" data-sync="connect">Verbinden</button></div>`;
+  if (sel === "gdrive") return warn + `
+    <label>Google-Client-ID<input id="gdId" placeholder="123…apps.googleusercontent.com" value="${d("gdId", cfg.gdrive.clientId)}"></label>
+    <p class="muted small">Autorisierte JavaScript-Quelle in der Google Cloud Console: <b>${esc(location.origin)}</b>. Die Daten liegen im versteckten App-Ordner deines Drive (nur diese App sieht sie).</p>
+    <div class="row-btns"><button class="btn small primary" data-sync="connect">Mit Google verbinden</button></div>`;
+  if (sel === "onenote") return warn + `
+    <label>Anwendungs-(Client-)ID<input id="onId" placeholder="00000000-0000-0000-0000-000000000000" value="${d("onId", cfg.onenote.clientId)}"></label>
+    <p class="muted small">Redirect-URI (Plattform „Single-Page-Anwendung“): <b>${redirect}</b>. Die Daten werden auf einer Seite „ABOmination Sync“ in deinem Standard-Notizbuch gespeichert.</p>
+    <div class="row-btns"><button class="btn small primary" data-sync="connect">Mit Microsoft verbinden</button></div>`;
+  return "";
+}
+function renderSyncPanel() {
+  const el = $("#syncPanel"); if (!el) return;
+  $("#syncProv").value = selProv;
+  if (!selProv) { el.innerHTML = `<p class="muted small">Ohne Sync liegen die Daten nur in diesem Browser. Sichern kannst du sie jederzeit unter „Daten“.</p>`; return; }
+  if (backend && cfg.provider === selProv) {
+    const st = { ok: "Verbunden und aktuell.", "needs-permission": "Anmeldung nötig oder abgelaufen.", error: "Letzter Abgleich fehlgeschlagen.", off: "" }[syncState];
+    el.innerHTML = `<p class="small">Verbunden mit <b>${esc(backend.describe())}</b>. ${esc(st)}${syncMsg ? `<br><span class="${syncState === "ok" ? "muted" : "warn"}">${esc(syncMsg)}</span>` : ""}</p>
+      <div class="row-btns">${syncState === "needs-permission"
+        ? `<button class="btn small primary" data-sync="resume">Anmelden</button>`
+        : `<button class="btn small" data-sync="now">Jetzt abgleichen</button>`}
+      <button class="btn small danger" data-sync="off">Trennen</button></div>`;
+  } else el.innerHTML = syncForm(selProv);
+}
+$("#syncProv").addEventListener("change", async e => {
+  selProv = e.target.value; draft = {};
+  if (!selProv && backend && confirm("Sync trennen? Die Daten bleiben lokal erhalten.")) await disconnectSync();
+  renderSyncPanel();
+});
+$("#syncPanel").addEventListener("input", e => { if (e.target.id) draft[e.target.id] = e.target.value; });
+$("#syncPanel").addEventListener("click", e => {
+  const a = e.target.dataset.sync;
+  if (a === "connect") connectSelected(); else if (a === "resume") resumeSync();
+  else if (a === "now") syncNow(); else if (a === "off") disconnectSync();
+});
+$("#btnSync").onclick = () => { if (syncState === "needs-permission") resumeSync(); else openSettings(); };
+window.addEventListener("focus", () => { if (backend && syncState !== "needs-permission") syncNow(); });
+setInterval(() => { if (backend && (syncState === "ok" || syncState === "error") && !document.hidden) syncNow(); }, 60000);
+
+/* ================= Tabelle / Filter ================= */
+$("#rows").addEventListener("click", e => {
+  const ed = e.target.closest("[data-edit]"), del = e.target.closest("[data-del]");
+  if (ed) openDlg(ed.dataset.edit);
+  if (del) removeSub(del.dataset.del);
+});
+// Löschen (Tabelle und Ratenkauf-Widget). Aktive Abos zählen als Kündigung; eine bereits abbezahlte
+// Ratenzahlung nicht – dort kann ein Eingabefehler auch aus den Errungenschaften zurückgenommen werden.
+function removeSub(id) {
+  const s = subs.find(x => x.id === id); if (!s) return;
+  const v = view().find(x => x.id === id), paidOff = !!v && v.inst && v.state === "done";
+  if (!confirm(`„${s.name}“ wirklich löschen?`)) return;
+  if (paidOff) {
+    if (ach.doneInstallmentIds.includes(id) && confirm("War das ein Eingabefehler?\n\nOK = Die Zählung „Ratenzahlung abbezahlt“ zurücknehmen (auch dadurch erhaltene Errungenschaften)\nAbbrechen = Fortschritt behalten")) {
+      ach.doneInstallmentIds = ach.doneInstallmentIds.filter(x => x !== id);
+      ach.installmentsPaid = Math.max(0, ach.installmentsPaid - 1);
+      if (ach.installmentsPaid < 1) delete ach.unlocked["debt-free"];
+      if (ach.installmentsPaid < 3) delete ach.unlocked["debt-free-3"];
+      saveAch();
+    }
+  } else if (s.status !== "cancelled") { trackCancel(s); saveAch(); }
+  subs = subs.filter(x => x.id !== id); save(); render();
+}
+document.querySelector("thead").addEventListener("click", e => {
+  const th = e.target.closest("[data-sort]"); if (!th) return;
+  const k = th.dataset.sort;
+  sort = { key: k, dir: sort.key === k ? -sort.dir : 1 };
+  render();
+});
+["#q", "#fStatus", "#fCat", "#fKind", "#fAcc"].forEach(s => $(s).addEventListener("input", render));
+
+/* ================= Export / Import ================= */
+function download(name, text, type) {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([text], { type }));
+  a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+$("#btnExport").onclick = () => {
+  download(`abos-${toISO(today())}.json`, JSON.stringify({ app: "abo-manager", version: 2, updatedAt: meta.updatedAt, subs }, null, 2), "application/json");
+  ach.exportedJson = true; saveAch(); checkAchievements(subs, view());
+};
+$("#btnCsv").onclick = () => {
+  const cell = v => `"${String(v ?? "").replace(/"/g, '""')}"`, num = v => v.toFixed(2).replace(".", ",");
+  const head = ["Name","Art","Kategorie","Preis","Währung","Abrechnung",`Pro Monat (${settings.base})`,"Nächste Zahlung","Status","Raten bezahlt/gesamt","Kaufpreis","Zinssatz p. a. (%)","Gesamtkosten Raten","Nutzung","Bankkonto","Zahlungsart","Kündigungsfrist (Tage)","Notizen"];
+  const rows = view().map(s => [s.name, s.inst ? "Ratenzahlung" : "Abo", s.category, num(s.price), s.currency, CYCLES[s.cycle].label, num(s.monthly),
+    toISO(s.next), STATUS[s.state], s.inst ? `${s.paid}/${s.totalPayments}` : "",
+    s.loan ? num(s.principal) : "", s.loan && s.interestRate > 0 ? String(s.interestRate).replace(".", ",") : "", s.loan ? num(s.loan.total) : "", USAGE[s.usage] || "", s.account, s.payment, s.noticeDays, s.notes]);
+  download(`abos-${toISO(today())}.csv`, "\ufeff" + [head, ...rows].map(r => r.map(cell).join(";")).join("\r\n"), "text/csv;charset=utf-8");
+};
+$("#btnImport").onclick = () => $("#fileImport").click();
+$("#fileImport").addEventListener("change", async e => {
+  const file = e.target.files[0]; e.target.value = "";
+  if (!file) return;
+  try {
+    const data = JSON.parse(await file.text());
+    const list = Array.isArray(data) ? data : data.subs;
+    if (!Array.isArray(list)) throw 0;
+    const c = clean(list);
+    if (!confirm(`${c.length} Abos importieren? Die aktuellen Daten (${subs.length}) werden ersetzt.`)) return;
+    subs = c; save(); render(); maybeRefreshRates();
+  } catch { alert("Datei konnte nicht gelesen werden. Erwartet wird eine JSON-Sicherung aus dieser App."); }
+});
+
+/* ================= Design: Icons, Zeitleiste, Effekte ================= */
+const svg = p => `<svg viewBox="0 0 24 24" aria-hidden="true">${p}</svg>`;
+const ICON = {
+  wallet: svg('<path d="M3 7a2 2 0 0 1 2-2h13a1 1 0 0 1 1 1v2"/><path d="M3 7v11a2 2 0 0 0 2 2h14a1 1 0 0 0 1-1v-3"/><path d="M21 10h-5a2 2 0 0 0 0 4h5z"/>'),
+  calendar: svg('<rect x="3" y="4.5" width="18" height="16.5" rx="3"/><path d="M8 2.5v4M16 2.5v4M3 10h18"/>'),
+  clock: svg('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),
+  trend: svg('<path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/>'),
+  bank: svg('<path d="M3 10l9-6 9 6"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8"/><path d="M3 20h18"/>'),
+  bulb: svg('<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/>'),
+  receipt: svg('<path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/>'),
+  trophy: svg('<path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5a2 2 0 0 0 0 4h3M16 6h3a2 2 0 0 1 0 4h-3"/><path d="M12 13v4M8.5 20h7"/>'),
+  pie: svg('<path d="M12 3v9h9"/><path d="M20.4 15A9 9 0 1 1 9 3.6"/>'),
+  arrow: svg('<path d="M5 12h14M13 6l6 6-6 6"/>'),
+  lock: svg('<rect x="4" y="10" width="16" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>'),
+  cloud: svg('<path d="M7 18a4.5 4.5 0 0 1-.6-8.96A6 6 0 0 1 18 9.5a4 4 0 0 1-.5 8.5z"/>'),
+  plus: svg('<path d="M12 5v14M5 12h14"/>'),
+  gear: svg('<circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1"/>')
+};
+// Zeitleiste der nächsten 30 Tage: Punkte nach Tagen positioniert, Karten auf 3 Bahnen verteilt (überlappungsarm)
+function renderTimeline(soon) {
+  const el = $("#timeline"), DAYS = 30;
+  if (!soon.length) { el.innerHTML = `<div class="muted" style="padding:28px 0">Keine Zahlungen in den nächsten 30 Tagen.</div>`; return; }
+  const last = [-99, -99, -99];
+  const marks = soon.map(s => {
+    const x = Math.min(100, Math.max(0, s.inDays / DAYS * 100));
+    let lane = [0, 1, 2].find(l => x - last[l] >= 15);                // erste Bahn mit genug Abstand
+    if (lane === undefined) lane = last.indexOf(Math.min(...last));
+    last[lane] = x;
+    const edge = x < 9 ? " edge-l" : x > 91 ? " edge-r" : "";
+    return `<div class="tl-mark lane${lane}${s.inst ? " inst" : ""}${edge}" style="left:${x.toFixed(2)}%" tabindex="0" title="${esc(s.name)} · ${fmtDate(s.next)} · ${esc(money(s.due, s.currency))}">
+      <span class="tl-stem"></span><span class="tl-dot"></span>
+      <span class="tl-card"><b>${esc(s.name)}</b><small>${fmtDate(s.next)} · ${money(s.due, s.currency)}</small></span></div>`;
+  }).join("");
+  const ticks = [0, 7, 14, 21, 30].map(d => `<span class="tl-tick" style="left:${d / DAYS * 100}%"><i></i><em>${d === 0 ? "Heute" : "+" + d + " Tage"}</em></span>`).join("");
+  el.innerHTML = `<div class="tl"><div class="tl-line"></div>${ticks}${marks}</div>`;
+}
+// Errungenschaften-Kachel auf dem Dashboard
+function renderAchTile() {
+  const el = $("#achTile"); if (!el) return;
+  const n = Object.keys(ach.unlocked).length, tot = ACHIEVEMENTS.length;
+  const recent = ACHIEVEMENTS.filter(a => ach.unlocked[a.id]).sort((a, b) => ach.unlocked[b.id] - ach.unlocked[a.id]).slice(0, 6);
+  const nexts = ACHIEVEMENTS.filter(a => !ach.unlocked[a.id]).slice(0, 3);
+  el.innerHTML = `<div class="tile-head"><span class="ic-c">${ICON.trophy}</span><h2>Errungenschaften</h2></div>
+    <div class="ach-tile-body">
+      <div class="ach-big"><span class="num-serif">${n}</span><span class="muted">von ${tot} freigeschaltet</span></div>
+      <div class="ach-bar"><i style="width:${(n / tot * 100).toFixed(0)}%"></i></div>
+      ${recent.length ? `<div><div class="eyebrow" style="margin-bottom:10px">Zuletzt freigeschaltet</div><div class="ach-recent">${recent.map(a => `<span class="ach-pill">${a.icon} ${esc(a.title)}</span>`).join("")}</div></div>` : `<p class="muted small" style="margin:0">Noch nichts freigeschaltet. Lege dein erstes Abo an.</p>`}
+      ${nexts.length ? `<div><div class="eyebrow" style="margin-bottom:10px">Nächste Ziele</div><ul class="ach-next">${nexts.map(a => `<li><span class="ach-ic">${a.icon}</span><div><b>${esc(a.title)}</b><div class="muted small">${esc(a.desc)}</div></div></li>`).join("")}</ul></div>` : ""}
+      <button class="btn small" data-open-ach>Alle ansehen <span class="ic">${ICON.arrow}</span></button>
+    </div>`;
+}
+$("#achTile").addEventListener("click", e => { if (e.target.closest("[data-open-ach]")) $("#btnAch").click(); });
+
+function initTheme() {
+  document.querySelectorAll("[data-ic]").forEach(el => { el.innerHTML = ICON[el.dataset.ic] || ""; });
+  // Scroll-Einblendung (Fade-in mit leichtem Versatz), gestaffelt
+  const els = [...document.querySelectorAll(".reveal")];
+  if (!("IntersectionObserver" in window) || reducedMotion()) { els.forEach(e => e.classList.add("in")); }
+  else {
+    const io = new IntersectionObserver(list => list.forEach(en => { if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); } }),
+      { threshold: 0.06, rootMargin: "0px 0px -4% 0px" });
+    els.forEach((e, i) => { e.style.setProperty("--d", (i % 4) * 80 + "ms"); io.observe(e); });
+  }
+  // Glow folgt dem Mauszeiger
+  $(".bento").addEventListener("pointermove", e => {
+    const t = e.target.closest(".tile"); if (!t) return;
+    const r = t.getBoundingClientRect();
+    t.style.setProperty("--mx", (e.clientX - r.left) + "px"); t.style.setProperty("--my", (e.clientY - r.top) + "px");
+  });
+}
+
+/* ================= Start ================= */
+initTheme();
+render();
+renderSync();
+maybeRefreshRates();
+initSync();
+</script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+﻿# Sicherungskopien und lokale Exporte/Sync-Dateien (koennen Finanzdaten enthalten)
+*.vor-redesign.html
+abos-*.json
+abo-manager-sync.json
+abo-manager.json
+*.ics
+*.bak
