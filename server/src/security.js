@@ -2,8 +2,23 @@
 import crypto from "node:crypto";
 import { promisify } from "node:util";
 
-const scrypt = promisify(crypto.scrypt);
+const scryptRaw = promisify(crypto.scrypt);
 const SCRYPT = { N: 16384, r: 8, p: 1, len: 32 };
+
+// Höchstens 4 scrypt-Berechnungen gleichzeitig (je ~16 MB Speicher): viele parallele Anmeldeversuche
+// (z. B. von vielen IPs) können so den Speicher nicht erschöpfen. Bei überlanger Warteschlange: 503.
+const MAX_PARALLEL = 4, MAX_QUEUE = 200;
+let active = 0;
+const queue = [];
+async function scrypt(...args) {
+  if (active < MAX_PARALLEL) active++;
+  else {
+    if (queue.length >= MAX_QUEUE) throw Object.assign(new Error("Server ausgelastet, bitte gleich erneut versuchen."), { statusCode: 503, code: "busy" });
+    await new Promise(r => queue.push(r));                                    // Platz wird direkt übergeben (siehe finally)
+  }
+  try { return await scryptRaw(...args); }
+  finally { const next = queue.shift(); if (next) next(); else active--; }
+}
 
 export const randomToken = (bytes = 32) => crypto.randomBytes(bytes).toString("base64url");
 export const sha256 = s => crypto.createHash("sha256").update(s).digest("hex");

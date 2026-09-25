@@ -166,6 +166,19 @@ try {
   await login(A.p, "Maciej", PW2); await unlocked(A.p);
   check("Anmeldung mit neuem Passwort", (await rows(A.p)).length === 3);
 
+  // 12) Vollständige Sicherung einlesen: Abos ersetzt, Einstellungen übernommen, Errungenschaften zusammengeführt
+  const backupFile = path.join(WORK, "sicherung.json");
+  fs.writeFileSync(backupFile, JSON.stringify({ app: "abo-manager", version: 3, subs: [
+    { id: "imp-1", name: "Import-Abo", price: 5, cycle: "monthly", nextDate: "2026-12-01" }],
+    settings: { base: "CHF", remindDays: 5 }, achievements: { unlocked: { "json-export": 1700000000000 } } }));
+  await (await A.p.$("#fileImport")).uploadFile(backupFile);
+  await A.p.waitForFunction(() => [...document.querySelectorAll("#rows tr .name")].some(e => e.textContent === "Import-Abo"), { timeout: 10000 });
+  await A.p.click("#btnSettings");
+  check("Sicherung: Abos ersetzt", JSON.stringify(await rows(A.p)) === '["Import-Abo"]', JSON.stringify(await rows(A.p)));
+  check("Sicherung: Einstellungen übernommen", await A.p.$eval("#setBase", e => e.value) === "CHF" && await A.p.$eval("#setRemind", e => e.value) === "5");
+  check("Sicherung: Errungenschaft übernommen", /Vorsorge getroffen/.test(await A.p.$eval("#achTile", e => e.textContent)));
+  await A.p.evaluate(() => document.querySelector("#dlgSet").close());
+
   check("Keine JS-/CSP-Fehler in der Konsole", errors.length === 0, errors.join(" | "));
   await A.b.close(); await B.b.close();
 } catch (e) {

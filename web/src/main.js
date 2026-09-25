@@ -1,4 +1,5 @@
 // Einstieg: Styles laden, dann Anmeldung zeigen. Die App selbst startet erst nach dem Entsperren (auth.js → startApp).
+import "./fonts/fonts.css";
 import "./styles.css";
 import { startAuth } from "./auth.js";
 

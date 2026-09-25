@@ -11,6 +11,8 @@ import { optimize as optimizeWith } from "./lib/optimize.js";
 import { computeReminders as remindersFor } from "./lib/reminders.js";
 import { buildIcs } from "./lib/ics.js";
 import { analyzeStatement } from "./lib/bank.js";
+import { buildBackup, parseBackup } from "./lib/backup.js";
+import { mergeAch } from "./lib/merge.js";
 
 /* ================= Konstanten ================= */
 const KEY = "abo-manager-v1", META_KEY = "abo-manager-meta", SET_KEY = "abo-manager-settings",
@@ -129,7 +131,8 @@ const mb = v => money(v, settings.base);
 const convert = (amount, from, to = settings.base) => convertWith(rates, amount, from, to);
 async function refreshRates(manual) {
   try {
-    const r = await fetch("https://api.frankfurter.dev/v1/latest?base=EUR");
+    // Server-Konto: Kurse über den eigenen Server (zwischengespeichert, kein externer Aufruf aus dem Browser)
+    const r = await fetch(Vault.mode === "server" ? "/api/rates" : "https://api.frankfurter.dev/v1/latest?base=EUR");
     if (!r.ok) throw new Error(r.status);
     const j = await r.json();
     rates = { EUR: 1, ...j.rates };
@@ -1146,7 +1149,7 @@ function download(name, text, type) {
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }
 $("#btnExport").onclick = () => {
-  download(`abos-${toISO(today())}.json`, JSON.stringify({ app: "abo-manager", version: 2, updatedAt: meta.updatedAt, subs }, null, 2), "application/json");
+  download(`abos-${toISO(today())}.json`, JSON.stringify(buildBackup({ subs, meta, settings, achievements: ach }), null, 2), "application/json");
   ach.exportedJson = true; saveAch(); checkAchievements(subs, view());
 };
 $("#btnCsv").onclick = () => {
@@ -1162,13 +1165,14 @@ $("#fileImport").addEventListener("change", async e => {
   const file = e.target.files[0]; e.target.value = "";
   if (!file) return;
   try {
-    const data = JSON.parse(await file.text());
-    const list = Array.isArray(data) ? data : data.subs;
-    if (!Array.isArray(list)) throw 0;
-    const now = Date.now(), c = clean(list).map(s => ({ ...s, updatedAt: now }));
-    if (!confirm(`${c.length} Abos importieren? Die aktuellen Daten (${subs.length}) werden ersetzt.`)) return;
+    const b = parseBackup(JSON.parse(await file.text()));
+    const now = Date.now(), c = b.subs.map(s => ({ ...s, updatedAt: now }));
+    const extra = [b.settings && "Einstellungen werden übernommen", b.achievements && "Errungenschaften werden zusammengeführt"].filter(Boolean);
+    if (!confirm(`${c.length} Abos importieren? Die aktuellen Daten (${subs.length}) werden ersetzt.${extra.length ? "\n" + extra.join(", ") + "." : ""}`)) return;
     const keep = new Set(c.map(s => s.id));                                // ersetzte Einträge als gelöscht markieren (Abgleich)
     meta.deleted = { ...meta.deleted, ...Object.fromEntries(subs.filter(s => !keep.has(s.id)).map(s => [s.id, now])) };
+    if (b.settings) { settings = { ...settings, ...b.settings }; saveSettings(); Vault.bump(); }
+    if (b.achievements) { ach = mergeAch(ach, b.achievements); saveAch(); }
     subs = c; save(); render(); maybeRefreshRates();
   } catch { alert("Datei konnte nicht gelesen werden. Erwartet wird eine JSON-Sicherung aus dieser App."); }
 });

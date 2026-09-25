@@ -8,8 +8,9 @@ Abo- und Ratenzahlungs-Manager im Browser. Der Build erzeugt eine einzige HTML-D
 - Optional: eigener Server (Docker) mit Konten fuer mehrere Geraete, Ende-zu-Ende-verschluesselt – siehe [DEPLOYMENT.md](DEPLOYMENT.md)
 
 Externe Aufrufe (optional, die App funktioniert auch offline):
-- Schriften von Google Fonts (ohne Verbindung werden Systemschriften genutzt)
-- Wechselkurse von api.frankfurter.dev (nur bei Fremdwaehrungen, sonst Naeherungswerte)
+- Wechselkurse von api.frankfurter.dev (nur bei Fremdwaehrungen, sonst Naeherungswerte; mit Server-Konto ueber den eigenen Server)
+
+Schriften (Inter, Roboto, Playfair Display) sind eingebettet, siehe `web/src/fonts/LICENSE.md`.
 - Google-/Microsoft-Anmeldung und APIs nur, wenn der jeweilige Cloud-Sync eingerichtet ist
 
 ## Start

@@ -11,6 +11,7 @@ import { readSession, purgeExpired, Throttle } from "./sessions.js";
 import { KDF } from "./schemas.js";
 import authRoutes from "./routes/auth.js";
 import vaultRoutes from "./routes/vault.js";
+import ratesRoutes from "./routes/rates.js";
 
 export const VERSION = "0.2.0";
 
@@ -21,8 +22,8 @@ export function buildCsp(html) {
   return [
     "default-src 'self'",
     `script-src 'self' ${hashes.join(" ")} https://accounts.google.com`,       // Google-Anmeldung (Drive-Sync)
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com",
-    "font-src 'self' https://fonts.gstatic.com",
+    "style-src 'self' 'unsafe-inline' https://accounts.google.com",
+    "font-src 'self' data:",                                                  // selbst gehostete Schriften, eingebettet
     "img-src 'self' data:",
     "connect-src 'self' https:",                                               // Wechselkurse, Sync-Anbieter (Nextcloud: beliebiger Host)
     "frame-src https://accounts.google.com",
@@ -30,7 +31,7 @@ export function buildCsp(html) {
   ].join("; ");
 }
 
-export async function buildApp({ config, db, logger = { level: config.logLevel } }) {
+export async function buildApp({ config, db, logger = { level: config.logLevel }, fetchImpl }) {
   const app = Fastify({ logger, trustProxy: config.trustProxy, bodyLimit: config.maxVaultBytes + 64 * 1024 });
   const secret = serverSecret(db), throttle = new Throttle();
 
@@ -52,8 +53,13 @@ export async function buildApp({ config, db, logger = { level: config.logLevel }
     reply.header("Referrer-Policy", "no-referrer");
     reply.header("Cross-Origin-Opener-Policy", "same-origin-allow-popups");   // OAuth-Popups (Google/Microsoft) brauchen window.opener
     reply.header("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+    reply.header("X-Frame-Options", "DENY");                                   // ältere Browser (neuere: frame-ancestors)
+    reply.header("Cross-Origin-Resource-Policy", "same-origin");
     if (req.protocol === "https") reply.header("Strict-Transport-Security", "max-age=31536000");
-    if (req.url.startsWith("/api/")) reply.header("Cache-Control", "no-store");
+    if (req.url.startsWith("/api/")) {
+      reply.header("Cache-Control", "no-store");
+      reply.header("Content-Security-Policy", "default-src 'none'; frame-ancestors 'none'");   // JSON braucht nichts
+    }
     return payload;
   });
 
@@ -67,6 +73,7 @@ export async function buildApp({ config, db, logger = { level: config.logLevel }
 
   await app.register(authRoutes, { config, db, secret, throttle });
   await app.register(vaultRoutes, { config, db });
+  await app.register(ratesRoutes, { fetchImpl });
 
   // Web-App ausliefern (dist/ aus dem Build), falls vorhanden
   const index = path.join(config.staticDir, "index.html");
@@ -83,7 +90,7 @@ export async function buildApp({ config, db, logger = { level: config.logLevel }
   app.setNotFoundHandler((req, reply) => reply.code(404).send({ error: "not_found", message: "Nicht gefunden." }));
   app.setErrorHandler((error, req, reply) => {
     if (error.validation) return reply.code(400).send({ error: "invalid_request", message: "Ungültige Anfrage: " + error.message });
-    if (error.statusCode && error.statusCode < 500) return reply.code(error.statusCode).send({ error: error.code || "error", message: error.message });
+    if (error.statusCode && (error.statusCode < 500 || error.statusCode === 503)) return reply.code(error.statusCode).send({ error: error.code || "error", message: error.message });
     req.log.error(error);
     return reply.code(500).send({ error: "internal", message: "Interner Fehler." });
   });

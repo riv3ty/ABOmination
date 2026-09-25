@@ -19,7 +19,7 @@ function mergeSubs(local = [], remote = [], deleted) {
 const newer = (a, b) => a === undefined ? b : b === undefined ? a : ts(b?.changedAt) > ts(a?.changedAt) ? b : a;
 
 // Errungenschaften: freigeschaltet = Vereinigung (frühester Zeitpunkt), Zähler = Maximum, Merker = ODER, Listen = Vereinigung
-function mergeAch(a, b) {
+export function mergeAch(a, b) {
   if (!a || !b) return a || b;
   const out = { ...b, ...a };
   for (const k of new Set([...Object.keys(a), ...Object.keys(b)])) {

@@ -30,6 +30,7 @@ Die Daten liegen im Docker-Volume `abomination_abo-data` (SQLite-Datenbank unter
 
 Wichtig für alle Varianten:
 - an `http://127.0.0.1:8080` weiterleiten,
+- der Container braucht ausgehend nur `https://api.frankfurter.dev` (Wechselkurse; ohne Zugang gibt es Näherungswerte),
 - die Header `Host`, `X-Forwarded-For` und `X-Forwarded-Proto` setzen (sonst: Sperre nach Fehlversuchen trifft alle, und HTTPS wird nicht erkannt),
 - Anfragen bis mindestens **6 MB** erlauben (Tresor bis 5 MB),
 - **keine eigene Content-Security-Policy** setzen – die App liefert eine passende mit.
@@ -166,5 +167,6 @@ docker compose start app
 
 - Der Container läuft als unprivilegierter Benutzer, mit schreibgeschütztem Dateisystem (außer `/data`), ohne Zusatzrechte.
 - Nur `authKey`-Hashes (scrypt) und verschlüsselte Tresore liegen auf dem Server; Passwort und Datenschlüssel verlassen das Gerät nie.
-- Sperre nach Fehlversuchen, Rate-Limits, CSRF-Schutz, strenge Content-Security-Policy.
+- Sperre nach Fehlversuchen, Rate-Limits, begrenzte parallele Passwortprüfungen, CSRF-Schutz, strenge Content-Security-Policy.
+- Keine Aufrufe fremder Dienste aus dem Browser: Schriften sind eingebettet, Wechselkurse holt der Server (ausgehend nur zu `api.frankfurter.dev`).
 - Details zum Protokoll: [server/API.md](server/API.md).

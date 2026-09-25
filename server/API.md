@@ -30,6 +30,7 @@ Es gibt **keinen Passwort-Reset**: ohne Passwort ist der Tresor nicht zu entschl
 |---|---|---|---|
 | GET | `/api/health` | – | `{ ok, version }` |
 | GET | `/api/config` | – | `{ version, registration, maxVaultBytes, kdf }` |
+| GET | `/api/rates` | – | `{ date, rates, fetchedAt, source }` – EZB-Kurse (1 EUR = x), max. alle 12 h von frankfurter.dev geholt; 503 wenn nicht verfügbar |
 | POST | `/api/auth/prelogin` | `{ username }` | `{ kdf, salt, iter }` (für unbekannte Namen ein stabiles Scheinsalz) |
 | POST | `/api/auth/register` | `{ username, invite?, salt, iter, authKey, vault, client?, label? }` | 201 `{ user, vault: { version }, sessionId, token? }` |
 | POST | `/api/auth/login` | `{ username, authKey, client?, label? }` | `{ user, sessionId, token? }` |
@@ -46,7 +47,7 @@ Es gibt **keinen Passwort-Reset**: ohne Passwort ist der Tresor nicht zu entschl
 `PUT /api/vault` schreibt nur, wenn `baseVersion` der aktuellen Version entspricht. Sonst kommt 409 mit dem aktuellen Stand; der Client führt zusammen und schreibt erneut mit der neuen Version.
 
 ### Schutz vor Passwort-Raten
-Pro IP und Name ab 5 Fehlversuchen exponentiell wachsende Sperre (bis 15 Minuten) → 429 mit `Retry-After`. Zusätzlich 30 Auth-Anfragen pro Minute und IP, allgemein 300 Anfragen pro Minute.
+Pro IP und Name ab 5 Fehlversuchen exponentiell wachsende Sperre (bis 15 Minuten) → 429 mit `Retry-After`. Zusätzlich 30 Auth-Anfragen pro Minute und IP, allgemein 300 Anfragen pro Minute. Höchstens 4 scrypt-Prüfungen laufen gleichzeitig (Rest wartet; bei Überlast 503).
 
 ## Verwaltung
 

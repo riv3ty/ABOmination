@@ -23,6 +23,7 @@ Abo-/Ratenzahlungs-Manager, reiner Web-Client (Vanilla JS, keine Frameworks). UI
 - Schema-Änderungen nur als neue Migration in `MIGRATIONS` (db.js), nie bestehende ändern.
 - Auth-Routen: Session per Cookie (Web, CSRF-Header `X-Requested-With: abomination`) oder Bearer (App). Verwaltung per CLI `server/src/cli.js`.
 - Docker: Image enthaelt nur `server/src`, `server/bin`, `dist` + Laufzeit-Abhaengigkeiten; laeuft als `node`, read-only, Daten in `/data`. Neue Laufzeitdateien im Dockerfile ergaenzen.
+- Schriften liegen in `web/src/fonts/` und werden eingebettet (CSP `font-src data:`); keine externen Ressourcen (CDN, Google Fonts) einbinden.
 - CSP wird aus den Inline-Skripten von `dist/index.html` berechnet: keine Inline-Event-Handler (`onclick=` usw.) im Markup verwenden.
 
 ## Regeln
@@ -31,4 +32,4 @@ Abo-/Ratenzahlungs-Manager, reiner Web-Client (Vanilla JS, keine Frameworks). UI
 - Port 8765 ist bei Google/Microsoft als Ursprung registriert.
 
 ## Geplant (Server-Deployment)
-Phase 0 (Module/Tests), 1 (Backend), 2 (Web-Client im Server-Modus) und 3 (Docker: Dockerfile, compose.yaml, DEPLOYMENT.md) fertig; offen: 4 Haertung, 5 PWA/Android. Docker-Container auf Ubuntu hinter dem vorhandenen Reverse Proxy des Users; Server speichert nur verschluesselte Tresor-Blobs (E2E, getrennter Auth-/Enc-Key), Registrierung nur per Einladung, spaeter Android-App. Lokaler Modus mit den bisherigen Sync-Anbietern bleibt erhalten.
+Phase 0 (Module/Tests), 1 (Backend), 2 (Web-Client im Server-Modus), 3 (Docker: Dockerfile, compose.yaml, DEPLOYMENT.md) und 4 (Haertung: eingebettete Schriften, /api/rates, scrypt-Begrenzung, Header) fertig; offen: 5 PWA/Android. Docker-Container auf Ubuntu hinter dem vorhandenen Reverse Proxy des Users; Server speichert nur verschluesselte Tresor-Blobs (E2E, getrennter Auth-/Enc-Key), Registrierung nur per Einladung, spaeter Android-App. Lokaler Modus mit den bisherigen Sync-Anbietern bleibt erhalten.

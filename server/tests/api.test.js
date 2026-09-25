@@ -44,6 +44,8 @@ describe("Grundlagen", () => {
     const r = await app.inject("/api/health");
     expect(r.headers["x-content-type-options"]).toBe("nosniff");
     expect(r.headers["cache-control"]).toBe("no-store");
+    expect(r.headers["x-frame-options"]).toBe("DENY");
+    expect(r.headers["content-security-policy"]).toBe("default-src 'none'; frame-ancestors 'none'");
     const nf = await app.inject("/gibtsnicht");
     expect(nf.statusCode).toBe(404);
     expect(nf.json().error).toBe("not_found");
@@ -114,6 +116,12 @@ describe("Anmeldung", () => {
     expect(token).toMatch(/^[A-Za-z0-9_-]{40,}$/);
     const me2 = await app.inject({ url: "/api/auth/me", headers: { authorization: "Bearer " + token } });
     expect(me2.json().session.kind).toBe("app");
+  });
+
+  it("viele gleichzeitige Anmeldungen werden abgearbeitet (scrypt-Begrenzung staut, verliert aber nichts)", async () => {
+    const { key: k } = await register("Anna");
+    const res = await Promise.all(Array.from({ length: 12 }, () => post("/api/auth/login", { username: "Anna", authKey: k, client: "app" })));
+    expect(res.map(r => r.statusCode)).toEqual(Array(12).fill(200));
   });
 
   it("nach 5 Fehlversuchen wird gebremst (auch mit richtigem Passwort)", async () => {
@@ -217,6 +225,29 @@ describe("Verwaltung (CLI)", () => {
     expect(run(["invites"], db, () => {})).toHaveLength(0);              // die von register() genutzte ist verbraucht
     invite(2);
     expect(run(["invites"], db, () => {})).toHaveLength(1);
+  });
+});
+
+describe("Wechselkurse", () => {
+  const withRates = async fetchImpl => { await app.close(); config = loadConfig({ STATIC_DIR: "x" }); db = openDb(":memory:"); app = await buildApp({ config, db, logger: false, fetchImpl }); };
+  const ok = body => async () => ({ ok: true, json: async () => body });
+
+  it("holt einmal, liefert danach aus dem Zwischenspeicher", async () => {
+    let calls = 0;
+    await withRates(async () => { calls++; return ok({ date: "2026-09-25", rates: { USD: 1.17, CHF: 0.94 } })(); });
+    const a = (await app.inject("/api/rates")).json(), b = (await app.inject("/api/rates")).json();
+    expect(a).toMatchObject({ date: "2026-09-25", rates: { USD: 1.17, CHF: 0.94 } });
+    expect(b.fetchedAt).toBe(a.fetchedAt);
+    expect(calls).toBe(1);
+  });
+
+  it("filtert unplausible Werte und meldet 503, wenn nichts verfügbar ist", async () => {
+    await withRates(ok({ date: "2026-09-25", rates: { USD: 1.1, "<x>": 5, GBP: -1, JPY: "viel" } }));
+    expect((await app.inject("/api/rates")).json().rates).toEqual({ USD: 1.1 });
+    await withRates(async () => { throw new Error("offline"); });
+    const r = await app.inject("/api/rates");
+    expect(r.statusCode).toBe(503);
+    expect(r.json().error).toBe("rates_unavailable");
   });
 });
 
