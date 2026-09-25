@@ -1,6 +1,11 @@
 ﻿# ABOmination
 
-Lokaler Abo- und Ratenzahlungs-Manager als einzelne HTML-Datei (kein Server, keine Abhaengigkeiten).
+Lokaler Abo- und Ratenzahlungs-Manager als einzelne HTML-Datei (kein Server, kein Build, keine Bibliotheken).
+
+Externe Aufrufe (optional, die App funktioniert auch offline):
+- Schriften von Google Fonts (ohne Verbindung werden Systemschriften genutzt)
+- Wechselkurse von api.frankfurter.dev (nur bei Fremdwaehrungen, sonst Naeherungswerte)
+- Google-/Microsoft-Anmeldung und APIs nur, wenn der jeweilige Cloud-Sync eingerichtet ist
 
 - Abos, Ratenzahlungen (Zins/Annuitaet), Mehrwaehrung, Erinnerungen/ICS, Kontoauszug-Import, Bankkonto-Auswertung, Optimierungstipps, Errungenschaften
 - Profile mit Login, Daten AES-256-GCM-verschluesselt im Browser (PBKDF2)
