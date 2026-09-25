@@ -1,18 +1,51 @@
-﻿# ABOmination
+# ABOmination
 
-Lokaler Abo- und Ratenzahlungs-Manager als einzelne HTML-Datei (kein Server, kein Build, keine Bibliotheken).
+Abo- und Ratenzahlungs-Manager im Browser. Der Build erzeugt eine einzige HTML-Datei (`dist/index.html`), die ohne Server funktioniert.
+
+- Abos, Ratenzahlungen (Zins/Annuitaet), Mehrwaehrung, Erinnerungen/ICS, Kontoauszug-Import, Bankkonto-Auswertung, Optimierungstipps, Errungenschaften
+- Profile mit Login, Daten AES-256-GCM-verschluesselt im Browser (PBKDF2)
+- Optional Sync: Datei, Nextcloud, Google Drive, OneNote (siehe SYNC-EINRICHTEN.md)
+- Geplant: Betrieb als Docker-Container mit Server-Konten (Ende-zu-Ende-verschluesselt)
 
 Externe Aufrufe (optional, die App funktioniert auch offline):
 - Schriften von Google Fonts (ohne Verbindung werden Systemschriften genutzt)
 - Wechselkurse von api.frankfurter.dev (nur bei Fremdwaehrungen, sonst Naeherungswerte)
 - Google-/Microsoft-Anmeldung und APIs nur, wenn der jeweilige Cloud-Sync eingerichtet ist
 
-- Abos, Ratenzahlungen (Zins/Annuitaet), Mehrwaehrung, Erinnerungen/ICS, Kontoauszug-Import, Bankkonto-Auswertung, Optimierungstipps, Errungenschaften
-- Profile mit Login, Daten AES-256-GCM-verschluesselt im Browser (PBKDF2)
-- Optional Sync: Datei, Nextcloud, Google Drive, OneNote (siehe SYNC-EINRICHTEN.md)
-
 ## Start
-Doppelklick auf `Abo-Manager-starten.cmd` (oeffnet http://localhost:8765/) oder `abo-manager.html` direkt oeffnen.
+
+Voraussetzung: Node.js 22 oder neuer.
+
+```
+npm install
+npm run build
+```
+
+Danach Doppelklick auf `Abo-Manager-starten.cmd` (oeffnet http://localhost:8765/) oder `dist/index.html` direkt oeffnen.
+
+## Entwicklung
+
+| Befehl | Zweck |
+|---|---|
+| `npm run dev` | Entwicklungsserver mit Live-Reload auf http://localhost:8765/ |
+| `npm test` | Unit-Tests (Vitest) fuer die Logik in `web/src/lib/` |
+| `npm run lint` | ESLint |
+| `npm run build` | `dist/index.html` bauen |
+| `npm run check` | Lint + Tests + Build |
+
+Hinweis: Der Browser speichert Daten pro Adresse. Dev-Server, `npm run preview` und der Starter laufen alle unter `http://localhost:8765` und teilen sich daher dieselben Profile.
+
+Aufbau:
+
+```
+web/index.html          Markup (Dialoge, Kacheln)
+web/src/main.js         Einstieg
+web/src/vault.js        Profile + verschluesselter Tresor (PBKDF2/AES-GCM)
+web/src/auth.js         Anmelde-Oberflaeche, Konto-Funktionen
+web/src/app.js          App-Oberflaeche, Dialoge, Cloud-Sync (startet erst nach dem Entsperren)
+web/src/lib/            reine Logik ohne DOM/Zustand (Datum, Kredit, Auswertung, Optimierung, ICS, Kontoauszug)
+web/tests/              Tests zu lib/
+```
 
 ## Datenschutz
 Der Repo-Inhalt enthaelt nur Code. Alle Nutzerdaten liegen ausschliesslich im Browser (localStorage/IndexedDB) und sind nicht Teil dieses Repos. Exporte (`abos-*.json`), Sync-Dateien und `.ics` sind per `.gitignore` ausgeschlossen.

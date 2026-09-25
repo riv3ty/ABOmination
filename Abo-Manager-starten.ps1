@@ -1,9 +1,12 @@
-# Startet den ABOmination lokal unter http://localhost:8765/ (nur auf diesem Rechner erreichbar).
+﻿# Startet den ABOmination lokal unter http://localhost:8765/ (nur auf diesem Rechner erreichbar).
 # Noetig fuer Google Drive und OneNote, weil deren Anmeldung eine http-Adresse verlangt.
 param([int]$Port = 8765, [switch]$NoBrowser)
 
-$file = Join-Path $PSScriptRoot 'abo-manager.html'
-if (-not (Test-Path $file)) { Write-Host "abo-manager.html nicht gefunden: $file"; exit 1 }
+$file = Join-Path $PSScriptRoot 'dist\index.html'
+if (-not (Test-Path $file)) {
+    Write-Host "dist\index.html nicht gefunden. Bitte einmal bauen:  npm install  und  npm run build"
+    exit 1
+}
 
 $listener = New-Object System.Net.HttpListener
 $listener.Prefixes.Add("http://localhost:$Port/")

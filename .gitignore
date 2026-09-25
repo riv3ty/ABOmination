@@ -5,3 +5,7 @@ abo-manager-sync.json
 abo-manager.json
 *.ics
 *.bak
+
+# Build und Abhaengigkeiten
+node_modules/
+dist/

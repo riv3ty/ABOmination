@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ABOmination</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700&family=Playfair+Display:ital,wght@0,500;1,400&family=Roboto:wght@400;500;700&display=swap">
+<script>
+// Rücksprung-Seite der Microsoft-Anmeldung (Popup): Ergebnis ans Hauptfenster melden, App hier nicht starten
+(function(){var p=new URLSearchParams(location.search);if((p.get("state")||"").indexOf("aboms-")===0){window.__aboCb=true;try{if(window.opener)window.opener.postMessage({type:"aboms",href:location.href},location.origin);}catch(e){}document.addEventListener("DOMContentLoaded",function(){document.body.innerHTML='<p style="font:16px sans-serif;padding:24px">Anmeldung abgeschlossen. Dieses Fenster kann geschlossen werden.</p>';});}})();
+</script>
+<script type="module" src="./src/main.js"></script>
+</head>
+<body class="locked">
+<div id="auth" hidden></div>
+<div class="wrap">
+  <header class="nav">
+    <h1 class="brand"><span class="brand-mark" data-ic="calendar"></span>ABOmination</h1>
+    <div class="actions">
+      <button class="btn" id="btnLock" title="Sperren und abmelden"><span class="ic" data-ic="lock"></span><span id="userName"></span></button>
+      <button class="btn" id="btnAch" title="Errungenschaften"><span class="ic" data-ic="trophy"></span><span id="achCount"></span></button>
+      <button class="btn pill" id="btnSync" hidden></button>
+      <button class="btn" id="btnBank"><span class="ic" data-ic="bank"></span><span class="lbl">Kontoauszug importieren</span></button>
+      <button class="btn" id="btnSettings"><span class="ic" data-ic="gear"></span><span class="lbl">Einstellungen</span></button>
+      <button class="btn primary" id="btnAdd"><span class="ic" data-ic="plus"></span>Abo hinzufügen</button>
+    </div>
+  </header>
+
+  <div id="reminders"></div>
+
+  <main class="bento">
+    <div id="stats">
+      <article class="tile t-hero reveal" id="tHero"></article>
+      <article class="tile t-year reveal" id="tYear"></article>
+      <article class="tile t-30 reveal" id="t30"></article>
+      <article class="tile t-open reveal" id="tOpen" hidden></article>
+    </div>
+
+    <article class="tile t-time reveal">
+      <div class="tile-head"><span class="ic-c" data-ic="calendar"></span><h2>Zeitleiste · nächste 30 Tage</h2></div>
+      <div class="tl-scroll"><div id="timeline"></div></div>
+      <div id="upcoming"></div>
+    </article>
+
+    <article class="tile t-cats reveal">
+      <div class="tile-head"><span class="ic-c" data-ic="pie"></span><h2>Kosten nach Kategorie</h2><span class="sub">pro Monat</span></div>
+      <div id="cats"></div>
+    </article>
+
+    <article class="tile t-accts reveal">
+      <div class="tile-head"><span class="ic-c" data-ic="bank"></span><h2>Abgänge pro Bankkonto</h2><span class="sub">pro Monat</span></div>
+      <div id="accts"></div>
+    </article>
+
+    <article class="tile t-opt reveal" id="optTile">
+      <div class="tile-head"><span class="ic-c" data-ic="bulb"></span><h2>Optimierung</h2></div>
+      <div id="opt"></div>
+    </article>
+
+    <article class="tile t-ach reveal" id="achTile"></article>
+
+    <article class="tile t-inst reveal" id="instCard" hidden>
+      <div class="inst-headline"><div class="tile-head" style="margin:0"><span class="ic-c" data-ic="receipt"></span><h2>Ratenkäufe</h2></div><div class="seg-wrap" id="instTabs"></div></div>
+      <div id="instSummary"></div><div id="instList"></div>
+    </article>
+  </main>
+
+  <section class="section reveal" id="verwalten">
+    <div class="section-head"><div class="eyebrow">Verwalten</div><h2 class="h-display">Alle Abos</h2></div>
+    <div class="card table-card">
+      <div class="toolbar">
+        <input id="q" type="search" placeholder="Suchen …">
+        <select id="fStatus">
+          <option value="active">Aktiv</option>
+          <option value="">Alle</option>
+          <option value="done">Abbezahlt</option>
+          <option value="paused">Pausiert</option>
+          <option value="cancelled">Gekündigt</option>
+        </select>
+        <select id="fKind">
+          <option value="">Abos &amp; Raten</option>
+          <option value="subscription">Nur Abos</option>
+          <option value="installment">Nur Ratenzahlungen</option>
+        </select>
+        <select id="fCat"><option value="">Alle Kategorien</option></select>
+        <select id="fAcc"><option value="">Alle Bankkonten</option></select>
+      </div>
+      <div style="overflow-x:auto">
+        <table>
+          <thead><tr>
+            <th data-sort="name">Abo</th>
+            <th data-sort="price" class="num">Preis</th>
+            <th data-sort="monthly" class="num hide-m">/ Monat</th>
+            <th data-sort="next">Nächste Zahlung</th>
+            <th data-sort="status" class="hide-m">Status</th>
+            <th></th>
+          </tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+      <div class="empty" id="empty" hidden>Noch keine Abos. Klicke auf „Abo hinzufügen“ oder importiere einen Kontoauszug.</div>
+    </div>
+  </section>
+  <p class="muted small foot-note">Alle Daten werden lokal in diesem Browser gespeichert. Für Sicherung und Geräte-Sync: Einstellungen.</p>
+</div>
+
+<!-- Abo bearbeiten -->
+<dialog id="dlg">
+  <form class="f" id="form" method="dialog">
+    <h2 id="dlgTitle">Abo hinzufügen</h2>
+    <label class="full">Name
+      <input name="name" required placeholder="z. B. Netflix" maxlength="80">
+    </label>
+    <label>Art
+      <select name="kind">
+        <option value="subscription">Abo</option>
+        <option value="installment">Ratenzahlung</option>
+      </select>
+    </label>
+    <label>Abrechnung / Rhythmus
+      <select name="cycle">
+        <option value="monthly">Monatlich</option>
+        <option value="quarterly">Vierteljährlich</option>
+        <option value="yearly">Jährlich</option>
+        <option value="weekly">Wöchentlich</option>
+      </select>
+    </label>
+    <label><span id="lblPrice">Preis</span>
+      <input name="price" type="number" step="0.01" min="0" required>
+    </label>
+    <label>Währung
+      <select name="currency"></select>
+    </label>
+    <label class="inst-only" hidden>Gesamtpreis (Kaufpreis)
+      <input name="principal" type="number" min="0" step="0.01" placeholder="z. B. 1200">
+    </label>
+    <label class="inst-only" hidden>Zinssatz p. a. (%)
+      <input name="interestRate" type="number" min="0" max="100" step="0.01" placeholder="0 = zinslos">
+    </label>
+    <label class="inst-only" hidden>Raten insgesamt
+      <input name="totalPayments" type="number" min="1" step="1" placeholder="z. B. 12">
+    </label>
+    <label class="inst-only" hidden>Davon bereits gezahlt (bis zur nächsten Rate)
+      <span class="paid-row">
+        <input name="paidValue" type="number" min="0" step="1" placeholder="0">
+        <select name="paidUnit" aria-label="Einheit"><option value="count">Raten</option><option value="amount">Betrag</option></select>
+      </span>
+    </label>
+    <div class="loan-calc full" id="loanCalc" hidden></div>
+    <label><span id="lblNext">Nächste Zahlung</span>
+      <input name="nextDate" type="date" required>
+    </label>
+    <label>Kategorie
+      <input name="category" list="catList" placeholder="z. B. Streaming">
+      <datalist id="catList"></datalist>
+    </label>
+    <label>Status
+      <select name="status">
+        <option value="active">Aktiv</option>
+        <option value="paused">Pausiert</option>
+        <option value="cancelled">Gekündigt</option>
+      </select>
+    </label>
+    <label class="sub-only">Kündigungsfrist (Tage)
+      <input name="noticeDays" type="number" min="0" step="1" placeholder="0">
+    </label>
+    <label class="sub-only">Nutzung
+      <select name="usage">
+        <option value="">Keine Angabe</option>
+        <option value="often">Oft</option>
+        <option value="sometimes">Manchmal</option>
+        <option value="rarely">Selten</option>
+      </select>
+    </label>
+    <label class="sub-only">Jahrespreis (falls es einen gibt)
+      <input name="yearlyAlt" type="number" step="0.01" min="0" placeholder="z. B. 99">
+    </label>
+    <label>Bankkonto
+      <input name="account" list="accList" placeholder="z. B. Girokonto Sparkasse" maxlength="60">
+      <datalist id="accList"></datalist>
+    </label>
+    <label>Zahlungsart
+      <input name="payment" placeholder="z. B. PayPal, Visa …" maxlength="60">
+    </label>
+    <label class="full">Notizen
+      <textarea name="notes" rows="2" maxlength="500"></textarea>
+    </label>
+    <div class="foot">
+      <button type="button" class="btn" id="btnCancel">Abbrechen</button>
+      <button type="submit" class="btn primary">Speichern</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Einstellungen -->
+<dialog id="dlgSet">
+  <div class="box">
+    <div class="dhead"><h2>Einstellungen</h2><button class="btn small" id="setClose">Schließen</button></div>
+
+    <section>
+      <h3>Konto</h3>
+      <p class="small" style="margin-top:0">Angemeldet als <b id="acName"></b></p>
+      <label>Automatisch sperren nach
+        <select id="setAutoLock">
+          <option value="0">Nie</option>
+          <option value="5">5 Minuten Inaktivität</option>
+          <option value="15">15 Minuten Inaktivität</option>
+          <option value="30">30 Minuten Inaktivität</option>
+          <option value="60">60 Minuten Inaktivität</option>
+        </select>
+      </label>
+      <div class="row-btns">
+        <button class="btn small" id="acLock">🔒 Sperren</button>
+        <button class="btn small" id="acPw">Passwort ändern</button>
+        <button class="btn small" id="acRename">Name ändern</button>
+        <button class="btn small danger" id="acDelete">Profil löschen</button>
+      </div>
+      <p class="muted small">Deine Daten sind in diesem Browser mit deinem Passwort verschlüsselt (AES-256). Es gibt <b>keinen Passwort-Reset</b>: Wer das Passwort vergisst, kann die Daten nicht wiederherstellen (außer aus einer Sicherung oder dem Cloud-Sync). JSON-Sicherungen und Cloud-Sync sind <b>nicht</b> verschlüsselt.</p>
+    </section>
+
+    <section>
+      <h3>Währung</h3>
+      <label>Hauptwährung (für alle Summen)
+        <select id="setBase"></select>
+      </label>
+      <div class="muted small" id="rateInfo"></div>
+      <div class="row-btns"><button class="btn small" id="btnRates">Wechselkurse aktualisieren</button></div>
+    </section>
+
+    <section>
+      <h3>Erinnerungen</h3>
+      <label>Zahlungen ankündigen (Tage vorher)
+        <input id="setRemind" type="number" min="0" max="30">
+      </label>
+      <label>Kündigungsfristen ankündigen (Tage vorher)
+        <input id="setNoticeRemind" type="number" min="0" max="60">
+      </label>
+      <label class="check"><input type="checkbox" id="setNotif"> Browser-Benachrichtigungen aktivieren</label>
+      <p class="muted small">Hinweise erscheinen immer oben in der App. Benachrichtigungen kommen nur, solange die App im Browser geöffnet ist. Für Erinnerungen im Hintergrund exportiere die Kalender-Datei und öffne sie in Outlook, Google Kalender oder Apple Kalender.</p>
+      <div class="row-btns"><button class="btn small" id="btnIcs">📆 Kalender-Datei (.ics) exportieren</button></div>
+    </section>
+
+    <section>
+      <h3>Cloud-Sync (Geräte abgleichen)</h3>
+      <label>Anbieter
+        <select id="syncProv">
+          <option value="">Aus</option>
+          <option value="file">Datei im Cloud-Ordner (OneDrive, Dropbox, Nextcloud-Client …)</option>
+          <option value="nextcloud">Nextcloud (WebDAV)</option>
+          <option value="gdrive">Google Drive</option>
+          <option value="onenote">OneNote</option>
+        </select>
+      </label>
+      <div id="syncPanel"></div>
+    </section>
+
+    <section>
+      <h3>Daten</h3>
+      <div class="row-btns">
+        <button class="btn small" id="btnExport">Sicherung (JSON)</button>
+        <button class="btn small" id="btnImport">Sicherung einlesen</button>
+        <button class="btn small" id="btnCsv">Liste als CSV</button>
+        <input type="file" id="fileImport" accept=".json,application/json" hidden>
+      </div>
+    </section>
+  </div>
+</dialog>
+
+<!-- Errungenschaften -->
+<dialog id="dlgAch" class="wide">
+  <div class="box">
+    <div class="dhead"><h2>🏆 Errungenschaften</h2><button class="btn small" id="achClose">Schließen</button></div>
+    <p class="muted small" id="achProgress" style="margin-top:0"></p>
+    <div class="ach-grid" id="achList"></div>
+  </div>
+</dialog>
+<div id="toasts" class="toast-wrap"></div>
+
+<!-- Passwort ändern / Profil löschen -->
+<dialog id="dlgPw">
+  <form class="box" id="formPw" method="dialog">
+    <div class="dhead"><h2 id="pwTitle"></h2></div>
+    <label>Aktuelles Passwort<input type="password" id="pwOld" autocomplete="current-password" required></label>
+    <label class="pw-new">Neues Passwort (mind. 8 Zeichen)<input type="password" id="pwNew" autocomplete="new-password" minlength="8"></label>
+    <label class="pw-new">Neues Passwort wiederholen<input type="password" id="pwNew2" autocomplete="new-password"></label>
+    <div class="au-err" id="pwErr"></div>
+    <div class="foot">
+      <button type="button" class="btn" id="pwCancel">Abbrechen</button>
+      <button type="submit" class="btn primary" id="pwOk">OK</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Kontoauszug-Import -->
+<input type="file" id="fileBank" accept=".csv,.txt,text/csv" hidden>
+<dialog id="dlgBank" class="wide">
+  <div class="box">
+    <div class="dhead"><h2>Abos im Kontoauszug</h2><button class="btn small" id="bankClose">Abbrechen</button></div>
+    <div id="bankBody"></div>
+  </div>
+</dialog>
+
+</body>
+</html>
