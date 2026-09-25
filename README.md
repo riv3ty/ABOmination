@@ -45,7 +45,21 @@ web/src/auth.js         Anmelde-Oberflaeche, Konto-Funktionen
 web/src/app.js          App-Oberflaeche, Dialoge, Cloud-Sync (startet erst nach dem Entsperren)
 web/src/lib/            reine Logik ohne DOM/Zustand (Datum, Kredit, Auswertung, Optimierung, ICS, Kontoauszug)
 web/tests/              Tests zu lib/
+server/src/             API-Server (app.js, routes/, db.js, cli.js)
+server/tests/           API-Tests
 ```
+
+## Server (in Arbeit)
+
+Node-Server (Fastify + SQLite) mit Konten und Ende-zu-Ende-verschluesseltem Tresor. API und Schluesselprotokoll: [server/API.md](server/API.md).
+
+```
+npm run build                       # Web-App bauen (wird vom Server ausgeliefert)
+npm run abo -- invite               # Einladungscode fuer die Registrierung
+COOKIE_SECURE=false npm start       # http://127.0.0.1:8080 (Konfiguration: .env.example)
+```
+
+Die Web-App nutzt den Server noch nicht (folgt in Phase 2); Docker-Setup folgt in Phase 3.
 
 ## Datenschutz
 Der Repo-Inhalt enthaelt nur Code. Alle Nutzerdaten liegen ausschliesslich im Browser (localStorage/IndexedDB) und sind nicht Teil dieses Repos. Exporte (`abos-*.json`), Sync-Dateien und `.ics` sind per `.gitignore` ausgeschlossen.

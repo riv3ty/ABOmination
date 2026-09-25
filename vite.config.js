@@ -11,5 +11,5 @@ export default defineConfig({
   // Port 8765: bei Google/Microsoft als Redirect-/Ursprungs-Adresse registriert (siehe SYNC-EINRICHTEN.md)
   server: { port: 8765, strictPort: true },
   preview: { port: 8765, strictPort: true },
-  test: { root: ".", include: ["web/tests/**/*.test.js"] }
+  test: { root: ".", include: ["web/tests/**/*.test.js", "server/tests/**/*.test.js"] }
 });

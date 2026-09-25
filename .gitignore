@@ -9,3 +9,7 @@ abo-manager.json
 # Build und Abhaengigkeiten
 node_modules/
 dist/
+
+# Server: lokale Datenbank und Konfiguration
+data/
+.env

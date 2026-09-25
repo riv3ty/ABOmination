@@ -1,0 +1,90 @@
+// Fastify-App zusammensetzen (für Server-Start und Tests)
+import Fastify from "fastify";
+import cookie from "@fastify/cookie";
+import rateLimit from "@fastify/rate-limit";
+import fastifyStatic from "@fastify/static";
+import crypto from "node:crypto";
+import fs from "node:fs";
+import path from "node:path";
+import { serverSecret } from "./security.js";
+import { readSession, purgeExpired, Throttle } from "./sessions.js";
+import { KDF } from "./schemas.js";
+import authRoutes from "./routes/auth.js";
+import vaultRoutes from "./routes/vault.js";
+
+export const VERSION = "0.2.0";
+
+// Content-Security-Policy für die Web-App. Inline-Skripte (Build als Einzeldatei) werden per Hash erlaubt.
+export function buildCsp(html) {
+  const hashes = [...html.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g)]
+    .map(m => `'sha256-${crypto.createHash("sha256").update(m[1]).digest("base64")}'`);
+  return [
+    "default-src 'self'",
+    `script-src 'self' ${hashes.join(" ")} https://accounts.google.com`,       // Google-Anmeldung (Drive-Sync)
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com",
+    "font-src 'self' https://fonts.gstatic.com",
+    "img-src 'self' data:",
+    "connect-src 'self' https:",                                               // Wechselkurse, Sync-Anbieter (Nextcloud: beliebiger Host)
+    "frame-src https://accounts.google.com",
+    "object-src 'none'", "base-uri 'none'", "form-action 'self'", "frame-ancestors 'none'"
+  ].join("; ");
+}
+
+export async function buildApp({ config, db, logger = { level: config.logLevel } }) {
+  const app = Fastify({ logger, trustProxy: config.trustProxy, bodyLimit: config.maxVaultBytes + 64 * 1024 });
+  const secret = serverSecret(db), throttle = new Throttle();
+
+  await app.register(cookie);
+  await app.register(rateLimit, { global: true, max: 300, timeWindow: "1 minute" });
+
+  // Anmeldung prüfen; bei Cookie-Sessions zusätzlich CSRF-Schutz für ändernde Anfragen
+  app.decorate("requireAuth", async (req, reply) => {
+    const s = readSession(db, config, req);
+    if (!s) return reply.code(401).send({ error: "unauthorized", message: "Nicht angemeldet oder Sitzung abgelaufen." });
+    if (s.viaCookie && req.method !== "GET" && req.headers["x-requested-with"] !== "abomination")
+      return reply.code(403).send({ error: "csrf", message: "Anfrage abgelehnt (Header X-Requested-With fehlt)." });
+    req.session = s;
+  });
+
+  // Allgemeine Sicherheits-Header; API-Antworten nie zwischenspeichern
+  app.addHook("onSend", async (req, reply, payload) => {
+    reply.header("X-Content-Type-Options", "nosniff");
+    reply.header("Referrer-Policy", "no-referrer");
+    reply.header("Cross-Origin-Opener-Policy", "same-origin-allow-popups");   // OAuth-Popups (Google/Microsoft) brauchen window.opener
+    reply.header("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+    if (req.protocol === "https") reply.header("Strict-Transport-Security", "max-age=31536000");
+    if (req.url.startsWith("/api/")) reply.header("Cache-Control", "no-store");
+    return payload;
+  });
+
+  app.get("/api/health", async () => ({ ok: true, version: VERSION }));
+  app.get("/api/config", async () => ({ version: VERSION, registration: config.registration, maxVaultBytes: config.maxVaultBytes, kdf: KDF }));
+
+  await app.register(authRoutes, { config, db, secret, throttle });
+  await app.register(vaultRoutes, { config, db });
+
+  // Web-App ausliefern (dist/ aus dem Build), falls vorhanden
+  const index = path.join(config.staticDir, "index.html");
+  if (fs.existsSync(index)) {
+    const csp = buildCsp(fs.readFileSync(index, "utf8"));
+    await app.register(fastifyStatic, {
+      root: config.staticDir, index: ["index.html"], wildcard: false,
+      setHeaders: (reply, file) => {                                           // @fastify/static ≥ 10: Fastify-Reply
+        if (file.endsWith(".html")) reply.header("Content-Security-Policy", csp).header("Cache-Control", "no-cache");
+      }
+    });
+  } else app.log.warn(`Keine Web-App gefunden (${index}) – nur die API läuft. Vorher "npm run build" ausführen.`);
+
+  app.setNotFoundHandler((req, reply) => reply.code(404).send({ error: "not_found", message: "Nicht gefunden." }));
+  app.setErrorHandler((error, req, reply) => {
+    if (error.validation) return reply.code(400).send({ error: "invalid_request", message: "Ungültige Anfrage: " + error.message });
+    if (error.statusCode && error.statusCode < 500) return reply.code(error.statusCode).send({ error: error.code || "error", message: error.message });
+    req.log.error(error);
+    return reply.code(500).send({ error: "internal", message: "Interner Fehler." });
+  });
+
+  purgeExpired(db);
+  const timer = setInterval(() => purgeExpired(db), 3600000); timer.unref();
+  app.addHook("onClose", async () => clearInterval(timer));
+  return app;
+}

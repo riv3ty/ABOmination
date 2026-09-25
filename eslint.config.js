@@ -13,7 +13,7 @@ export default [
     }
   },
   {
-    files: ["web/tests/**/*.js", "*.config.js"],
+    files: ["web/tests/**/*.js", "server/**/*.js", "*.config.js"],
     languageOptions: { ecmaVersion: 2024, sourceType: "module", globals: { ...globals.node } }
   }
 ];

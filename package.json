@@ -2,7 +2,7 @@
   "name": "abomination",
   "private": true,
   "version": "0.2.0",
-  "description": "Abo- und Ratenzahlungs-Manager (Web-Client; Server folgt)",
+  "description": "Abo- und Ratenzahlungs-Manager: Web-Client und Server (Ende-zu-Ende-verschluesselt)",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -11,10 +11,13 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint .",
-    "check": "npm run lint && npm run test && npm run build"
+    "check": "npm run lint && npm run test && npm run build",
+    "start": "node server/src/index.js",
+    "server:dev": "node --watch server/src/index.js",
+    "abo": "node server/bin/abo.js"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=22.13"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -23,5 +26,14 @@
     "vite": "^8.3.1",
     "vite-plugin-singlefile": "^2.3.3",
     "vitest": "^5.0.2"
+  },
+  "dependencies": {
+    "@fastify/cookie": "^11.1.2",
+    "@fastify/rate-limit": "^11.2.0",
+    "@fastify/static": "^10.1.4",
+    "fastify": "^5.12.5"
+  },
+  "bin": {
+    "abo": "server/bin/abo.js"
   }
 }
