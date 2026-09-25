@@ -58,7 +58,11 @@ export async function buildApp({ config, db, logger = { level: config.logLevel }
   });
 
   app.get("/favicon.ico", async (req, reply) => reply.code(204).send());      // Browser fragen danach; keine Datei nötig
-  app.get("/api/health", async () => ({ ok: true, version: VERSION }));
+  // Prüft auch die Datenbank. Docker fragt alle 30 s – deshalb nicht ins Request-Log.
+  app.get("/api/health", { logLevel: "warn" }, async () => {
+    db.prepare("SELECT 1").get();
+    return { ok: true, version: VERSION };
+  });
   app.get("/api/config", async () => ({ version: VERSION, registration: config.registration, maxVaultBytes: config.maxVaultBytes, kdf: KDF }));
 
   await app.register(authRoutes, { config, db, secret, throttle });

@@ -1,0 +1,19 @@
+# Nur Quellcode ins Build-Kontext (keine Daten, Abhängigkeiten oder Build-Reste)
+.git
+node_modules
+dist
+data
+e2e
+server/tests
+web/tests
+.env
+*.md
+!README.md
+abos-*.json
+abo-manager-sync.json
+abo-manager.json
+*.ics
+*.bak
+*.cmd
+*.ps1
+.claude

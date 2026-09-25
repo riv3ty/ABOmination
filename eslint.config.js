@@ -15,5 +15,10 @@ export default [
   {
     files: ["web/tests/**/*.js", "server/**/*.js", "*.config.js"],
     languageOptions: { ecmaVersion: 2024, sourceType: "module", globals: { ...globals.node } }
+  },
+  {
+    files: ["e2e/**/*.js"],                                                   // Node-Skript, Callbacks laufen im Browser
+    languageOptions: { ecmaVersion: 2024, sourceType: "module", globals: { ...globals.node, ...globals.browser } },
+    rules: { "no-empty": ["error", { allowEmptyCatch: true }] }
   }
 ];

@@ -220,6 +220,39 @@ describe("Verwaltung (CLI)", () => {
   });
 });
 
+describe("Hinter dem Reverse Proxy", () => {
+  it("übernimmt https und Client-IP aus den Proxy-Headern (Sperre pro echter IP)", async () => {
+    await app.close(); await setup({ TRUST_PROXY: "true" });
+    const { key: k } = await register("Anna");
+    const viaProxy = (ip, authKey) => post("/api/auth/login", { username: "Anna", authKey }, { "x-forwarded-for": ip, "x-forwarded-proto": "https" });
+    for (let i = 0; i < 5; i++) await viaProxy("203.0.113.7", key());
+    expect((await viaProxy("203.0.113.7", k)).statusCode).toBe(429);        // Angreifer gesperrt …
+    const ok = await viaProxy("198.51.100.20", k);                           // … andere Nutzer hinter demselben Proxy nicht
+    expect(ok.statusCode).toBe(200);
+    expect(ok.headers["strict-transport-security"]).toContain("max-age=");
+  });
+
+  it("ohne TRUST_PROXY werden Proxy-Header ignoriert", async () => {
+    const r = await app.inject({ url: "/api/health", headers: { "x-forwarded-proto": "https" } });
+    expect(r.headers["strict-transport-security"]).toBeUndefined();
+  });
+});
+
+describe("Sicherung (CLI)", () => {
+  it("backup schreibt eine lesbare Kopie und räumt alte auf", async () => {
+    await register("Anna");
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "abo-backup-"));
+    const f = run(["backup"], db, () => {}, { dataDir: dir });
+    const copy = openDb(f);
+    expect(copy.prepare("SELECT display FROM users").get().display).toBe("Anna");
+    copy.close();
+    for (const n of ["2020-01-01-00-00", "2020-01-02-00-00", "2020-01-03-00-00"]) fs.writeFileSync(path.join(dir, "backups", `abomination-${n}.db`), "");
+    run(["backup", "--keep", "2"], db, () => {}, { dataDir: dir });
+    expect(fs.readdirSync(path.join(dir, "backups")).length).toBe(2);
+    expect(() => run(["backup", f], db, () => {})).toThrow(/existiert bereits/);
+  });
+});
+
 describe("Web-App ausliefern", () => {
   it("CSP enthält Hashes der Inline-Skripte", () => {
     const csp = buildCsp('<script>alert(1)</script><script type="module">x()</script><script src="a.js"></script>');

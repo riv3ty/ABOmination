@@ -1,0 +1,41 @@
+# ABOmination auf dem Server (Anleitung: DEPLOYMENT.md)
+#   Start/Update:  docker compose up -d --build
+#   Einladung:     docker compose exec app abo invite --note "Name"
+# Einstellungen stehen in .env (Vorlage: .env.example)
+name: abomination                                # fester Projektname → Volume heißt abomination_abo-data
+services:
+  app:
+    build: .
+    image: abomination:latest
+    container_name: abomination
+    restart: unless-stopped
+    init: true                                   # sauberes Beenden/Signale
+    environment:
+      REGISTRATION: ${REGISTRATION:-invite}
+      TRUST_PROXY: ${TRUST_PROXY:-true}          # nur sicher, weil der Port nicht öffentlich erreichbar ist (siehe ports)
+      COOKIE_SECURE: ${COOKIE_SECURE:-true}
+      SESSION_DAYS: ${SESSION_DAYS:-30}
+      MAX_VAULT_BYTES: ${MAX_VAULT_BYTES:-5242880}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    # Nur lokal auf dem Server erreichbar – dein Reverse Proxy leitet https://abo.deine-domain.de hierher.
+    # Läuft der Proxy selbst in Docker: "ports" entfernen und stattdessen das Proxy-Netzwerk eintragen (siehe DEPLOYMENT.md).
+    ports:
+      - "${BIND_ADDR:-127.0.0.1}:${HOST_PORT:-8080}:8080"
+    volumes:
+      - abo-data:/data
+    # Härtung: Dateisystem schreibgeschützt (außer /data), keine Zusatzrechte
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  abo-data:

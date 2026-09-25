@@ -4,6 +4,7 @@ Abo-/Ratenzahlungs-Manager, reiner Web-Client (Vanilla JS, keine Frameworks). UI
 
 ## Befehle
 - `npm run check` = Lint + Tests + Build (vor jedem Commit)
+- `npm run e2e` = Build + echter Server + zwei Chrome-Instanzen (Sync, Konflikt, offline, Passwortwechsel); bei Aenderungen an Login/Sync/Server laufen lassen. Docker-Test: `docker compose -p abotest up -d --build` (HOST_PORT=8797), Einladung per `docker compose -p abotest exec app abo invite`, dann `E2E_URL=http://localhost:8797/ E2E_INVITE=<code> node e2e/run.js`; danach `docker compose -p abotest down -v`
 - `npm test`, `npm run lint`, `npm run build` (-> `dist/index.html`, eine Datei via vite-plugin-singlefile), `npm run dev` (Port 8765)
 
 ## Architektur
@@ -21,6 +22,7 @@ Abo-/Ratenzahlungs-Manager, reiner Web-Client (Vanilla JS, keine Frameworks). UI
 - E2E-Protokoll und Endpunkte: `server/API.md` – bei API-Änderungen mitpflegen. Der Server sieht nur `authKey` (gehasht mit scrypt) und den verschlüsselten Tresor-Blob.
 - Schema-Änderungen nur als neue Migration in `MIGRATIONS` (db.js), nie bestehende ändern.
 - Auth-Routen: Session per Cookie (Web, CSRF-Header `X-Requested-With: abomination`) oder Bearer (App). Verwaltung per CLI `server/src/cli.js`.
+- Docker: Image enthaelt nur `server/src`, `server/bin`, `dist` + Laufzeit-Abhaengigkeiten; laeuft als `node`, read-only, Daten in `/data`. Neue Laufzeitdateien im Dockerfile ergaenzen.
 - CSP wird aus den Inline-Skripten von `dist/index.html` berechnet: keine Inline-Event-Handler (`onclick=` usw.) im Markup verwenden.
 
 ## Regeln
@@ -29,4 +31,4 @@ Abo-/Ratenzahlungs-Manager, reiner Web-Client (Vanilla JS, keine Frameworks). UI
 - Port 8765 ist bei Google/Microsoft als Ursprung registriert.
 
 ## Geplant (Server-Deployment)
-Phase 0 (Module/Tests), 1 (Backend) und 2 (Web-Client im Server-Modus) fertig; offen: 3 Docker, 4 Haertung, 5 PWA/Android. Docker-Container auf Ubuntu hinter dem vorhandenen Reverse Proxy des Users; Server speichert nur verschluesselte Tresor-Blobs (E2E, getrennter Auth-/Enc-Key), Registrierung nur per Einladung, spaeter Android-App. Lokaler Modus mit den bisherigen Sync-Anbietern bleibt erhalten.
+Phase 0 (Module/Tests), 1 (Backend), 2 (Web-Client im Server-Modus) und 3 (Docker: Dockerfile, compose.yaml, DEPLOYMENT.md) fertig; offen: 4 Haertung, 5 PWA/Android. Docker-Container auf Ubuntu hinter dem vorhandenen Reverse Proxy des Users; Server speichert nur verschluesselte Tresor-Blobs (E2E, getrennter Auth-/Enc-Key), Registrierung nur per Einladung, spaeter Android-App. Lokaler Modus mit den bisherigen Sync-Anbietern bleibt erhalten.
