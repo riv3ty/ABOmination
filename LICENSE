@@ -1,24 +1,56 @@
-Copyright (c) 2026 Maciej Peciak (riv3ty). All rights reserved.
+ABOmination Personal Use License
 
-This repository is publicly visible for transparency, security review and
-evaluation. It is NOT open source. No license is granted to use, copy, modify,
-merge, publish, distribute, sublicense or sell the software or any part of it,
-except where explicitly permitted in writing by the copyright holder.
+Copyright (c) 2026 Maciej Peciak (riv3ty). All rights reserved, except as
+expressly granted below.
 
-Viewing the source on GitHub and forking it within GitHub, as permitted by
-GitHub's Terms of Service, is allowed. Running your own instance for personal,
-non-commercial use requires permission; please open an issue or get in touch.
+The source code is publicly available but this is NOT an open-source license.
 
-Third-party components keep their own licenses:
-  - Fonts in web/src/fonts/ (SIL Open Font License 1.1, see web/src/fonts/LICENSE.md)
-  - npm dependencies (see their respective package licenses)
+1. Permitted use (free of charge, for natural persons)
+   You may:
+   a) view and study the source code;
+   b) run the software for personal, private, non-commercial purposes for
+      yourself and the members of your household – including running your own
+      server with the official Docker image or a build from this repository;
+   c) modify the software for such personal use.
+   Forking this repository on GitHub, as permitted by GitHub's Terms of
+   Service, is allowed.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY ARISING FROM THE USE OF THE SOFTWARE.
+2. Not permitted without prior written permission of the copyright holder
+   a) any commercial use, including use within a company or organisation,
+      offering the software or a hosted instance as a service to third
+      parties, or charging for access to it;
+   b) distributing, publishing, sublicensing or selling the software or
+      modified versions of it (outside of a GitHub fork as described above),
+      including redistributing container images or builds;
+   c) removing or altering copyright notices or this license;
+   d) using the name "ABOmination" or its logo in a way that suggests
+      endorsement by, or affiliation with, the copyright holder.
+
+3. Contributions
+   Contributions submitted to this repository (e.g. pull requests) may be used,
+   modified and distributed by the copyright holder under any terms.
+
+4. Third-party components keep their own licenses
+   - Fonts in web/src/fonts/ (SIL Open Font License 1.1, see web/src/fonts/LICENSE.md)
+   - npm dependencies (see their respective package licenses)
+
+5. No warranty, limitation of liability
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+   IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+   SOFTWARE. You are responsible for backing up your data.
+
+For any use not covered above, please open an issue or get in touch.
 
 ---
 
-Deutsch: Alle Rechte vorbehalten. Der Quellcode ist öffentlich einsehbar, aber
-keine Open-Source-Software. Nutzung, Vervielfältigung, Veränderung und
-Weitergabe nur mit schriftlicher Erlaubnis des Rechteinhabers.
+Deutsch (Zusammenfassung; maßgeblich ist der englische Text):
+Der Quellcode ist öffentlich, aber keine Open-Source-Software. Privatpersonen
+dürfen ABOmination kostenlos für private, nicht-kommerzielle Zwecke für sich
+und ihren Haushalt nutzen, selbst hosten und dafür anpassen. Kommerzielle
+Nutzung, Weiterverbreitung (auch veränderter Fassungen oder eigener Images)
+und die Nutzung von Name/Logo nur mit schriftlicher Erlaubnis. Keine
+Gewährleistung.

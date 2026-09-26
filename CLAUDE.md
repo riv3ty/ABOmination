@@ -28,7 +28,7 @@ Abo-/Ratenzahlungs-Manager, reiner Web-Client (Vanilla JS, keine Frameworks). UI
 - CSP wird aus den Inline-Skripten von `dist/index.html` berechnet: keine Inline-Event-Handler (`onclick=` usw.) im Markup verwenden.
 
 ## Oeffentlicher Auftritt
-- README.md (EN) + README.de.md (DE) synchron halten; Entwickler-Doku in docs/DEVELOPMENT.md. Lizenz: alle Rechte vorbehalten (LICENSE) – nicht "Open Source" nennen.
+- README.md (EN) + README.de.md (DE) synchron halten; Entwickler-Doku in docs/DEVELOPMENT.md. Lizenz: eigene "Personal Use License" (privat/nicht-kommerziell frei, inkl. Selbsthosting; kommerziell und Weiterverbreitung nur mit Erlaubnis) – nicht "Open Source" nennen.
 - Roadmap nur in `docs/roadmap.json` pflegen, dann `npm run roadmap` (erzeugt ROADMAP.md/.de.md; Website liest die JSON).
 - Website: `site/` (Vorlagen, EN/DE per `<span lang>`), Build `npm run site` → `_site/` inkl. Demo unter `/app/` (`?demo` laedt Beispieldaten aus `scripts/demo-data.js`). Newsletter (Brevo) und Impressum/Datenschutz erscheinen nur, wenn `site/site.config.json` ausgefuellt ist – keine Personendaten erfinden.
 - Screenshots: `npm run screenshots` (nur Beispieldaten). GitHub Actions: ci.yml (check + e2e), docker.yml (GHCR, amd64/arm64), pages.yml.

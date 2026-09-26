@@ -10,7 +10,7 @@ Thanks for your interest in ABOmination!
 
 ## Pull requests
 
-ABOmination is **not open source** (all rights reserved, see [LICENSE](LICENSE)). Pull requests are only accepted after prior agreement in an issue; by submitting one you agree that your contribution may be used under the project's terms.
+ABOmination is source-available but **not open source** (free for personal use, see [LICENSE](LICENSE)). Pull requests are only accepted after prior agreement in an issue; by submitting one you agree that your contribution may be used under the project's terms.
 
 If we agreed on a change:
 

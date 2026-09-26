@@ -14,7 +14,7 @@
   <a href="https://github.com/riv3ty/ABOmination/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/riv3ty/ABOmination/actions/workflows/ci.yml/badge.svg"></a>
   <a href="https://github.com/riv3ty/ABOmination/pkgs/container/abomination"><img alt="Docker image" src="https://img.shields.io/badge/docker-ghcr.io%2Friv3ty%2Fabomination-2496ED?logo=docker&logoColor=white"></a>
   <a href="https://riv3ty.github.io/ABOmination/"><img alt="Website" src="https://img.shields.io/badge/website-live%20demo-8b5cf6"></a>
-  <img alt="License" src="https://img.shields.io/badge/license-all%20rights%20reserved-lightgrey">
+  <a href="LICENSE"><img alt="License: free for personal use" src="https://img.shields.io/badge/license-free%20for%20personal%20use-lightgrey"></a>
   <img alt="App language" src="https://img.shields.io/badge/app%20UI-German-555">
 </p>
 
@@ -121,4 +121,4 @@ Bug reports and ideas are very welcome – please use the [issue templates](http
 
 ## License
 
-© 2026 Maciej Peciak. **All rights reserved.** The source code is publicly visible for transparency and review but is not open source – see [LICENSE](LICENSE). Bundled fonts are licensed under the SIL Open Font License ([details](web/src/fonts/LICENSE.md)).
+© 2026 Maciej Peciak. **Free for personal, non-commercial use** – including self-hosting for yourself and your household. Commercial use and redistribution require permission. The source code is public but this is not an open-source license – see [LICENSE](LICENSE). Bundled fonts are licensed under the SIL Open Font License ([details](web/src/fonts/LICENSE.md)).
