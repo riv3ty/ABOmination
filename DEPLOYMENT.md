@@ -12,19 +12,32 @@ Der Container enthält den API-Server und die gebaute Web-App. Er lauscht nur lo
 
 ## 2. Installation
 
-```bash
-# Code auf den Server holen (Git-Remote oder Kopie des Repos)
-sudo mkdir -p /opt/abomination && sudo chown "$USER" /opt/abomination
-git clone <dein-repo> /opt/abomination        # oder: rsync/scp des Repos nach /opt/abomination
-cd /opt/abomination
+### Variante A: fertiges Image (empfohlen)
 
-cp .env.example .env                          # Einstellungen prüfen (Standard passt meist)
-docker compose up -d --build                  # baut das Image und startet den Container
+Das Image wird bei jedem Update automatisch gebaut und in der GitHub Container Registry veröffentlicht (`ghcr.io/riv3ty/abomination`, für amd64 und arm64). Auf dem Server reichen zwei Dateien:
+
+```bash
+sudo mkdir -p /opt/abomination && sudo chown "$USER" /opt/abomination && cd /opt/abomination
+curl -fsSLO https://raw.githubusercontent.com/riv3ty/ABOmination/main/compose.yaml
+curl -fsSL https://raw.githubusercontent.com/riv3ty/ABOmination/main/.env.example -o .env   # Einstellungen prüfen
+docker compose pull
+docker compose up -d
 docker compose ps                             # Status sollte nach ~10 s "healthy" sein
 curl -s http://127.0.0.1:8080/api/health      # {"ok":true,...}
 ```
 
-Die Daten liegen im Docker-Volume `abomination_abo-data` (SQLite-Datenbank unter `/data` im Container).
+Eine feste Version statt `latest`: in `.env` z. B. `ABO_VERSION=0.3.0` eintragen.
+
+### Variante B: selbst bauen
+
+```bash
+git clone https://github.com/riv3ty/ABOmination.git /opt/abomination
+cd /opt/abomination
+cp .env.example .env
+docker compose up -d --build
+```
+
+Die Daten liegen in beiden Fällen im Docker-Volume `abomination_abo-data` (SQLite-Datenbank unter `/data` im Container).
 
 ## 3. Reverse Proxy
 
@@ -127,8 +140,8 @@ Einstellungen stehen in `.env` (siehe `.env.example`), z. B. `REGISTRATION=close
 
 ```bash
 cd /opt/abomination
-git pull                                        # bzw. neue Dateien kopieren
-docker compose up -d --build
+docker compose pull && docker compose up -d     # Variante A (fertiges Image)
+# git pull && docker compose up -d --build      # Variante B (selbst bauen)
 docker image prune -f                           # alte Images aufräumen
 ```
 Datenbank-Migrationen laufen beim Start automatisch. Vorher eine Sicherung anlegen (siehe unten).

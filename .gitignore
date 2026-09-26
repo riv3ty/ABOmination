@@ -13,3 +13,6 @@ dist/
 # Server: lokale Datenbank und Konfiguration
 data/
 .env
+
+# Website-Build (GitHub Pages)
+_site/

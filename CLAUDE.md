@@ -27,6 +27,12 @@ Abo-/Ratenzahlungs-Manager, reiner Web-Client (Vanilla JS, keine Frameworks). UI
 - Schriften liegen in `web/src/fonts/` und werden eingebettet (CSP `font-src data:`); keine externen Ressourcen (CDN, Google Fonts) einbinden.
 - CSP wird aus den Inline-Skripten von `dist/index.html` berechnet: keine Inline-Event-Handler (`onclick=` usw.) im Markup verwenden.
 
+## Oeffentlicher Auftritt
+- README.md (EN) + README.de.md (DE) synchron halten; Entwickler-Doku in docs/DEVELOPMENT.md. Lizenz: alle Rechte vorbehalten (LICENSE) – nicht "Open Source" nennen.
+- Roadmap nur in `docs/roadmap.json` pflegen, dann `npm run roadmap` (erzeugt ROADMAP.md/.de.md; Website liest die JSON).
+- Website: `site/` (Vorlagen, EN/DE per `<span lang>`), Build `npm run site` → `_site/` inkl. Demo unter `/app/` (`?demo` laedt Beispieldaten aus `scripts/demo-data.js`). Newsletter (Brevo) und Impressum/Datenschutz erscheinen nur, wenn `site/site.config.json` ausgefuellt ist – keine Personendaten erfinden.
+- Screenshots: `npm run screenshots` (nur Beispieldaten). GitHub Actions: ci.yml (check + e2e), docker.yml (GHCR, amd64/arm64), pages.yml.
+
 ## Regeln
 - Alles, was in HTML landet, mit `esc()` escapen. Importierte/synchronisierte Daten laufen durch `normalizeSub()`.
 - Das Inline-Skript im `<head>` von `web/index.html` (Microsoft-OAuth-Ruecksprung) muss vor dem Modul laufen – nicht entfernen.

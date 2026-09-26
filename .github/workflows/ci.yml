@@ -1,0 +1,28 @@
+# Lint, Tests, Build und Ende-zu-Ende-Test (echter Server + zwei Chrome-Instanzen) bei jedem Push und Pull Request
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - name: End-to-end test
+        run: node e2e/run.js
+        env:
+          CHROME_PATH: /usr/bin/google-chrome

@@ -2,11 +2,13 @@
 import { $, esc } from "./lib/dom.js";
 import { Vault, USERS_KEY, LEGACY_KEYS, ITER, rget, sleep } from "./vault.js";
 import { ServerStore, detectServer, cachedAccounts, validUsername } from "./server/store.js";
-import { startApp } from "./app.js";
+import { startApp, loadDemoData } from "./app.js";
 
 /* ---------- Anmelde-Oberfläche ---------- */
 const root = $("#auth");
 let view = { mode: "list" }, busy = false, fails = 0, server = null;   // server = Konfiguration, falls die App auf einem Server läuft
+// Demo (Website): ?demo in der Adresse → Profil „Demo“ vorschlagen und nach dem Anlegen Beispieldaten laden
+const DEMO = new URLSearchParams(location.search).has("demo");
 const legacyData = () => {                    // unverschlüsselte Daten aus früheren Versionen
   const d = {}; for (const k of LEGACY_KEYS) { const v = rget(k, undefined); if (v !== undefined) d[k] = v; }
   return Object.keys(d).length ? d : null;
@@ -74,7 +76,8 @@ function render() {
     const first = !users.length && !accounts.length, legacy = !users.length && legacyData();
     root.innerHTML = `<form class="au-card" id="auCreate"><h1>${first ? "Willkommen" : "Neues lokales Profil"}</h1>
       ${legacy ? `<div class="au-note">Deine bisherigen Abos in diesem Browser werden in dieses Profil übernommen und ab jetzt verschlüsselt gespeichert.</div>` : ""}
-      <label>Name<input id="auName" maxlength="40" autocomplete="username" placeholder="z. B. Maciej"></label>
+      ${DEMO ? `<div class="au-note"><b>Demo:</b> Das Profil wird mit erfundenen Beispieldaten gefüllt. Alles bleibt ausschließlich in diesem Browser. Wähle ein beliebiges Passwort (mind. 8 Zeichen).</div>` : ""}
+      <label>Name<input id="auName" maxlength="40" autocomplete="username" placeholder="z. B. Maciej"${DEMO ? ' value="Demo"' : ""}></label>
       <label>Passwort (mind. 8 Zeichen)<input type="password" id="auPw" autocomplete="new-password"></label>
       <label>Passwort wiederholen<input type="password" id="auPw2" autocomplete="new-password"></label>
       <div class="au-note">Es gibt keinen Passwort-Reset. Wer das Passwort vergisst, kann die Daten des Profils nicht wiederherstellen.</div>
@@ -113,6 +116,7 @@ async function doCreate() {
     await Vault.create(name, pw, initial || {});
     if (initial) for (const k of LEGACY_KEYS) localStorage.removeItem(k);      // Klartext-Reste entfernen
     enter();
+    if (DEMO) { history.replaceState(null, "", location.pathname); await loadDemoData(); }
   } catch (e) { err.textContent = e.message; setBusy(false); }
 }
 async function doSrvLogin() {

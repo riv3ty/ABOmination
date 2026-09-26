@@ -1,0 +1,50 @@
+name: Bug report / Fehler melden
+description: Something doesn't work as expected. / Etwas funktioniert nicht wie erwartet.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! **Please never include real financial data** – sample data from the [live demo](https://riv3ty.github.io/ABOmination/app/?demo) is ideal.
+        Security issues: please report privately (see SECURITY.md).
+        Danke für die Meldung! **Bitte keine echten Finanzdaten anhängen.** Sicherheitslücken bitte vertraulich melden (siehe SECURITY.md).
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened? / Was ist passiert?
+      description: Steps to reproduce and what you expected instead. / Schritte zum Nachstellen und was du stattdessen erwartet hast.
+      placeholder: |
+        1. …
+        2. …
+        Expected: …
+    validations:
+      required: true
+  - type: dropdown
+    id: mode
+    attributes:
+      label: How do you use ABOmination? / Wie nutzt du ABOmination?
+      options:
+        - Live demo (website)
+        - Local profile (file / Windows launcher)
+        - Own server (Docker)
+        - Installed app (PWA)
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Browser & OS / Browser & Betriebssystem
+      placeholder: e.g. Chrome 140, Windows 11 / Android 15
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version (server `/api/health` or Docker tag)
+      placeholder: e.g. 0.3.0 or latest
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / Screenshots
+      description: Browser console (F12) or `docker compose logs app` – please remove personal data.
+      render: text

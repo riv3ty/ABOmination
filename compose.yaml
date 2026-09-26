@@ -1,12 +1,13 @@
 # ABOmination auf dem Server (Anleitung: DEPLOYMENT.md)
-#   Start/Update:  docker compose up -d --build
+#   Start/Update:  docker compose pull && docker compose up -d   (fertiges Image von GHCR)
+#   Selbst bauen:  docker compose up -d --build                  (im geklonten Repo)
 #   Einladung:     docker compose exec app abo invite --note "Name"
 # Einstellungen stehen in .env (Vorlage: .env.example)
 name: abomination                                # fester Projektname → Volume heißt abomination_abo-data
 services:
   app:
+    image: ghcr.io/riv3ty/abomination:${ABO_VERSION:-latest}   # feste Version z. B. ABO_VERSION=0.3.0
     build: .
-    image: abomination:latest
     container_name: abomination
     restart: unless-stopped
     init: true                                   # sauberes Beenden/Signale

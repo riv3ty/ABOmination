@@ -1164,18 +1164,28 @@ $("#btnImport").onclick = () => $("#fileImport").click();
 $("#fileImport").addEventListener("change", async e => {
   const file = e.target.files[0]; e.target.value = "";
   if (!file) return;
-  try {
-    const b = parseBackup(JSON.parse(await file.text()));
-    const now = Date.now(), c = b.subs.map(s => ({ ...s, updatedAt: now }));
-    const extra = [b.settings && "Einstellungen werden übernommen", b.achievements && "Errungenschaften werden zusammengeführt"].filter(Boolean);
-    if (!confirm(`${c.length} Abos importieren? Die aktuellen Daten (${subs.length}) werden ersetzt.${extra.length ? "\n" + extra.join(", ") + "." : ""}`)) return;
-    const keep = new Set(c.map(s => s.id));                                // ersetzte Einträge als gelöscht markieren (Abgleich)
-    meta.deleted = { ...meta.deleted, ...Object.fromEntries(subs.filter(s => !keep.has(s.id)).map(s => [s.id, now])) };
-    if (b.settings) { settings = { ...settings, ...b.settings }; saveSettings(); Vault.bump(); }
-    if (b.achievements) { ach = mergeAch(ach, b.achievements); saveAch(); }
-    subs = c; save(); render(); maybeRefreshRates();
-  } catch { alert("Datei konnte nicht gelesen werden. Erwartet wird eine JSON-Sicherung aus dieser App."); }
+  let b;
+  try { b = parseBackup(JSON.parse(await file.text())); }
+  catch { return alert("Datei konnte nicht gelesen werden. Erwartet wird eine JSON-Sicherung aus dieser App."); }
+  const extra = [b.settings && "Einstellungen werden übernommen", b.achievements && "Errungenschaften werden zusammengeführt"].filter(Boolean);
+  if (confirm(`${b.subs.length} Abos importieren? Die aktuellen Daten (${subs.length}) werden ersetzt.${extra.length ? "\n" + extra.join(", ") + "." : ""}`)) applyBackup(b);
 });
+// Sicherung übernehmen: Abos ersetzen (ersetzte als gelöscht markieren), Einstellungen übernehmen, Errungenschaften zusammenführen
+function applyBackup(b) {
+  const now = Date.now(), c = b.subs.map(s => ({ ...s, updatedAt: now }));
+  const keep = new Set(c.map(s => s.id));                                  // ersetzte Einträge als gelöscht markieren (Abgleich)
+  meta.deleted = { ...meta.deleted, ...Object.fromEntries(subs.filter(s => !keep.has(s.id)).map(s => [s.id, now])) };
+  if (b.settings) { settings = { ...settings, ...b.settings }; saveSettings(); Vault.bump(); }
+  if (b.achievements) { ach = mergeAch(ach, b.achievements); saveAch(); }
+  subs = c; save(); render(); maybeRefreshRates();
+}
+// Demo (Website): Beispieldaten in ein frisch angelegtes lokales Profil laden
+export async function loadDemoData(url = "./demo-data.json") {
+  try {
+    const r = await fetch(url, { cache: "no-store" });
+    if (r.ok) applyBackup(parseBackup(await r.json()));
+  } catch (e) { console.warn("Beispieldaten nicht geladen:", e.message); }
+}
 
 /* ================= Design: Icons, Zeitleiste, Effekte ================= */
 const svg = p => `<svg viewBox="0 0 24 24" aria-hidden="true">${p}</svg>`;

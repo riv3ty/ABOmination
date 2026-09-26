@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ABOmination – subscriptions & installments, end-to-end encrypted</title>
+<meta name="description" content="Keep track of every subscription and installment plan. Reminders, cancellation deadlines, interest, savings tips – encrypted on your device, self-hostable.">
+<meta property="og:title" content="ABOmination">
+<meta property="og:description" content="Every subscription. Every installment. One calm overview – end-to-end encrypted.">
+<meta property="og:image" content="{{siteUrl}}assets/screenshots/dashboard-dark.webp">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0f0f11">
+<link rel="icon" type="image/svg+xml" href="assets/icons/icon.svg">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="site.css">
+<script>
+  // Sprache vor dem ersten Rendern setzen (gespeichert > Browser-Sprache)
+  (function () { var l; try { l = localStorage.getItem("abo-site-lang"); } catch (e) {}
+    l = l || ((navigator.language || "").toLowerCase().indexOf("de") === 0 ? "de" : "en");
+    document.documentElement.dataset.lang = l; document.documentElement.lang = l; })();
+</script>
+</head>
+<body>
+<header class="nav">
+  <a class="brand" href="#top"><img src="assets/icons/icon.svg" alt="" width="34" height="34"><span>ABOmination</span></a>
+  <nav class="links">
+    <a href="#features"><span lang="en">Features</span><span lang="de">Funktionen</span></a>
+    <a href="#privacy"><span lang="en">Privacy</span><span lang="de">Datenschutz</span></a>
+    <a href="#start"><span lang="en">Get started</span><span lang="de">Loslegen</span></a>
+    <a href="#roadmap">Roadmap</a>
+    <!--if:newsletter--><a href="#newsletter">Newsletter</a><!--endif:newsletter-->
+    <a href="{{repo}}">GitHub</a>
+  </nav>
+  <div class="nav-actions">
+    <button class="lang" type="button" id="langToggle" aria-label="Sprache wechseln / switch language"><span lang="en">DE</span><span lang="de">EN</span></button>
+    <a class="btn primary" href="app/?demo"><span lang="en">Live demo</span><span lang="de">Live-Demo</span></a>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="hero-text">
+      <p class="eyebrow"><span lang="en">Subscriptions · Installments · Privacy</span><span lang="de">Abos · Ratenkäufe · Privatsphäre</span></p>
+      <h1>
+        <span lang="en">Every subscription.<br>Every installment.<br><em>One calm overview.</em></span>
+        <span lang="de">Jedes Abo.<br>Jede Rate.<br><em>Ein ruhiger Überblick.</em></span>
+      </h1>
+      <p class="lede">
+        <span lang="en">ABOmination shows what really leaves your account every month – with reminders, cancellation deadlines, interest calculation and savings tips. Your data is encrypted on your device; even your own server can't read it.</span>
+        <span lang="de">ABOmination zeigt, was wirklich jeden Monat abgeht – mit Erinnerungen, Kündigungsfristen, Zinsberechnung und Spartipps. Deine Daten werden auf deinem Gerät verschlüsselt; nicht einmal dein eigener Server kann sie lesen.</span>
+      </p>
+      <div class="cta">
+        <a class="btn primary big" href="app/?demo"><span lang="en">Try it in your browser</span><span lang="de">Im Browser ausprobieren</span></a>
+        <a class="btn big" href="#start"><span lang="en">Self-host with Docker</span><span lang="de">Selbst hosten mit Docker</span></a>
+      </div>
+      <p class="fine"><span lang="en">Demo runs entirely in your browser with sample data – nothing is uploaded.</span><span lang="de">Die Demo läuft komplett in deinem Browser mit Beispieldaten – nichts wird hochgeladen.</span></p>
+    </div>
+    <figure class="hero-shot frame">
+      <div class="frame-bar"><i></i><i></i><i></i></div>
+      <picture>
+        <source srcset="assets/screenshots/dashboard-dark.webp" media="(prefers-color-scheme: dark)">
+        <img src="assets/screenshots/dashboard-light.webp" alt="ABOmination dashboard with monthly total, reminders and upcoming payments" width="1440" height="1100">
+      </picture>
+    </figure>
+  </section>
+
+  <section id="features" class="section">
+    <p class="eyebrow"><span lang="en">Features</span><span lang="de">Funktionen</span></p>
+    <h2><span lang="en">Everything you pay regularly – in one place.</span><span lang="de">Alles, was du regelmäßig zahlst – an einem Ort.</span></h2>
+    <div class="bento">
+      <article class="card wide">
+        <h3><span lang="en">Dashboard that tells the truth</span><span lang="de">Ein Dashboard, das ehrlich ist</span></h3>
+        <p><span lang="en">Monthly and yearly totals, the next 30 days on a timeline, spending by category and by bank account – in your main currency, with live exchange rates.</span>
+           <span lang="de">Monats- und Jahressumme, die nächsten 30 Tage als Zeitleiste, Kosten nach Kategorie und Bankkonto – in deiner Hauptwährung, mit aktuellen Wechselkursen.</span></p>
+      </article>
+      <article class="card">
+        <h3><span lang="en">Installments & interest</span><span lang="de">Ratenkäufe & Zinsen</span></h3>
+        <p><span lang="en">Amortization schedule, remaining debt and an early-payoff simulator.</span><span lang="de">Tilgungsplan, Restschuld und ein Simulator für Sondertilgungen.</span></p>
+      </article>
+      <article class="card">
+        <h3><span lang="en">Never miss a deadline</span><span lang="de">Keine Frist verpassen</span></h3>
+        <p><span lang="en">Reminders before payments and cancellation deadlines, plus a calendar file for Outlook, Google or Apple.</span><span lang="de">Hinweise vor Zahlungen und Kündigungsfristen, dazu eine Kalenderdatei für Outlook, Google oder Apple.</span></p>
+      </article>
+      <article class="card">
+        <h3><span lang="en">Import your bank statement</span><span lang="de">Kontoauszug importieren</span></h3>
+        <p><span lang="en">Recurring payments are detected automatically in CSV exports.</span><span lang="de">Wiederkehrende Zahlungen werden in CSV-Exporten automatisch erkannt.</span></p>
+      </article>
+      <article class="card">
+        <h3><span lang="en">Savings tips</span><span lang="de">Spartipps</span></h3>
+        <p><span lang="en">Rarely used, duplicated or overlapping subscriptions, cheaper yearly plans.</span><span lang="de">Selten genutzte, doppelte oder überlappende Abos, günstigere Jahrestarife.</span></p>
+      </article>
+      <article class="card full">
+        <h3><span lang="en">Works everywhere</span><span lang="de">Läuft überall</span></h3>
+        <p><span lang="en">Installable app for Android, iOS and desktop – also offline. Native Android app in progress.</span><span lang="de">Installierbare App für Android, iOS und Desktop – auch offline. Native Android-App in Arbeit.</span></p>
+      </article>
+    </div>
+    <div class="gallery">
+      <figure class="frame"><img src="assets/screenshots/installments-light.webp" alt="Installment plans with progress, schedule and payoff simulator" loading="lazy"></figure>
+      <figure class="frame"><img src="assets/screenshots/insights-dark.webp" alt="Savings tips" loading="lazy"></figure>
+      <figure class="phone"><picture><source srcset="assets/screenshots/mobile-dark.webp" media="(prefers-color-scheme: dark)"><img src="assets/screenshots/mobile-light.webp" alt="ABOmination on a phone" loading="lazy"></picture></figure>
+    </div>
+  </section>
+
+  <section id="privacy" class="section privacy">
+    <p class="eyebrow"><span lang="en">Privacy by design</span><span lang="de">Datenschutz eingebaut</span></p>
+    <h2><span lang="en">Your finances stay yours.</span><span lang="de">Deine Finanzen bleiben deine.</span></h2>
+    <div class="steps">
+      <div class="step"><b>1</b><h3><span lang="en">Encrypted on your device</span><span lang="de">Auf deinem Gerät verschlüsselt</span></h3>
+        <p><span lang="en">Your password derives two keys (PBKDF2 → HKDF). One encrypts your data with AES-256-GCM and never leaves the device.</span><span lang="de">Aus deinem Passwort entstehen zwei Schlüssel (PBKDF2 → HKDF). Einer verschlüsselt deine Daten mit AES-256-GCM und verlässt das Gerät nie.</span></p></div>
+      <div class="step"><b>2</b><h3><span lang="en">Your server stores ciphertext</span><span lang="de">Dein Server speichert nur Chiffretext</span></h3>
+        <p><span lang="en">The server only checks a separate login key and stores the encrypted vault. A database leak reveals nothing readable.</span><span lang="de">Der Server prüft nur einen getrennten Anmeldeschlüssel und speichert den verschlüsselten Tresor. Ein Datenbank-Leck verrät nichts Lesbares.</span></p></div>
+      <div class="step"><b>3</b><h3><span lang="en">No tracking, no cloud lock-in</span><span lang="de">Kein Tracking, kein Cloud-Zwang</span></h3>
+        <p><span lang="en">No analytics, no ads, no third-party fonts. Use it locally in your browser or on your own server.</span><span lang="de">Keine Analyse, keine Werbung, keine fremden Schriften. Nutze es lokal im Browser oder auf deinem eigenen Server.</span></p></div>
+    </div>
+  </section>
+
+  <section id="start" class="section">
+    <p class="eyebrow"><span lang="en">Get started</span><span lang="de">Loslegen</span></p>
+    <h2><span lang="en">Three ways to use ABOmination.</span><span lang="de">Drei Wege zu ABOmination.</span></h2>
+    <div class="start">
+      <article class="card">
+        <h3><span lang="en">Try the demo</span><span lang="de">Demo ausprobieren</span></h3>
+        <p><span lang="en">Runs locally in your browser with sample data. Create a profile with any password.</span><span lang="de">Läuft lokal in deinem Browser mit Beispieldaten. Profil mit beliebigem Passwort anlegen.</span></p>
+        <a class="btn primary" href="app/?demo"><span lang="en">Open demo</span><span lang="de">Demo öffnen</span></a>
+      </article>
+      <article class="card code-card">
+        <h3><span lang="en">Self-host with Docker</span><span lang="de">Selbst hosten mit Docker</span></h3>
+        <p><span lang="en">Accounts for your household, sync across devices, behind your reverse proxy.</span><span lang="de">Konten für deinen Haushalt, Abgleich zwischen Geräten, hinter deinem Reverse Proxy.</span></p>
+<pre><code>curl -O {{repo}}/raw/main/compose.yaml
+docker compose pull &amp;&amp; docker compose up -d
+docker compose exec app abo invite</code></pre>
+        <a class="btn" href="{{repo}}/blob/main/DEPLOYMENT.md"><span lang="en">Deployment guide (German)</span><span lang="de">Anleitung</span></a>
+      </article>
+      <article class="card">
+        <h3><span lang="en">Use it locally</span><span lang="de">Lokal nutzen</span></h3>
+        <p><span lang="en">A single HTML file – open it in your browser, no server needed. Optional sync via a cloud folder.</span><span lang="de">Eine einzige HTML-Datei – im Browser öffnen, kein Server nötig. Optionaler Abgleich über einen Cloud-Ordner.</span></p>
+        <a class="btn" href="{{repo}}#readme"><span lang="en">Read the README</span><span lang="de">Zum README</span></a>
+      </article>
+    </div>
+  </section>
+
+  <section id="roadmap" class="section">
+    <p class="eyebrow">Roadmap</p>
+    <h2><span lang="en">What's next.</span><span lang="de">Was als Nächstes kommt.</span></h2>
+    <!--roadmap-->
+    <p class="fine"><a href="{{repo}}/blob/main/ROADMAP.md"><span lang="en">Full roadmap on GitHub →</span><span lang="de">Ganze Roadmap auf GitHub →</span></a></p>
+  </section>
+
+  <!--if:newsletter-->
+  <section id="newsletter" class="section newsletter">
+    <div class="card nl-card">
+      <div>
+        <p class="eyebrow">Newsletter</p>
+        <h2><span lang="en">Hear about new releases.</span><span lang="de">Neuigkeiten direkt ins Postfach.</span></h2>
+        <p><span lang="en">Occasional updates on new features and releases – no spam, unsubscribe any time. You'll get a confirmation e-mail first.</span>
+           <span lang="de">Gelegentliche Neuigkeiten zu Funktionen und Versionen – kein Spam, jederzeit abbestellbar. Zuerst kommt eine Bestätigungsmail.</span></p>
+      </div>
+      <form id="nlForm" action="{{newsletter.brevoFormAction}}" method="post" novalidate>
+        <label class="sr" for="nlEmail">E-Mail</label>
+        <input id="nlEmail" type="email" name="EMAIL" required autocomplete="email" placeholder="name@example.com">
+        <input type="text" name="email_address_check" value="" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <input type="hidden" name="locale" id="nlLocale" value="en">
+        <label class="consent"><input type="checkbox" name="OPT_IN" value="1" required>
+          <span><span lang="en">I agree to receive the newsletter and accept the <a href="datenschutz.html">privacy policy</a>.</span><span lang="de">Ich möchte den Newsletter erhalten und akzeptiere die <a href="datenschutz.html">Datenschutzerklärung</a>.</span></span></label>
+        <button class="btn primary" type="submit"><span lang="en">Subscribe</span><span lang="de">Anmelden</span></button>
+        <p class="nl-msg" id="nlMsg" role="status"></p>
+      </form>
+    </div>
+  </section>
+  <!--endif:newsletter-->
+</main>
+
+<footer class="footer">
+  <div class="brand"><img src="assets/icons/icon.svg" alt="" width="26" height="26"><span>ABOmination</span></div>
+  <nav>
+    <a href="{{repo}}">GitHub</a>
+    <a href="{{repo}}/blob/main/ROADMAP.md">Roadmap</a>
+    <a href="{{repo}}/blob/main/SECURITY.md"><span lang="en">Security</span><span lang="de">Sicherheit</span></a>
+    <!--if:legal--><a href="impressum.html">Impressum</a><a href="datenschutz.html"><span lang="en">Privacy policy</span><span lang="de">Datenschutz</span></a><!--endif:legal-->
+  </nav>
+  <p>© 2026 Maciej Peciak · <span lang="en">All rights reserved.</span><span lang="de">Alle Rechte vorbehalten.</span></p>
+</footer>
+<script src="site.js"></script>
+</body>
+</html>

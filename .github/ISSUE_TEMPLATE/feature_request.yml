@@ -1,0 +1,24 @@
+name: Feature request / Idee vorschlagen
+description: Suggest an improvement or new feature. / Verbesserung oder neue Funktion vorschlagen.
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: Please check the [roadmap](https://github.com/riv3ty/ABOmination/blob/main/ROADMAP.md) first. / Bitte vorher kurz in die Roadmap schauen.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would it solve? / Welches Problem löst es?
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: Your idea / Deine Idee
+      description: How should it work? / Wie soll es funktionieren?
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives / Alternativen

@@ -31,7 +31,7 @@ const FILES = [
 
 fs.mkdirSync(OUT, { recursive: true });
 fs.writeFileSync(path.join(OUT, "icon.svg"), VARIANTS.normal);
-const browser = await puppeteer.launch({ executablePath: CHROME, headless: true });
+const browser = await puppeteer.launch({ executablePath: CHROME, headless: true, args: process.env.CI ? ["--no-sandbox"] : [] });
 const page = await browser.newPage();
 for (const [name, variant, size] of FILES) {
   await page.setViewport({ width: size, height: size });

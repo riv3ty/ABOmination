@@ -13,7 +13,7 @@ import authRoutes from "./routes/auth.js";
 import vaultRoutes from "./routes/vault.js";
 import ratesRoutes from "./routes/rates.js";
 
-export const VERSION = "0.2.0";
+export const VERSION = JSON.parse(fs.readFileSync(new URL("../../package.json", import.meta.url), "utf8")).version;   // eine Quelle für die Versionsnummer
 
 // Content-Security-Policy für die Web-App. Inline-Skripte (Build als Einzeldatei) werden per Hash erlaubt.
 export function buildCsp(html) {

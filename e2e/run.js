@@ -37,7 +37,8 @@ for (let i = 0; i < 50; i++) {                                               // 
 
 const errors = [];
 async function device(name) {
-  const b = await puppeteer.launch({ executablePath: CHROME, headless: true, userDataDir: path.join(WORK, "chrome-" + name), args: ["--no-first-run"] });
+  const b = await puppeteer.launch({ executablePath: CHROME, headless: true, userDataDir: path.join(WORK, "chrome-" + name),
+    args: ["--no-first-run", ...(process.env.CI ? ["--no-sandbox"] : [])] });              // GitHub-Runner: ohne Sandbox
   const p = await b.newPage();
   p.on("dialog", d => d.accept());
   p.on("pageerror", e => errors.push(`${name}: ${e.message}`));

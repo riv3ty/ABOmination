@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="de" data-lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Impressum – ABOmination</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/svg+xml" href="assets/icons/icon.svg">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<header class="nav">
+  <a class="brand" href="./"><img src="assets/icons/icon.svg" alt="" width="34" height="34"><span>ABOmination</span></a>
+  <div class="nav-actions"><a class="btn" href="./">← Startseite</a></div>
+</header>
+<main class="legal">
+  <h1>Impressum</h1>
+  <p><em>Legal notice (German law, § 5 DDG).</em></p>
+
+  <h2>Angaben gemäß § 5 DDG</h2>
+  <p>{{legal.name}}<br>{{legal.street}}<br>{{legal.postalCity}}<br>{{legal.country}}</p>
+
+  <h2>Kontakt</h2>
+  <p>E-Mail: <a href="mailto:{{legal.email}}">{{legal.email}}</a><!--if:phone--><br>Telefon: {{legal.phone}}<!--endif:phone--></p>
+
+  <h2>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h2>
+  <p>{{legal.name}}, Anschrift wie oben.</p>
+
+  <h2>Haftung für Inhalte und Links</h2>
+  <p>Die Inhalte dieser Seite wurden mit Sorgfalt erstellt. Für die Richtigkeit, Vollständigkeit und Aktualität kann jedoch keine Gewähr übernommen werden. Diese Seite enthält Links zu externen Websites (z. B. GitHub), auf deren Inhalte kein Einfluss besteht; für diese Inhalte ist der jeweilige Anbieter verantwortlich.</p>
+
+  <h2>Urheberrecht</h2>
+  <p>Inhalte, Gestaltung und Quellcode von ABOmination unterliegen dem Urheberrecht. Alle Rechte vorbehalten.</p>
+</main>
+<footer class="footer">
+  <nav><a href="./">Startseite</a><a href="datenschutz.html">Datenschutz</a><a href="{{repo}}">GitHub</a></nav>
+  <p>© 2026 {{legal.name}}</p>
+</footer>
+</body>
+</html>

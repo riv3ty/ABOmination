@@ -1,0 +1,16 @@
+{
+  "siteUrl": "https://riv3ty.github.io/ABOmination/",
+  "repo": "https://github.com/riv3ty/ABOmination",
+  "image": "ghcr.io/riv3ty/abomination",
+  "newsletter": {
+    "brevoFormAction": ""
+  },
+  "legal": {
+    "name": "",
+    "street": "",
+    "postalCity": "",
+    "country": "Deutschland",
+    "email": "",
+    "phone": ""
+  }
+}

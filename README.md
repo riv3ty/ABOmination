@@ -1,79 +1,124 @@
-# ABOmination
+<p align="center">
+  <img src="web/public/icons/icon.svg" width="88" height="88" alt="ABOmination logo">
+</p>
 
-Abo- und Ratenzahlungs-Manager im Browser. Der Build erzeugt eine einzige HTML-Datei (`dist/index.html`), die ohne Server funktioniert.
+<h1 align="center">ABOmination</h1>
 
-- Abos, Ratenzahlungen (Zins/Annuitaet), Mehrwaehrung, Erinnerungen/ICS, Kontoauszug-Import, Bankkonto-Auswertung, Optimierungstipps, Errungenschaften
-- Profile mit Login, Daten AES-256-GCM-verschluesselt im Browser (PBKDF2)
-- Optional Sync: Datei, Nextcloud, Google Drive, OneNote (siehe SYNC-EINRICHTEN.md)
-- Optional: eigener Server (Docker) mit Konten fuer mehrere Geraete, Ende-zu-Ende-verschluesselt – siehe [DEPLOYMENT.md](DEPLOYMENT.md)
-- Installierbar als App (PWA) auf Android, iOS und Desktop, startet auch ohne Netz
+<p align="center">
+  <b>Every subscription. Every installment. One calm overview.</b><br>
+  Track subscriptions and installment plans with reminders, cancellation deadlines, interest calculation and savings tips –<br>
+  end-to-end encrypted on your device, usable locally or on your own server.
+</p>
 
-Externe Aufrufe (optional, die App funktioniert auch offline):
-- Wechselkurse von api.frankfurter.dev (nur bei Fremdwaehrungen, sonst Naeherungswerte; mit Server-Konto ueber den eigenen Server)
+<p align="center">
+  <a href="https://github.com/riv3ty/ABOmination/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/riv3ty/ABOmination/actions/workflows/ci.yml/badge.svg"></a>
+  <a href="https://github.com/riv3ty/ABOmination/pkgs/container/abomination"><img alt="Docker image" src="https://img.shields.io/badge/docker-ghcr.io%2Friv3ty%2Fabomination-2496ED?logo=docker&logoColor=white"></a>
+  <a href="https://riv3ty.github.io/ABOmination/"><img alt="Website" src="https://img.shields.io/badge/website-live%20demo-8b5cf6"></a>
+  <img alt="License" src="https://img.shields.io/badge/license-all%20rights%20reserved-lightgrey">
+  <img alt="App language" src="https://img.shields.io/badge/app%20UI-German-555">
+</p>
 
-Schriften (Inter, Roboto, Playfair Display) sind eingebettet, siehe `web/src/fonts/LICENSE.md`.
-- Google-/Microsoft-Anmeldung und APIs nur, wenn der jeweilige Cloud-Sync eingerichtet ist
+<p align="center">
+  <a href="https://riv3ty.github.io/ABOmination/"><b>Website</b></a> ·
+  <a href="https://riv3ty.github.io/ABOmination/app/?demo"><b>Live demo</b></a> ·
+  <a href="DEPLOYMENT.md">Self-hosting</a> ·
+  <a href="ROADMAP.md">Roadmap</a> ·
+  <a href="README.de.md">Deutsch</a>
+</p>
 
-## Start
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/dashboard-dark.webp">
+    <img src="docs/screenshots/dashboard-light.webp" alt="ABOmination dashboard: monthly total, reminders, upcoming payments" width="900">
+  </picture>
+</p>
 
-Voraussetzung: Node.js 22 oder neuer.
+## Highlights
 
+- **Honest dashboard** – monthly and yearly totals, the next 30 days on a timeline, spending by category and bank account, multi-currency with ECB exchange rates.
+- **Installments done right** – amortization schedule, interest paid and outstanding, remaining debt and an early-payoff simulator.
+- **Never miss a deadline** – reminders before payments and cancellation deadlines, calendar export (`.ics`) for Outlook, Google and Apple.
+- **Bank statement import** – recurring payments are detected automatically in CSV exports.
+- **Savings tips** – rarely used, duplicated or overlapping subscriptions and cheaper yearly plans.
+- **Privacy by design** – AES-256-GCM encryption in the browser, no tracking, no third-party requests.
+- **Runs everywhere** – single HTML file, self-hosted Docker server with accounts and sync, installable PWA that works offline. A native Android app is in progress.
+
+<table>
+  <tr>
+    <td width="58%"><img src="docs/screenshots/installments-light.webp" alt="Installment plans with schedule and payoff simulator"></td>
+    <td width="30%"><img src="docs/screenshots/insights-dark.webp" alt="Savings tips"></td>
+    <td width="12%"><img src="docs/screenshots/mobile-dark.webp" alt="Mobile view"></td>
+  </tr>
+</table>
+
+## How your data is protected
+
+```mermaid
+flowchart LR
+  P["Password"] -->|PBKDF2-SHA256, 600k| M["Master key"]
+  M -->|HKDF auth| A["authKey"]
+  M -->|HKDF enc| E["encKey<br/>(never leaves the device)"]
+  E -->|AES-256-GCM| V["Encrypted vault"]
+  A -->|login| S[("Your server<br/>stores scrypt(authKey) + ciphertext")]
+  V -->|sync| S
 ```
-npm install
-npm run build
+
+The server never sees your password or your data – a database leak reveals nothing readable. For that reason there is **no password reset**. Details: [server/API.md](server/API.md) · Reporting vulnerabilities: [SECURITY.md](SECURITY.md).
+
+## Getting started
+
+### 1. Try it in the browser
+Open the **[live demo](https://riv3ty.github.io/ABOmination/app/?demo)** – it runs entirely in your browser with sample data; nothing is uploaded.
+
+### 2. Self-host with Docker
+Accounts for your household and sync across devices, behind your existing reverse proxy (HTTPS required):
+
+```bash
+mkdir abomination && cd abomination
+curl -fsSLO https://raw.githubusercontent.com/riv3ty/ABOmination/main/compose.yaml
+docker compose pull && docker compose up -d
+docker compose exec app abo invite --note "me"   # invite code for the first account
 ```
 
-Danach Doppelklick auf `Abo-Manager-starten.cmd` (oeffnet http://localhost:8765/) oder `dist/index.html` direkt oeffnen.
+Reverse proxy examples (nginx, Caddy, Traefik, Nginx Proxy Manager), backups and updates: **[DEPLOYMENT.md](DEPLOYMENT.md)** (German).
 
-## Entwicklung
+### 3. Local only
+Build once and open `dist/index.html` – no server required. Data stays encrypted in your browser; optional sync via a cloud folder, Nextcloud, Google Drive or OneNote ([SYNC-EINRICHTEN.md](SYNC-EINRICHTEN.md), German).
 
-| Befehl | Zweck |
+```bash
+npm ci && npm run build
+```
+
+## Tech stack
+
+| Part | Technology |
 |---|---|
-| `npm run dev` | Entwicklungsserver mit Live-Reload auf http://localhost:8765/ |
-| `npm test` | Unit-Tests (Vitest) fuer die Logik in `web/src/lib/` |
-| `npm run lint` | ESLint |
-| `npm run build` | `dist/index.html` bauen |
-| `npm run check` | Lint + Tests + Build |
-| `npm run e2e` | Ende-zu-Ende-Test: echter Server + zwei Browser (braucht Chrome/Chromium, ggf. `CHROME_PATH`). Gegen einen laufenden Server/Container: `E2E_URL=http://localhost:8080/ E2E_INVITE=<code> node e2e/run.js` (frisches Volume) |
+| Web app | Vanilla JavaScript (ES modules), Vite, built into a single HTML file |
+| Crypto | WebCrypto: PBKDF2, HKDF, AES-256-GCM |
+| Server | Node.js 24, Fastify 5, built-in `node:sqlite`, no native modules |
+| Deployment | Docker (non-root, read-only), GitHub Container Registry |
+| Quality | Vitest (unit + API), ESLint, Puppeteer end-to-end test with two browsers, CI on every push |
 
-Hinweis: Der Browser speichert Daten pro Adresse. Dev-Server, `npm run preview` und der Starter laufen alle unter `http://localhost:8765` und teilen sich daher dieselben Profile.
+## Development
 
-Aufbau:
-
-```
-web/index.html          Markup (Dialoge, Kacheln)
-web/src/main.js         Einstieg
-web/src/vault.js        Profile + verschluesselter Tresor (PBKDF2/AES-GCM)
-web/src/auth.js         Anmelde-Oberflaeche, Konto-Funktionen
-web/src/app.js          App-Oberflaeche, Dialoge, Cloud-Sync (startet erst nach dem Entsperren)
-web/src/server/store.js Server-Konto: Anmeldung, Offline-Kopie, Abgleich
-web/src/cryptoutil.js   Schluesselableitung, AES-GCM
-web/src/pwa.js          Manifest/Service Worker einbinden, "App installieren"
-web/public/             sw.js, manifest.webmanifest, icons/ (werden unveraendert nach dist/ kopiert)
-scripts/make-icons.js   Icons aus SVG erzeugen
-web/src/lib/            reine Logik ohne DOM/Zustand (Datum, Kredit, Auswertung, Optimierung, ICS, Kontoauszug)
-web/tests/              Tests zu lib/
-server/src/             API-Server (app.js, routes/, db.js, cli.js)
-server/tests/           API-Tests
-e2e/run.js              Ende-zu-Ende-Test (Puppeteer)
-Dockerfile, compose.yaml  Container-Betrieb (DEPLOYMENT.md)
+```bash
+npm ci
+npm run dev          # web app on http://localhost:8765 (proxies /api to :8080)
+npm run server:dev   # API server on :8080
+npm run check        # lint + tests + build
+npm run e2e          # real server + two Chrome instances
 ```
 
-## Server
+All commands and the project layout: [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
 
-Node-Server (Fastify + SQLite) mit Konten und Ende-zu-Ende-verschluesseltem Tresor. API und Schluesselprotokoll: [server/API.md](server/API.md).
+## Roadmap
 
-```
-npm run build                       # Web-App bauen (wird vom Server ausgeliefert)
-npm run abo -- invite               # Einladungscode fuer die Registrierung
-COOKIE_SECURE=false npm start       # http://127.0.0.1:8080 (Konfiguration: .env.example)
-```
+Next up: native Android app, passkeys, encrypted backups, price-increase alerts and a cancellation assistant. See **[ROADMAP.md](ROADMAP.md)** – and follow updates via the newsletter on the [website](https://riv3ty.github.io/ABOmination/).
 
-Laeuft die App ueber den Server, bietet die Anmeldung Server-Konten an (Anmelden, Registrieren, Uebernahme eines lokalen Profils). Die Daten werden im Browser verschluesselt, mit dem Server abgeglichen (Konflikte werden pro Eintrag zusammengefuehrt) und als verschluesselte Offline-Kopie auf dem Geraet gehalten. Lokale Profile funktionieren weiterhin, auch per Doppelklick ohne Server.
+## Contributing
 
-Entwicklung mit Server: `npm run server:dev` (API auf :8080) und `npm run dev` (Vite auf :8765 leitet `/api` weiter).
+Bug reports and ideas are very welcome – please use the [issue templates](https://github.com/riv3ty/ABOmination/issues/new/choose). Pull requests only after prior agreement, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
-Betrieb auf einem eigenen Server mit Docker: [DEPLOYMENT.md](DEPLOYMENT.md).
+## License
 
-## Datenschutz
-Der Repo-Inhalt enthaelt nur Code. Bei lokalen Profilen liegen alle Nutzerdaten ausschliesslich im Browser (localStorage/IndexedDB). Bei Server-Konten liegen sie zusaetzlich auf dem eigenen Server – dort nur als im Browser verschluesselter Tresor, den der Server nicht lesen kann. Exporte (`abos-*.json`), Sync-Dateien und `.ics` sind per `.gitignore` ausgeschlossen.
+© 2026 Maciej Peciak. **All rights reserved.** The source code is publicly visible for transparency and review but is not open source – see [LICENSE](LICENSE). Bundled fonts are licensed under the SIL Open Font License ([details](web/src/fonts/LICENSE.md)).

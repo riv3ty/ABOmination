@@ -1,7 +1,7 @@
 {
   "name": "abomination",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Abo- und Ratenzahlungs-Manager: Web-Client und Server (Ende-zu-Ende-verschluesselt)",
   "type": "module",
   "scripts": {
@@ -15,7 +15,10 @@
     "start": "node --env-file-if-exists=.env server/src/index.js",
     "server:dev": "node --env-file-if-exists=.env --watch server/src/index.js",
     "abo": "node --env-file-if-exists=.env server/bin/abo.js",
-    "e2e": "npm run build && node e2e/run.js"
+    "e2e": "npm run build && node e2e/run.js",
+    "site": "npm run build && node scripts/build-site.js",
+    "screenshots": "npm run build && node scripts/screenshots.js",
+    "roadmap": "node scripts/build-roadmap.js"
   },
   "engines": {
     "node": ">=22.13"

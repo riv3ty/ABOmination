@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="de" data-lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Datenschutzerklärung – ABOmination</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/svg+xml" href="assets/icons/icon.svg">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<header class="nav">
+  <a class="brand" href="./"><img src="assets/icons/icon.svg" alt="" width="34" height="34"><span>ABOmination</span></a>
+  <div class="nav-actions"><a class="btn" href="./">← Startseite</a></div>
+</header>
+<main class="legal">
+  <h1>Datenschutzerklärung</h1>
+  <p><em>Privacy policy (German). Stand: {{today}}</em></p>
+
+  <h2>1. Verantwortlicher</h2>
+  <p>{{legal.name}}, {{legal.street}}, {{legal.postalCity}}, {{legal.country}} · E-Mail: <a href="mailto:{{legal.email}}">{{legal.email}}</a></p>
+
+  <h2>2. Grundsätze</h2>
+  <p>Diese Website verwendet keine Cookies, keine Analyse- oder Tracking-Werkzeuge und keine Werbung. Schriften und Bilder werden von dieser Website selbst ausgeliefert; es werden keine Inhalte von Drittanbietern (z. B. Google Fonts) nachgeladen.</p>
+
+  <h2>3. Hosting durch GitHub Pages</h2>
+  <p>Die Website wird bei GitHub Pages gehostet, einem Dienst der GitHub Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA (Tochter der Microsoft Corporation). Beim Aufruf verarbeitet GitHub technisch notwendige Daten, insbesondere Ihre IP-Adresse, Datum und Uhrzeit, aufgerufene Seite, Browser und Betriebssystem, um die Website auszuliefern und ihre Sicherheit zu gewährleisten. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an einer sicheren und zuverlässigen Bereitstellung). Dabei kann eine Übermittlung in die USA erfolgen; GitHub ist unter dem EU-US Data Privacy Framework zertifiziert. Weitere Informationen: <a href="https://docs.github.com/de/site-policy/privacy-policies/github-general-privacy-statement">Datenschutzerklärung von GitHub</a>.</p>
+
+  <h2>4. Live-Demo der App</h2>
+  <p>Die Demo unter <code>/app/</code> läuft vollständig in Ihrem Browser. Profile und eingegebene Daten werden ausschließlich lokal in Ihrem Browser (localStorage) verschlüsselt gespeichert und nicht an uns übertragen. Sie können sie jederzeit über die Browser-Einstellungen (Websitedaten löschen) entfernen.</p>
+  <p>Wenn Sie in der Demo Beträge in Fremdwährungen verwenden, ruft die App aktuelle Wechselkurse der Europäischen Zentralbank über den Dienst <a href="https://frankfurter.dev">frankfurter.dev</a> ab. Dabei wird Ihre IP-Adresse an diesen Dienst übermittelt; es werden keine Abo-Daten übertragen. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (korrekte Umrechnung auf Ihren Wunsch).</p>
+  <p>Optional in der App einrichtbare Sync-Anbieter (z. B. Google Drive, OneNote, Nextcloud) werden nur genutzt, wenn Sie diese selbst aktiv verbinden; dann gelten die Datenschutzbestimmungen des jeweiligen Anbieters.</p>
+
+  <!--if:newsletter-->
+  <h2>5. Newsletter</h2>
+  <p>Wenn Sie den Newsletter abonnieren, verarbeiten wir Ihre E-Mail-Adresse, um Ihnen gelegentlich Neuigkeiten zu ABOmination zu senden. Rechtsgrundlage ist Ihre Einwilligung (Art. 6 Abs. 1 lit. a DSGVO). Die Anmeldung erfolgt im Double-Opt-in-Verfahren: Sie erhalten zunächst eine E-Mail mit einem Bestätigungslink; erst nach der Bestätigung werden Sie eingetragen. Wir speichern dabei Anmelde- und Bestätigungszeitpunkt sowie die IP-Adresse, um die Einwilligung nachweisen zu können.</p>
+  <p>Für den Versand nutzen wir Brevo (Sendinblue SAS, 106 boulevard Haussmann, 75008 Paris, Frankreich) als Auftragsverarbeiter. Die Daten werden in der EU verarbeitet. Brevo wertet ggf. aus, ob E-Mails geöffnet und Links angeklickt wurden, um den Versand zu verbessern. Weitere Informationen: <a href="https://www.brevo.com/de/legal/privacypolicy/">Datenschutzerklärung von Brevo</a>.</p>
+  <p>Sie können Ihre Einwilligung jederzeit mit Wirkung für die Zukunft widerrufen – über den Abmeldelink in jeder E-Mail oder per Nachricht an die oben genannte Adresse. Ihre Daten werden nach der Abmeldung gelöscht, soweit keine gesetzlichen Aufbewahrungspflichten bestehen.</p>
+  <!--endif:newsletter-->
+
+  <h2>Ihre Rechte</h2>
+  <p>Sie haben das Recht auf Auskunft (Art. 15 DSGVO), Berichtigung (Art. 16), Löschung (Art. 17), Einschränkung der Verarbeitung (Art. 18), Datenübertragbarkeit (Art. 20) und Widerspruch gegen Verarbeitungen auf Grundlage berechtigter Interessen (Art. 21 DSGVO). Eine erteilte Einwilligung können Sie jederzeit widerrufen. Außerdem können Sie sich bei einer Datenschutz-Aufsichtsbehörde beschweren, insbesondere in dem Bundesland Ihres Wohnsitzes.</p>
+
+  <h2>Kontakt zum Datenschutz</h2>
+  <p>Fragen zum Datenschutz richten Sie bitte an <a href="mailto:{{legal.email}}">{{legal.email}}</a>.</p>
+</main>
+<footer class="footer">
+  <nav><a href="./">Startseite</a><a href="impressum.html">Impressum</a><a href="{{repo}}">GitHub</a></nav>
+  <p>© 2026 {{legal.name}}</p>
+</footer>
+</body>
+</html>

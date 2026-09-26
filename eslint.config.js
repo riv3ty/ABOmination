@@ -2,7 +2,7 @@ import js from "@eslint/js";
 import globals from "globals";
 
 export default [
-  { ignores: ["dist/", "node_modules/", "abo-manager.html"] },
+  { ignores: ["dist/", "_site/", "node_modules/", "abo-manager.html"] },
   js.configs.recommended,
   {
     files: ["web/src/**/*.js"],
@@ -26,7 +26,12 @@ export default [
     languageOptions: { ecmaVersion: 2024, sourceType: "script", globals: { ...globals.serviceworker } }
   },
   {
-    files: ["scripts/**/*.js"],
-    languageOptions: { ecmaVersion: 2024, sourceType: "module", globals: { ...globals.node } }
+    files: ["scripts/**/*.js"],                                               // Node-Skripte, Puppeteer-Callbacks laufen im Browser
+    languageOptions: { ecmaVersion: 2024, sourceType: "module", globals: { ...globals.node, ...globals.browser } }
+  },
+  {
+    files: ["site/**/*.js"],                                                  // Website (klassisches Skript im Browser)
+    languageOptions: { ecmaVersion: 2024, sourceType: "script", globals: { ...globals.browser } },
+    rules: { "no-empty": ["error", { allowEmptyCatch: true }], "no-unused-vars": ["error", { caughtErrors: "none" }] }
   }
 ];
