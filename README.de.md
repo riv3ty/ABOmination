@@ -20,7 +20,7 @@
 <p align="center">
   <a href="https://riv3ty.github.io/ABOmination/"><b>Website</b></a> ·
   <a href="https://riv3ty.github.io/ABOmination/app/?demo"><b>Live-Demo</b></a> ·
-  <a href="DEPLOYMENT.md">Selbst hosten</a> ·
+  <a href="DEPLOYMENT.de.md">Selbst hosten</a> ·
   <a href="ROADMAP.de.md">Roadmap</a> ·
   <a href="README.md">English</a>
 </p>
@@ -62,7 +62,7 @@ flowchart LR
   V -->|Abgleich| S
 ```
 
-Der Server sieht weder dein Passwort noch deine Daten – ein Datenbank-Leck verrät nichts Lesbares. Deshalb gibt es **keinen Passwort-Reset**. Details: [server/API.md](server/API.md) · Sicherheitslücken melden: [SECURITY.md](SECURITY.md).
+Der Server sieht weder dein Passwort noch deine Daten – ein Datenbank-Leck verrät nichts Lesbares. Deshalb gibt es **keinen Passwort-Reset**. Details: [server/API.de.md](server/API.de.md) · Sicherheitslücken melden: [SECURITY.de.md](SECURITY.de.md).
 
 ## Loslegen
 
@@ -79,10 +79,10 @@ docker compose pull && docker compose up -d
 docker compose exec app abo invite --note "ich"   # Einladungscode für das erste Konto
 ```
 
-Reverse-Proxy-Beispiele (nginx, Caddy, Traefik, Nginx Proxy Manager), Backups und Updates: **[DEPLOYMENT.md](DEPLOYMENT.md)**.
+Reverse-Proxy-Beispiele (nginx, Caddy, Traefik, Nginx Proxy Manager), Backups und Updates: **[DEPLOYMENT.de.md](DEPLOYMENT.de.md)**.
 
 ### 3. Nur lokal
-Einmal bauen und `dist/index.html` öffnen – kein Server nötig. Die Daten bleiben verschlüsselt im Browser; optionaler Abgleich über einen Cloud-Ordner, Nextcloud, Google Drive oder OneNote ([SYNC-EINRICHTEN.md](SYNC-EINRICHTEN.md)). Unter Windows startet `Abo-Manager-starten.cmd` die App auf http://localhost:8765.
+Einmal bauen und `dist/index.html` öffnen – kein Server nötig. Die Daten bleiben verschlüsselt im Browser; optionaler Abgleich über einen Cloud-Ordner, Nextcloud, Google Drive oder OneNote ([SYNC.de.md](SYNC.de.md)). Unter Windows startet `Abo-Manager-starten.cmd` die App auf http://localhost:8765.
 
 ```bash
 npm ci && npm run build
@@ -108,15 +108,37 @@ npm run check        # Lint + Tests + Build
 npm run e2e          # echter Server + zwei Chrome-Instanzen
 ```
 
-Alle Befehle und die Projektstruktur: [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) (Englisch).
+Alle Befehle und die Projektstruktur: [docs/DEVELOPMENT.de.md](docs/DEVELOPMENT.de.md).
 
 ## Roadmap
 
-Als Nächstes: native Android-App, Passkeys, verschlüsselte Sicherungen, Hinweise bei Preiserhöhungen und ein Kündigungsassistent. Siehe **[ROADMAP.de.md](ROADMAP.de.md)** – Neuigkeiten gibt es auch per Newsletter auf der [Website](https://riv3ty.github.io/ABOmination/).
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/roadmap/roadmap-de-dark.svg">
+  <img alt="Roadmap-Übersicht" src="docs/roadmap/roadmap-de-light.svg" width="100%">
+</picture>
+
+Als Nächstes: native Android-App, Passkeys, verschlüsselte Sicherungen, Hinweise bei Preiserhöhungen und ein Kündigungsassistent. Details in **[ROADMAP.de.md](ROADMAP.de.md)** – Neuigkeiten gibt es auch per Newsletter auf der [Website](https://riv3ty.github.io/ABOmination/).
+
+## Dokumentation
+
+Alle Dokumente gibt es auf Deutsch und Englisch.
+
+| Thema | Deutsch | English |
+|---|---|---|
+| Selbst hosten mit Docker | [DEPLOYMENT.de.md](DEPLOYMENT.de.md) | [DEPLOYMENT.md](DEPLOYMENT.md) |
+| Cloud-Sync für lokale Profile | [SYNC.de.md](SYNC.de.md) | [SYNC.md](SYNC.md) |
+| Server-API & Verschlüsselungsprotokoll | [server/API.de.md](server/API.de.md) | [server/API.md](server/API.md) |
+| Entwicklung | [docs/DEVELOPMENT.de.md](docs/DEVELOPMENT.de.md) | [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) |
+| Roadmap | [ROADMAP.de.md](ROADMAP.de.md) | [ROADMAP.md](ROADMAP.md) |
+| Sicherheitsrichtlinie | [SECURITY.de.md](SECURITY.de.md) | [SECURITY.md](SECURITY.md) |
+| Mitmachen | [CONTRIBUTING.de.md](CONTRIBUTING.de.md) | [CONTRIBUTING.md](CONTRIBUTING.md) |
+
+<!-- support:start -->
+<!-- support:end -->
 
 ## Mitmachen
 
-Fehlerberichte und Ideen sind sehr willkommen – bitte über die [Issue-Vorlagen](https://github.com/riv3ty/ABOmination/issues/new/choose). Pull Requests nur nach vorheriger Absprache, siehe [CONTRIBUTING.md](CONTRIBUTING.md).
+Fehlerberichte und Ideen sind sehr willkommen – bitte über die [Issue-Vorlagen](https://github.com/riv3ty/ABOmination/issues/new/choose). Pull Requests nur nach vorheriger Absprache, siehe [CONTRIBUTING.de.md](CONTRIBUTING.de.md).
 
 ## Lizenz
 

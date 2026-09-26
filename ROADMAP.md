@@ -1,8 +1,13 @@
 # Roadmap
 
-[Deutsch](ROADMAP.de.md) · Last updated: 2026-09-26
+**English** · [Deutsch](ROADMAP.de.md) · Last updated: 2026-09-26
 
 Where ABOmination is heading. Priorities can change – ideas and feedback are welcome in the [issues](https://github.com/riv3ty/ABOmination/issues).
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/roadmap/roadmap-en-dark.svg">
+  <img alt="Roadmap overview" src="docs/roadmap/roadmap-en-light.svg" width="100%">
+</picture>
 
 ## ✅ Shipped
 
@@ -41,4 +46,4 @@ Where ABOmination is heading. Priorities can change – ideas and feedback are w
 - **Browser extension** – Suggest adding a subscription right at checkout.
 - **Calendar feed** – Optional subscribable calendar (opt-in, as it reveals dates to the server).
 
-<sub>Generated from `docs/roadmap.json` – edit that file and run `node scripts/build-roadmap.js`.</sub>
+<sub>Generated from `docs/roadmap.json` – edit that file and run `npm run docs`.</sub>

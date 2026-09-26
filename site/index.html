@@ -1,24 +1,28 @@
 <!DOCTYPE html>
-<html lang="en" data-lang="en">
+<html lang="{{lang}}" data-lang="{{lang}}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ABOmination – subscriptions & installments, end-to-end encrypted</title>
-<meta name="description" content="Keep track of every subscription and installment plan. Reminders, cancellation deadlines, interest, savings tips – encrypted on your device, self-hostable.">
+<title><!--en-->ABOmination – subscriptions & installments, end-to-end encrypted<!--/en--><!--de-->ABOmination – Abos & Ratenkäufe, Ende-zu-Ende-verschlüsselt<!--/de--></title>
+<meta name="description" content="<!--en-->Keep track of every subscription and installment plan. Reminders, cancellation deadlines, interest, savings tips – encrypted on your device, self-hostable.<!--/en--><!--de-->Alle Abos und Ratenkäufe im Blick: Erinnerungen, Kündigungsfristen, Zinsen und Spartipps – verschlüsselt auf deinem Gerät, selbst hostbar.<!--/de-->">
 <meta property="og:title" content="ABOmination">
-<meta property="og:description" content="Every subscription. Every installment. One calm overview – end-to-end encrypted.">
+<meta property="og:description" content="<!--en-->Every subscription. Every installment. One calm overview – end-to-end encrypted.<!--/en--><!--de-->Jedes Abo. Jede Rate. Ein ruhiger Überblick – Ende-zu-Ende-verschlüsselt.<!--/de-->">
+<meta property="og:locale" content="<!--en-->en_US<!--/en--><!--de-->de_DE<!--/de-->">
 <meta property="og:image" content="{{siteUrl}}assets/screenshots/dashboard-dark.webp">
 <meta property="og:type" content="website">
 <meta name="theme-color" content="#0f0f11">
+<link rel="canonical" href="{{canonical}}">
+<link rel="alternate" hreflang="en" href="{{siteUrl}}">
+<link rel="alternate" hreflang="de" href="{{siteUrl}}de/">
+<link rel="alternate" hreflang="x-default" href="{{siteUrl}}">
 <link rel="icon" type="image/svg+xml" href="assets/icons/icon.svg">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="stylesheet" href="site.css">
-<script>
-  // Sprache vor dem ersten Rendern setzen (gespeichert > Browser-Sprache)
-  (function () { var l; try { l = localStorage.getItem("abo-site-lang"); } catch (e) {}
-    l = l || ((navigator.language || "").toLowerCase().indexOf("de") === 0 ? "de" : "en");
-    document.documentElement.dataset.lang = l; document.documentElement.lang = l; })();
-</script>
+<!--en--><script>
+  // Erster Besuch mit deutschem Browser → deutsche Fassung (außer es wurde bewusst Englisch gewählt)
+  (function () { try { if (!localStorage.getItem("abo-site-lang") && !/[?&]lang=en/.test(location.search)
+    && (navigator.language || "").toLowerCase().indexOf("de") === 0) location.replace("de/" + location.hash); } catch (e) {} })();
+</script><!--/en-->
 </head>
 <body>
 <header class="nav">
@@ -29,10 +33,11 @@
     <a href="#start"><span lang="en">Get started</span><span lang="de">Loslegen</span></a>
     <a href="#roadmap">Roadmap</a>
     <!--if:newsletter--><a href="#newsletter">Newsletter</a><!--endif:newsletter-->
+    <!--if:funding--><a href="#support"><span lang="en">Support</span><span lang="de">Unterstützen</span></a><!--endif:funding-->
     <a href="{{repo}}">GitHub</a>
   </nav>
   <div class="nav-actions">
-    <button class="lang" type="button" id="langToggle" aria-label="Sprache wechseln / switch language"><span lang="en">DE</span><span lang="de">EN</span></button>
+    <a class="lang" href="{{altHref}}" hreflang="{{altLang}}" data-setlang="{{altLang}}" title="<!--en-->Deutsche Version<!--/en--><!--de-->English version<!--/de-->">{{altLabel}}</a>
     <a class="btn primary" href="app/?demo"><span lang="en">Live demo</span><span lang="de">Live-Demo</span></a>
   </div>
 </header>
@@ -129,12 +134,12 @@
 <pre><code>curl -O {{repo}}/raw/main/compose.yaml
 docker compose pull &amp;&amp; docker compose up -d
 docker compose exec app abo invite</code></pre>
-        <a class="btn" href="{{repo}}/blob/main/DEPLOYMENT.md"><span lang="en">Deployment guide (German)</span><span lang="de">Anleitung</span></a>
+        <a class="btn" href="{{doc.deployment}}"><span lang="en">Deployment guide</span><span lang="de">Anleitung</span></a>
       </article>
       <article class="card">
         <h3><span lang="en">Use it locally</span><span lang="de">Lokal nutzen</span></h3>
         <p><span lang="en">A single HTML file – open it in your browser, no server needed. Optional sync via a cloud folder.</span><span lang="de">Eine einzige HTML-Datei – im Browser öffnen, kein Server nötig. Optionaler Abgleich über einen Cloud-Ordner.</span></p>
-        <a class="btn" href="{{repo}}#readme"><span lang="en">Read the README</span><span lang="de">Zum README</span></a>
+        <a class="btn" href="{{doc.readme}}"><span lang="en">Read the README</span><span lang="de">Zum README</span></a>
       </article>
     </div>
   </section>
@@ -142,8 +147,14 @@ docker compose exec app abo invite</code></pre>
   <section id="roadmap" class="section">
     <p class="eyebrow">Roadmap</p>
     <h2><span lang="en">What's next.</span><span lang="de">Was als Nächstes kommt.</span></h2>
+    <figure class="roadmap-graph">
+      <picture>
+        <source srcset="assets/roadmap/roadmap-{{lang}}-dark.svg" media="(prefers-color-scheme: dark)">
+        <img src="assets/roadmap/roadmap-{{lang}}-light.svg" alt="<!--en-->Roadmap overview: shipped, in progress, next, later and ideas<!--/en--><!--de-->Roadmap-Übersicht: erledigt, in Arbeit, als Nächstes, später und Ideen<!--/de-->" width="1200" loading="lazy">
+      </picture>
+    </figure>
     <!--roadmap-->
-    <p class="fine"><a href="{{repo}}/blob/main/ROADMAP.md"><span lang="en">Full roadmap on GitHub →</span><span lang="de">Ganze Roadmap auf GitHub →</span></a></p>
+    <p class="fine"><a href="{{doc.roadmap}}"><span lang="en">Full roadmap on GitHub →</span><span lang="de">Ganze Roadmap auf GitHub →</span></a></p>
   </section>
 
   <!--if:newsletter-->
@@ -159,7 +170,7 @@ docker compose exec app abo invite</code></pre>
         <label class="sr" for="nlEmail">E-Mail</label>
         <input id="nlEmail" type="email" name="EMAIL" required autocomplete="email" placeholder="name@example.com">
         <input type="text" name="email_address_check" value="" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
-        <input type="hidden" name="locale" id="nlLocale" value="en">
+        <input type="hidden" name="locale" id="nlLocale" value="{{lang}}">
         <label class="consent"><input type="checkbox" name="OPT_IN" value="1" required>
           <span><span lang="en">I agree to receive the newsletter and accept the <a href="datenschutz.html">privacy policy</a>.</span><span lang="de">Ich möchte den Newsletter erhalten und akzeptiere die <a href="datenschutz.html">Datenschutzerklärung</a>.</span></span></label>
         <button class="btn primary" type="submit"><span lang="en">Subscribe</span><span lang="de">Anmelden</span></button>
@@ -168,15 +179,26 @@ docker compose exec app abo invite</code></pre>
     </div>
   </section>
   <!--endif:newsletter-->
+
+  <!--if:funding-->
+  <section id="support" class="section support">
+    <p class="eyebrow"><span lang="en">Support</span><span lang="de">Unterstützen</span></p>
+    <h2><span lang="en">Keep ABOmination going.</span><span lang="de">Hilf, ABOmination weiterzuentwickeln.</span></h2>
+    <p class="lede"><span lang="en">ABOmination is free for personal use, without ads or tracking. If it saves you money, you can support its development – every contribution helps.</span>
+      <span lang="de">ABOmination ist für die private Nutzung kostenlos, ohne Werbung und Tracking. Wenn es dir Geld spart, kannst du die Weiterentwicklung unterstützen – jeder Beitrag hilft.</span></p>
+    <!--funding-->
+  </section>
+  <!--endif:funding-->
 </main>
 
 <footer class="footer">
   <div class="brand"><img src="assets/icons/icon.svg" alt="" width="26" height="26"><span>ABOmination</span></div>
   <nav>
     <a href="{{repo}}">GitHub</a>
-    <a href="{{repo}}/blob/main/ROADMAP.md">Roadmap</a>
-    <a href="{{repo}}/blob/main/SECURITY.md"><span lang="en">Security</span><span lang="de">Sicherheit</span></a>
-    <!--if:legal--><a href="impressum.html">Impressum</a><a href="datenschutz.html"><span lang="en">Privacy policy</span><span lang="de">Datenschutz</span></a><!--endif:legal-->
+    <a href="{{doc.roadmap}}">Roadmap</a>
+    <!--if:funding--><a href="#support"><span lang="en">Support</span><span lang="de">Unterstützen</span></a><!--endif:funding-->
+    <a href="{{doc.security}}"><span lang="en">Security</span><span lang="de">Sicherheit</span></a>
+    <!--if:legal--><a href="impressum.html"><span lang="en">Legal notice</span><span lang="de">Impressum</span></a><a href="datenschutz.html"><span lang="en">Privacy policy</span><span lang="de">Datenschutz</span></a><!--endif:legal-->
   </nav>
   <p>© 2026 Maciej Peciak · <a href="{{repo}}/blob/main/LICENSE"><span lang="en">Free for personal use</span><span lang="de">Privat kostenlos nutzbar</span></a></p>
 </footer>

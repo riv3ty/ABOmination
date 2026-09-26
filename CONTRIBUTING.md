@@ -1,5 +1,7 @@
 # Contributing
 
+**English** · [Deutsch](CONTRIBUTING.de.md)
+
 Thanks for your interest in ABOmination!
 
 ## Issues are welcome
@@ -21,6 +23,3 @@ If we agreed on a change:
 
 More details: [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
 
----
-
-**Deutsch:** Fehlerberichte und Ideen gern als Issue (bitte ohne echte Finanzdaten). Pull Requests nur nach vorheriger Absprache, da das Projekt nicht Open Source ist.

@@ -1,21 +1,25 @@
 <!DOCTYPE html>
-<html lang="de" data-lang="de">
+<html lang="{{lang}}" data-lang="{{lang}}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Impressum – ABOmination</title>
+<title><!--en-->Legal notice<!--/en--><!--de-->Impressum<!--/de--> – ABOmination</title>
 <meta name="robots" content="noindex">
+<link rel="canonical" href="{{canonical}}">
 <link rel="icon" type="image/svg+xml" href="assets/icons/icon.svg">
 <link rel="stylesheet" href="site.css">
 </head>
 <body>
 <header class="nav">
   <a class="brand" href="./"><img src="assets/icons/icon.svg" alt="" width="34" height="34"><span>ABOmination</span></a>
-  <div class="nav-actions"><a class="btn" href="./">← Startseite</a></div>
+  <div class="nav-actions">
+    <a class="lang" href="{{altHref}}" hreflang="{{altLang}}" data-setlang="{{altLang}}">{{altLabel}}</a>
+    <a class="btn" href="./">← <!--en-->Home<!--/en--><!--de-->Startseite<!--/de--></a>
+  </div>
 </header>
 <main class="legal">
+<!--de-->
   <h1>Impressum</h1>
-  <p><em>Legal notice (German law, § 5 DDG).</em></p>
 
   <h2>Angaben gemäß § 5 DDG</h2>
   <p>{{legal.name}}<br>{{legal.street}}<br>{{legal.postalCity}}<br>{{legal.country}}</p>
@@ -31,10 +35,31 @@
 
   <h2>Urheberrecht</h2>
   <p>Inhalte, Gestaltung und Quellcode von ABOmination unterliegen dem Urheberrecht. Die private, nicht-kommerzielle Nutzung ist kostenlos erlaubt; alle weiteren Rechte bleiben vorbehalten (siehe <a href="{{repo}}/blob/main/LICENSE">Lizenz</a>).</p>
+<!--/de-->
+<!--en-->
+  <h1>Legal notice</h1>
+  <p><em>Impressum according to German law. This translation is provided for convenience; the <a href="{{altHref}}">German version</a> is legally binding.</em></p>
+
+  <h2>Information according to § 5 DDG (German Digital Services Act)</h2>
+  <p>{{legal.name}}<br>{{legal.street}}<br>{{legal.postalCity}}<br>{{legal.country}}</p>
+
+  <h2>Contact</h2>
+  <p>E-mail: <a href="mailto:{{legal.email}}">{{legal.email}}</a><!--if:phone--><br>Phone: {{legal.phone}}<!--endif:phone--></p>
+
+  <h2>Responsible for the content according to § 18 (2) MStV</h2>
+  <p>{{legal.name}}, address as above.</p>
+
+  <h2>Liability for content and links</h2>
+  <p>The content of this site was created with care. However, no guarantee can be given for its accuracy, completeness or timeliness. This site contains links to external websites (e.g. GitHub) whose content is beyond our control; the respective provider is responsible for that content.</p>
+
+  <h2>Copyright</h2>
+  <p>Content, design and source code of ABOmination are protected by copyright. Private, non-commercial use is permitted free of charge; all other rights are reserved (see <a href="{{repo}}/blob/main/LICENSE">license</a>).</p>
+<!--/en-->
 </main>
 <footer class="footer">
-  <nav><a href="./">Startseite</a><a href="datenschutz.html">Datenschutz</a><a href="{{repo}}">GitHub</a></nav>
+  <nav><a href="./"><!--en-->Home<!--/en--><!--de-->Startseite<!--/de--></a><a href="datenschutz.html"><!--en-->Privacy policy<!--/en--><!--de-->Datenschutz<!--/de--></a><a href="{{repo}}">GitHub</a></nav>
   <p>© 2026 {{legal.name}}</p>
 </footer>
+<script src="site.js"></script>
 </body>
 </html>

@@ -1,5 +1,9 @@
 # Cloud-Sync einrichten
 
+[English](SYNC.md) · **Deutsch**
+
+Gilt für **lokale Profile**. Mit einem Server-Konto (siehe [DEPLOYMENT.de.md](DEPLOYMENT.de.md)) ist kein zusätzlicher Sync nötig.
+
 Es gibt vier Wege. Der erste ist der einfachste und braucht keine Zugangsdaten.
 
 | Weg | Aufwand | Braucht `http://localhost` |

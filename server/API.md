@@ -1,60 +1,63 @@
-# ABOmination Server-API
+# ABOmination server API
 
-Der Server kennt keine Abo-Daten. Er speichert pro Konto einen **verschlüsselten Tresor** und prüft beim Anmelden einen aus dem Passwort abgeleiteten Schlüssel. Passwort und Entschlüsselungsschlüssel verlassen das Gerät nie.
+**English** · [Deutsch](API.de.md)
 
-## Schlüsselableitung (Client)
+The server knows no subscription data. It stores one **encrypted vault** per account and checks a key derived from the password at login. The password and the decryption key never leave the device.
+
+## Key derivation (client)
 
 ```
-masterKey = PBKDF2-SHA256(passwort (UTF-8), salt, iter)          → 32 Byte
-authKey   = HKDF-SHA256(masterKey, salt = leer, info = "abomination/auth/v1") → 32 Byte, Base64 an den Server
-encKey    = HKDF-SHA256(masterKey, salt = leer, info = "abomination/enc/v1")  → AES-256-GCM-Schlüssel, bleibt lokal
+masterKey = PBKDF2-SHA256(password (UTF-8), salt, iter)            → 32 bytes
+authKey   = HKDF-SHA256(masterKey, salt = empty, info = "abomination/auth/v1") → 32 bytes, base64 to the server
+encKey    = HKDF-SHA256(masterKey, salt = empty, info = "abomination/enc/v1")  → AES-256-GCM key, stays local
 ```
 
-- `salt`: 16 zufällige Byte, bei Registrierung und Passwortwechsel neu erzeugt (Base64).
-- `iter`: mindestens 100.000, Standard 600.000 (`GET /api/config` → `kdf`).
-- Tresor: `{ v: 1, iv: Base64(12 Byte), ct: Base64(AES-GCM(encKey, iv, JSON der Daten)) }`.
+- `salt`: 16 random bytes, regenerated on registration and password change (base64).
+- `iter`: at least 100,000, default 600,000 (`GET /api/config` → `kdf`).
+- Vault: `{ v: 1, iv: base64(12 bytes), ct: base64(AES-GCM(encKey, iv, JSON of the data)) }`.
 
-Der Server hasht den `authKey` zusätzlich mit scrypt. Ein Datenbank-Leck liefert also weder Daten noch Anmeldeschlüssel.
-Es gibt **keinen Passwort-Reset**: ohne Passwort ist der Tresor nicht zu entschlüsseln.
+The server additionally hashes the `authKey` with scrypt, so a database leak yields neither data nor login keys.
+There is **no password reset**: without the password the vault cannot be decrypted.
 
-## Authentifizierung
+## Authentication
 
-- **Web:** Cookie `abo_session` (httpOnly, SameSite=Strict, Pfad `/api`). Ändernde Anfragen mit Cookie brauchen zusätzlich den Header `X-Requested-With: abomination` (CSRF-Schutz).
-- **App:** bei Login/Registrierung `client: "app"` senden → `token` im Body; danach `Authorization: Bearer <token>`.
-- Sitzungen verlängern sich bei Nutzung (`SESSION_DAYS`).
-- Fehler: `{ error: "<code>", message: "<deutscher Text>" }`.
+- **Web:** cookie `abo_session` (httpOnly, SameSite=Strict, path `/api`). Mutating requests with a cookie also need the header `X-Requested-With: abomination` (CSRF protection).
+- **Apps:** send `client: "app"` on login/registration → `token` in the body; afterwards `Authorization: Bearer <token>`.
+- Sessions are extended on use (`SESSION_DAYS`).
+- Errors: `{ error: "<code>", message: "<German text>" }` – clients should branch on `error`, not on `message`.
 
-## Endpunkte
+## Endpoints
 
-| Methode | Pfad | Body | Antwort |
+| Method | Path | Body | Response |
 |---|---|---|---|
 | GET | `/api/health` | – | `{ ok, version }` |
 | GET | `/api/config` | – | `{ version, registration, maxVaultBytes, kdf }` |
-| GET | `/api/rates` | – | `{ date, rates, fetchedAt, source }` – EZB-Kurse (1 EUR = x), max. alle 12 h von frankfurter.dev geholt; 503 wenn nicht verfügbar |
-| POST | `/api/auth/prelogin` | `{ username }` | `{ kdf, salt, iter }` (für unbekannte Namen ein stabiles Scheinsalz) |
+| GET | `/api/rates` | – | `{ date, rates, fetchedAt, source }` – ECB rates (1 EUR = x), fetched from frankfurter.dev at most every 12 h; 503 if unavailable |
+| POST | `/api/auth/prelogin` | `{ username }` | `{ kdf, salt, iter }` (a stable fake salt for unknown names) |
 | POST | `/api/auth/register` | `{ username, invite?, salt, iter, authKey, vault, client?, label? }` | 201 `{ user, vault: { version }, sessionId, token? }` |
 | POST | `/api/auth/login` | `{ username, authKey, client?, label? }` | `{ user, sessionId, token? }` |
 | POST | `/api/auth/logout` | – | 204 |
 | GET | `/api/auth/me` | – | `{ user, session }` |
 | GET | `/api/auth/sessions` | – | `{ sessions: [{ id, kind, label, createdAt, lastSeen, current }] }` |
-| DELETE | `/api/auth/sessions/:id` | – | 204 (Gerät abmelden) |
-| POST | `/api/auth/password` | `{ authKey, newSalt, newIter, newAuthKey, vault, baseVersion }` | `{ vault: { version } }`; andere Sitzungen werden beendet |
-| DELETE | `/api/account` | `{ authKey }` | 204 (Konto + Tresor gelöscht) |
+| DELETE | `/api/auth/sessions/:id` | – | 204 (sign out a device) |
+| POST | `/api/auth/password` | `{ authKey, newSalt, newIter, newAuthKey, vault, baseVersion }` | `{ vault: { version } }`; other sessions are ended |
+| DELETE | `/api/account` | `{ authKey }` | 204 (account and vault deleted) |
 | GET | `/api/vault` | – | `{ version, updatedAt, blob }` |
-| PUT | `/api/vault` | `{ blob, baseVersion }` | `{ version, updatedAt }` oder **409** `{ error: "conflict", version, updatedAt, blob }` |
+| PUT | `/api/vault` | `{ blob, baseVersion }` | `{ version, updatedAt }` or **409** `{ error: "conflict", version, updatedAt, blob }` |
 
-### Konflikte
-`PUT /api/vault` schreibt nur, wenn `baseVersion` der aktuellen Version entspricht. Sonst kommt 409 mit dem aktuellen Stand; der Client führt zusammen und schreibt erneut mit der neuen Version.
+### Conflicts
+`PUT /api/vault` only writes if `baseVersion` matches the current version. Otherwise it returns 409 with the current state; the client merges and writes again with the new version.
 
-### Schutz vor Passwort-Raten
-Pro IP und Name ab 5 Fehlversuchen exponentiell wachsende Sperre (bis 15 Minuten) → 429 mit `Retry-After`. Zusätzlich 30 Auth-Anfragen pro Minute und IP, allgemein 300 Anfragen pro Minute. Höchstens 4 scrypt-Prüfungen laufen gleichzeitig (Rest wartet; bei Überlast 503).
+### Brute-force protection
+Per IP and name, an exponentially growing lockout after 5 failed attempts (up to 15 minutes) → 429 with `Retry-After`. Additionally 30 auth requests per minute and IP, 300 requests per minute overall. At most 4 scrypt checks run in parallel (the rest waits; 503 when overloaded).
 
-## Verwaltung
+## Administration
 
 ```
-abo invite [--uses N] [--days N] [--note TEXT]   Einladungscode (Standard: 1× nutzbar, 7 Tage)
+abo invite [--uses N] [--days N] [--note TEXT]   invite code (default: single use, 7 days)
 abo invites | users
 abo logout-all <name>
 abo delete-user <name> --yes
+abo backup [file] [--keep N]                   database backup (VACUUM INTO)
 ```
-Lokal: `npm run abo -- invite`.
+Locally: `npm run abo -- invite`.

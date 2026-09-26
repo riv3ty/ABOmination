@@ -1,5 +1,7 @@
 # Security Policy
 
+**English** · [Deutsch](SECURITY.de.md)
+
 ABOmination handles personal financial data, so security reports are taken seriously.
 
 ## Reporting a vulnerability
@@ -25,7 +27,3 @@ Only the latest version on `main` (and the `latest` Docker image) receives secur
 - Data is encrypted in the browser (PBKDF2-SHA256 600k → HKDF → AES-256-GCM); the server stores only ciphertext and `scrypt(authKey)`.
 - Sessions: httpOnly/SameSite=Strict cookies with CSRF header, or bearer tokens for apps; stored as SHA-256 hashes.
 - Brute-force protection, rate limits, strict Content-Security-Policy, non-root read-only container.
-
----
-
-**Deutsch:** Sicherheitslücken bitte **nicht** als öffentliches Issue melden, sondern vertraulich über *Security → Report a vulnerability*. Antwort innerhalb von 7 Tagen.

@@ -98,6 +98,19 @@ pre { margin: 0; padding: 14px 16px; border-radius: 12px; background: #0f0f11; c
 .stage li b { display: block; font-family: var(--f-head); font-size: 15px; margin-bottom: 2px; }
 .stage li span { color: var(--muted); font-size: 14px; }
 
+/* Roadmap-Grafik (SVG aus docs/roadmap.json) */
+.roadmap-graph { margin: 0 0 22px; overflow-x: auto; border-radius: 22px; }
+.roadmap-graph img { min-width: 860px; width: 100%; }
+
+/* Unterstützen */
+.support .lede { margin-top: -18px; }
+.funding { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.fund { display: flex; flex-direction: column; gap: 6px; text-decoration: none; transition: transform .4s cubic-bezier(.34,1.56,.64,1), border-color .2s; }
+.fund:hover { transform: translateY(-3px); border-color: var(--accent); }
+.fund i { width: 12px; height: 12px; border-radius: 50%; margin-bottom: 6px; }
+.fund b { font-family: var(--f-head); font-size: 18px; }
+.fund span { color: var(--muted); font-size: 14px; }
+
 /* Newsletter */
 .nl-card { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: center;
   background: radial-gradient(90% 120% at 100% 0, rgba(139,92,246,.22), transparent 60%), var(--card); }

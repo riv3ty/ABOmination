@@ -1,27 +1,32 @@
 <!DOCTYPE html>
-<html lang="de" data-lang="de">
+<html lang="{{lang}}" data-lang="{{lang}}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Datenschutzerklärung – ABOmination</title>
+<title><!--en-->Privacy policy<!--/en--><!--de-->Datenschutzerklärung<!--/de--> – ABOmination</title>
 <meta name="robots" content="noindex">
+<link rel="canonical" href="{{canonical}}">
 <link rel="icon" type="image/svg+xml" href="assets/icons/icon.svg">
 <link rel="stylesheet" href="site.css">
 </head>
 <body>
 <header class="nav">
   <a class="brand" href="./"><img src="assets/icons/icon.svg" alt="" width="34" height="34"><span>ABOmination</span></a>
-  <div class="nav-actions"><a class="btn" href="./">← Startseite</a></div>
+  <div class="nav-actions">
+    <a class="lang" href="{{altHref}}" hreflang="{{altLang}}" data-setlang="{{altLang}}">{{altLabel}}</a>
+    <a class="btn" href="./">← <!--en-->Home<!--/en--><!--de-->Startseite<!--/de--></a>
+  </div>
 </header>
 <main class="legal">
+<!--de-->
   <h1>Datenschutzerklärung</h1>
-  <p><em>Privacy policy (German). Stand: {{today}}</em></p>
+  <p><em>Stand: {{today}}</em></p>
 
   <h2>1. Verantwortlicher</h2>
   <p>{{legal.name}}, {{legal.street}}, {{legal.postalCity}}, {{legal.country}} · E-Mail: <a href="mailto:{{legal.email}}">{{legal.email}}</a></p>
 
   <h2>2. Grundsätze</h2>
-  <p>Diese Website verwendet keine Cookies, keine Analyse- oder Tracking-Werkzeuge und keine Werbung. Schriften und Bilder werden von dieser Website selbst ausgeliefert; es werden keine Inhalte von Drittanbietern (z. B. Google Fonts) nachgeladen.</p>
+  <p>Diese Website verwendet keine Cookies, keine Analyse- oder Tracking-Werkzeuge und keine Werbung. Schriften und Bilder werden von dieser Website selbst ausgeliefert; es werden keine Inhalte von Drittanbietern (z. B. Google Fonts) nachgeladen. Ihre Sprachwahl wird ausschließlich lokal in Ihrem Browser gespeichert.</p>
 
   <h2>3. Hosting durch GitHub Pages</h2>
   <p>Die Website wird bei GitHub Pages gehostet, einem Dienst der GitHub Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA (Tochter der Microsoft Corporation). Beim Aufruf verarbeitet GitHub technisch notwendige Daten, insbesondere Ihre IP-Adresse, Datum und Uhrzeit, aufgerufene Seite, Browser und Betriebssystem, um die Website auszuliefern und ihre Sicherheit zu gewährleisten. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an einer sicheren und zuverlässigen Bereitstellung). Dabei kann eine Übermittlung in die USA erfolgen; GitHub ist unter dem EU-US Data Privacy Framework zertifiziert. Weitere Informationen: <a href="https://docs.github.com/de/site-policy/privacy-policies/github-general-privacy-statement">Datenschutzerklärung von GitHub</a>.</p>
@@ -38,15 +43,58 @@
   <p>Sie können Ihre Einwilligung jederzeit mit Wirkung für die Zukunft widerrufen – über den Abmeldelink in jeder E-Mail oder per Nachricht an die oben genannte Adresse. Ihre Daten werden nach der Abmeldung gelöscht, soweit keine gesetzlichen Aufbewahrungspflichten bestehen.</p>
   <!--endif:newsletter-->
 
+  <!--if:funding-->
+  <h2>6. Unterstützung (Ko-fi, Liberapay, GitHub Sponsors)</h2>
+  <p>Die Links im Abschnitt „Unterstützen“ führen zu externen Plattformen. Erst wenn Sie einen Link anklicken, werden Sie zu dem jeweiligen Anbieter weitergeleitet; für die dortige Verarbeitung (z. B. von Zahlungsdaten) ist der jeweilige Anbieter verantwortlich und es gelten dessen Datenschutzbestimmungen. Auf dieser Website werden keine Inhalte dieser Anbieter eingebunden.</p>
+  <!--endif:funding-->
+
   <h2>Ihre Rechte</h2>
   <p>Sie haben das Recht auf Auskunft (Art. 15 DSGVO), Berichtigung (Art. 16), Löschung (Art. 17), Einschränkung der Verarbeitung (Art. 18), Datenübertragbarkeit (Art. 20) und Widerspruch gegen Verarbeitungen auf Grundlage berechtigter Interessen (Art. 21 DSGVO). Eine erteilte Einwilligung können Sie jederzeit widerrufen. Außerdem können Sie sich bei einer Datenschutz-Aufsichtsbehörde beschweren, insbesondere in dem Bundesland Ihres Wohnsitzes.</p>
 
   <h2>Kontakt zum Datenschutz</h2>
   <p>Fragen zum Datenschutz richten Sie bitte an <a href="mailto:{{legal.email}}">{{legal.email}}</a>.</p>
+<!--/de-->
+<!--en-->
+  <h1>Privacy policy</h1>
+  <p><em>Last updated: {{today}}. This translation is provided for convenience; the <a href="{{altHref}}">German version</a> is legally binding.</em></p>
+
+  <h2>1. Controller</h2>
+  <p>{{legal.name}}, {{legal.street}}, {{legal.postalCity}}, {{legal.country}} · E-mail: <a href="mailto:{{legal.email}}">{{legal.email}}</a></p>
+
+  <h2>2. Principles</h2>
+  <p>This website uses no cookies, no analytics or tracking tools and no advertising. Fonts and images are served by this website itself; no third-party content (e.g. Google Fonts) is loaded. Your language choice is stored only locally in your browser.</p>
+
+  <h2>3. Hosting by GitHub Pages</h2>
+  <p>This website is hosted on GitHub Pages, a service of GitHub Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA (a subsidiary of Microsoft Corporation). When you visit, GitHub processes technically necessary data, in particular your IP address, date and time, the page requested, browser and operating system, in order to deliver the website and keep it secure. The legal basis is Art. 6 (1) (f) GDPR (legitimate interest in secure and reliable delivery). Data may be transferred to the USA; GitHub is certified under the EU-US Data Privacy Framework. More information: <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">GitHub privacy statement</a>.</p>
+
+  <h2>4. Live demo of the app</h2>
+  <p>The demo at <code>/app/</code> runs entirely in your browser. Profiles and data you enter are stored encrypted only locally in your browser (localStorage) and are not transmitted to us. You can remove them at any time in your browser settings (clear site data).</p>
+  <p>If you use amounts in foreign currencies in the demo, the app fetches current European Central Bank exchange rates from the service <a href="https://frankfurter.dev">frankfurter.dev</a>. Your IP address is transmitted to this service; no subscription data is sent. The legal basis is Art. 6 (1) (f) GDPR (correct conversion at your request).</p>
+  <p>Optional sync providers that can be set up in the app (e.g. Google Drive, OneNote, Nextcloud) are only used if you actively connect them yourself; the respective provider's privacy policy then applies.</p>
+
+  <!--if:newsletter-->
+  <h2>5. Newsletter</h2>
+  <p>If you subscribe to the newsletter, we process your e-mail address to occasionally send you news about ABOmination. The legal basis is your consent (Art. 6 (1) (a) GDPR). Subscription uses a double opt-in: you first receive an e-mail with a confirmation link and are only added after confirming. We store the time of subscription and confirmation and your IP address to be able to prove your consent.</p>
+  <p>We use Brevo (Sendinblue SAS, 106 boulevard Haussmann, 75008 Paris, France) as a processor for sending. Data is processed in the EU. Brevo may evaluate whether e-mails are opened and links clicked in order to improve delivery. More information: <a href="https://www.brevo.com/legal/privacypolicy/">Brevo privacy policy</a>.</p>
+  <p>You can withdraw your consent at any time with effect for the future – via the unsubscribe link in every e-mail or by writing to the address above. Your data will be deleted after unsubscribing unless statutory retention obligations apply.</p>
+  <!--endif:newsletter-->
+
+  <!--if:funding-->
+  <h2>6. Support (Ko-fi, Liberapay, GitHub Sponsors)</h2>
+  <p>The links in the "Support" section lead to external platforms. You are only forwarded to the respective provider when you click a link; the provider is responsible for any processing there (e.g. of payment data) and its privacy policy applies. No content from these providers is embedded on this website.</p>
+  <!--endif:funding-->
+
+  <h2>Your rights</h2>
+  <p>You have the right of access (Art. 15 GDPR), rectification (Art. 16), erasure (Art. 17), restriction of processing (Art. 18), data portability (Art. 20) and to object to processing based on legitimate interests (Art. 21 GDPR). You can withdraw any consent given at any time. You also have the right to lodge a complaint with a data protection supervisory authority, in particular in the German federal state of your residence.</p>
+
+  <h2>Contact regarding data protection</h2>
+  <p>Please send questions about data protection to <a href="mailto:{{legal.email}}">{{legal.email}}</a>.</p>
+<!--/en-->
 </main>
 <footer class="footer">
-  <nav><a href="./">Startseite</a><a href="impressum.html">Impressum</a><a href="{{repo}}">GitHub</a></nav>
+  <nav><a href="./"><!--en-->Home<!--/en--><!--de-->Startseite<!--/de--></a><a href="impressum.html"><!--en-->Legal notice<!--/en--><!--de-->Impressum<!--/de--></a><a href="{{repo}}">GitHub</a></nav>
   <p>© 2026 {{legal.name}}</p>
 </footer>
+<script src="site.js"></script>
 </body>
 </html>

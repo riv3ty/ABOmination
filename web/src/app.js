@@ -743,7 +743,7 @@ function nextcloudBackend(c) {
   const req = async (u, opt = {}) => {
     let r;
     try { r = await fetch(u, { cache: "no-store", ...opt, headers: { Authorization: auth, ...(opt.headers || {}) } }); }
-    catch { throw new Error("Nextcloud nicht erreichbar: Adresse falsch oder CORS nicht freigegeben (siehe SYNC-EINRICHTEN.md)."); }
+    catch { throw new Error("Nextcloud nicht erreichbar: Adresse falsch oder CORS nicht freigegeben (siehe SYNC.de.md)."); }
     if (r.status === 401) throw new AuthError("Benutzername oder App-Passwort falsch.");
     return r;
   };
@@ -1056,7 +1056,7 @@ function syncForm(sel) {
   const local = location.protocol === "file:";
   const redirect = esc(location.origin + location.pathname);
   const warn = local && sel !== "file"
-    ? `<p class="warn">Die App ist gerade als Datei geöffnet. Für ${PROV_LABEL[sel]} bitte über <b>Abo-Manager-starten.cmd</b> starten (http://localhost:8765) – siehe SYNC-EINRICHTEN.md.</p>` : "";
+    ? `<p class="warn">Die App ist gerade als Datei geöffnet. Für ${PROV_LABEL[sel]} bitte über <b>Abo-Manager-starten.cmd</b> starten (http://localhost:8765) – siehe SYNC.de.md.</p>` : "";
   if (sel === "file") return `<p class="muted small">Wähle eine Datei in einem Ordner, den ein Sync-Programm abgleicht (OneDrive, Google Drive für Desktop, Nextcloud-Client, Dropbox …). Die App hält sie automatisch aktuell. Auf dem zweiten Gerät wählst du dieselbe Datei. Funktioniert in Chrome und Edge.</p>
     <div class="row-btns"><button class="btn small primary" data-sync="connect"${syncSupported ? "" : " disabled"}>Sync-Datei wählen …</button></div>`;
   if (sel === "nextcloud") return warn + `

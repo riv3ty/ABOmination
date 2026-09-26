@@ -1,13 +1,11 @@
-// Website: Sprachumschaltung, Einblenden beim Scrollen, Newsletter-Anmeldung (Brevo, Double-Opt-in)
+// Website: Sprachwahl merken, Einblenden beim Scrollen, Newsletter-Anmeldung (Brevo, Double-Opt-in)
 (function () {
   "use strict";
   var root = document.documentElement;
 
-  var toggle = document.getElementById("langToggle");
-  if (toggle) toggle.addEventListener("click", function () {
-    var l = root.dataset.lang === "de" ? "en" : "de";
-    root.dataset.lang = l; root.lang = l;
-    try { localStorage.setItem("abo-site-lang", l); } catch (e) {}
+  // Sprachlink (EN/DE): bewusste Wahl merken, damit die automatische Weiterleitung sie respektiert
+  document.querySelectorAll("[data-setlang]").forEach(function (a) {
+    a.addEventListener("click", function () { try { localStorage.setItem("abo-site-lang", a.dataset.setlang); } catch (e) {} });
   });
 
   // Abschnitte sanft einblenden

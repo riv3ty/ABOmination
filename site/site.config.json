@@ -5,6 +5,11 @@
   "newsletter": {
     "brevoFormAction": "https://065820ec.sibforms.com/serve/MUIFAPGqNk7VELOKbD4-m81wYQpNT8YeqcCWmAGDbED3bGHC0T4rVVISLvaimIkptlH4D4EktVa3EK3vsy0OuUkfQWwrWu-sLVj2bEJgx99x8YZkeYTm5mdVmSp9JJcerCA3rRs1bV0dk0mWeRIrmOJMJm6THrSwBNPCxoWbFVjh-ZZsS8I5m60AzDa5Y4Lvj-eK1rY-wkLhlhyBaQ=="
   },
+  "funding": {
+    "githubSponsors": "",
+    "kofi": "",
+    "liberapay": ""
+  },
   "legal": {
     "name": "Maciej Peciak",
     "street": "Rodigallee 131",

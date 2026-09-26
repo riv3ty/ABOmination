@@ -80,10 +80,10 @@ docker compose pull && docker compose up -d
 docker compose exec app abo invite --note "me"   # invite code for the first account
 ```
 
-Reverse proxy examples (nginx, Caddy, Traefik, Nginx Proxy Manager), backups and updates: **[DEPLOYMENT.md](DEPLOYMENT.md)** (German).
+Reverse proxy examples (nginx, Caddy, Traefik, Nginx Proxy Manager), backups and updates: **[DEPLOYMENT.md](DEPLOYMENT.md)**.
 
 ### 3. Local only
-Build once and open `dist/index.html` – no server required. Data stays encrypted in your browser; optional sync via a cloud folder, Nextcloud, Google Drive or OneNote ([SYNC-EINRICHTEN.md](SYNC-EINRICHTEN.md), German).
+Build once and open `dist/index.html` – no server required. Data stays encrypted in your browser; optional sync via a cloud folder, Nextcloud, Google Drive or OneNote ([SYNC.md](SYNC.md)).
 
 ```bash
 npm ci && npm run build
@@ -113,7 +113,29 @@ All commands and the project layout: [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
 
 ## Roadmap
 
-Next up: native Android app, passkeys, encrypted backups, price-increase alerts and a cancellation assistant. See **[ROADMAP.md](ROADMAP.md)** – and follow updates via the newsletter on the [website](https://riv3ty.github.io/ABOmination/).
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/roadmap/roadmap-en-dark.svg">
+  <img alt="Roadmap overview" src="docs/roadmap/roadmap-en-light.svg" width="100%">
+</picture>
+
+Next up: native Android app, passkeys, encrypted backups, price-increase alerts and a cancellation assistant. Details in **[ROADMAP.md](ROADMAP.md)** – and follow updates via the newsletter on the [website](https://riv3ty.github.io/ABOmination/).
+
+## Documentation
+
+Every document is available in English and German.
+
+| Topic | English | Deutsch |
+|---|---|---|
+| Self-hosting with Docker | [DEPLOYMENT.md](DEPLOYMENT.md) | [DEPLOYMENT.de.md](DEPLOYMENT.de.md) |
+| Cloud sync for local profiles | [SYNC.md](SYNC.md) | [SYNC.de.md](SYNC.de.md) |
+| Server API & encryption protocol | [server/API.md](server/API.md) | [server/API.de.md](server/API.de.md) |
+| Development | [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) | [docs/DEVELOPMENT.de.md](docs/DEVELOPMENT.de.md) |
+| Roadmap | [ROADMAP.md](ROADMAP.md) | [ROADMAP.de.md](ROADMAP.de.md) |
+| Security policy | [SECURITY.md](SECURITY.md) | [SECURITY.de.md](SECURITY.de.md) |
+| Contributing | [CONTRIBUTING.md](CONTRIBUTING.md) | [CONTRIBUTING.de.md](CONTRIBUTING.de.md) |
+
+<!-- support:start -->
+<!-- support:end -->
 
 ## Contributing
 

@@ -8,7 +8,7 @@ export default defineConfig({
   base: "./",
   plugins: [viteSingleFile()],
   build: { outDir: "../dist", emptyOutDir: true, target: "es2022" },
-  // Port 8765: bei Google/Microsoft als Redirect-/Ursprungs-Adresse registriert (siehe SYNC-EINRICHTEN.md)
+  // Port 8765: bei Google/Microsoft als Redirect-/Ursprungs-Adresse registriert (siehe SYNC.de.md)
   // /api an den lokal laufenden Server (npm run server:dev) weiterreichen
   server: { port: 8765, strictPort: true, proxy: { "/api": "http://127.0.0.1:8080" } },
   preview: { port: 8765, strictPort: true },

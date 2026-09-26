@@ -28,9 +28,9 @@ Abo-/Ratenzahlungs-Manager, reiner Web-Client (Vanilla JS, keine Frameworks). UI
 - CSP wird aus den Inline-Skripten von `dist/index.html` berechnet: keine Inline-Event-Handler (`onclick=` usw.) im Markup verwenden.
 
 ## Oeffentlicher Auftritt
-- README.md (EN) + README.de.md (DE) synchron halten; Entwickler-Doku in docs/DEVELOPMENT.md. Lizenz: eigene "Personal Use License" (privat/nicht-kommerziell frei, inkl. Selbsthosting; kommerziell und Weiterverbreitung nur mit Erlaubnis) – nicht "Open Source" nennen.
-- Roadmap nur in `docs/roadmap.json` pflegen, dann `npm run roadmap` (erzeugt ROADMAP.md/.de.md; Website liest die JSON).
-- Website: `site/` (Vorlagen, EN/DE per `<span lang>`), Build `npm run site` → `_site/` inkl. Demo unter `/app/` (`?demo` laedt Beispieldaten aus `scripts/demo-data.js`). Newsletter (Brevo) und Impressum/Datenschutz erscheinen nur, wenn `site/site.config.json` ausgefuellt ist – keine Personendaten erfinden.
+- Alle Doku zweisprachig: `X.md` (EN) + `X.de.md` (DE) inkl. Sprachlink oben – immer beide pflegen (README, DEPLOYMENT, SYNC, server/API, docs/DEVELOPMENT, SECURITY, CONTRIBUTING, ROADMAP). Code-Kommentare bleiben deutsch. Lizenz: eigene "Personal Use License" (privat/nicht-kommerziell frei, inkl. Selbsthosting; kommerziell und Weiterverbreitung nur mit Erlaubnis) – nicht "Open Source" nennen.
+- Roadmap nur in `docs/roadmap.json` pflegen, dann `npm run docs` (erzeugt ROADMAP.md/.de.md und SVG-Grafiken in docs/roadmap/; Website liest JSON + SVG). Unterstützen-Links (Ko-fi, Liberapay, GitHub Sponsors) in `site/site.config.json` → `npm run docs` schreibt .github/FUNDING.yml und README-Abschnitt (Markierung support:start/end).
+- Website: `site/` (Vorlagen, EN/DE per `<span lang>` bzw. `<!--en-->…<!--/en-->`), Build `npm run site` → `_site/` (Englisch unter /, Deutsch unter /de/) inkl. Demo unter `/app/` (`?demo` laedt Beispieldaten aus `scripts/demo-data.js`). Newsletter (Brevo) und Impressum/Datenschutz erscheinen nur, wenn `site/site.config.json` ausgefuellt ist – keine Personendaten erfinden.
 - Screenshots: `npm run screenshots` (nur Beispieldaten). GitHub Actions: ci.yml (check + e2e), docker.yml (GHCR, amd64/arm64), pages.yml.
 
 ## Regeln

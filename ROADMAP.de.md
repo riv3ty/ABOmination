@@ -1,8 +1,13 @@
 # Roadmap
 
-[English](ROADMAP.md) · Stand: 2026-09-26
+[English](ROADMAP.md) · **Deutsch** · Stand: 2026-09-26
 
 Wohin sich ABOmination entwickelt. Prioritäten können sich ändern – Ideen und Feedback gern in den [Issues](https://github.com/riv3ty/ABOmination/issues).
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/roadmap/roadmap-de-dark.svg">
+  <img alt="Roadmap-Übersicht" src="docs/roadmap/roadmap-de-light.svg" width="100%">
+</picture>
 
 ## ✅ Erledigt
 
@@ -41,4 +46,4 @@ Wohin sich ABOmination entwickelt. Prioritäten können sich ändern – Ideen u
 - **Browser-Erweiterung** – Abo direkt beim Abschluss im Onlineshop erfassen.
 - **Kalender-Abo** – Optionaler abonnierbarer Kalender (freiwillig, da er dem Server Termine zeigt).
 
-<sub>Erzeugt aus `docs/roadmap.json` – dort ändern und `node scripts/build-roadmap.js` ausführen.</sub>
+<sub>Erzeugt aus `docs/roadmap.json` – dort ändern und `npm run docs` ausführen.</sub>
