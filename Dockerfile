@@ -2,7 +2,7 @@
 # ABOmination: Web-App bauen, dann schlankes Laufzeit-Image mit Server + gebauter App
 
 # --- 1) Web-App bauen (dist/index.html) ---
-FROM node:24-alpine AS build
+FROM node:26-alpine AS build
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --no-audit --no-fund
@@ -11,13 +11,13 @@ COPY web ./web
 RUN npm run build
 
 # --- 2) nur Laufzeit-Abhängigkeiten ---
-FROM node:24-alpine AS deps
+FROM node:26-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev --no-audit --no-fund && npm cache clean --force
 
 # --- 3) Laufzeit ---
-FROM node:24-alpine
+FROM node:26-alpine
 ENV NODE_ENV=production \
     HOST=0.0.0.0 \
     PORT=8080 \
