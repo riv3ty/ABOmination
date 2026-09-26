@@ -3,14 +3,14 @@
   "repo": "https://github.com/riv3ty/ABOmination",
   "image": "ghcr.io/riv3ty/abomination",
   "newsletter": {
-    "brevoFormAction": ""
+    "brevoFormAction": "https://065820ec.sibforms.com/serve/MUIFAPGqNk7VELOKbD4-m81wYQpNT8YeqcCWmAGDbED3bGHC0T4rVVISLvaimIkptlH4D4EktVa3EK3vsy0OuUkfQWwrWu-sLVj2bEJgx99x8YZkeYTm5mdVmSp9JJcerCA3rRs1bV0dk0mWeRIrmOJMJm6THrSwBNPCxoWbFVjh-ZZsS8I5m60AzDa5Y4Lvj-eK1rY-wkLhlhyBaQ=="
   },
   "legal": {
-    "name": "",
-    "street": "",
-    "postalCity": "",
+    "name": "Maciej Peciak",
+    "street": "Rodigallee 131",
+    "postalCity": "22043 Hamburg",
     "country": "Deutschland",
-    "email": "",
-    "phone": ""
+    "email": "maciej.peciak@outlook.de",
+    "phone": "+4915222353101"
   }
 }
