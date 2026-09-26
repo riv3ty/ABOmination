@@ -135,6 +135,17 @@ Every document is available in English and German.
 | Contributing | [CONTRIBUTING.md](CONTRIBUTING.md) | [CONTRIBUTING.de.md](CONTRIBUTING.de.md) |
 
 <!-- support:start -->
+## Support
+
+ABOmination is free for personal use, without ads or tracking. If it saves you money, you can support its development:
+
+<a href="https://github.com/sponsors/riv3ty"><img alt="GitHub Sponsors" src="https://img.shields.io/badge/GitHub%20Sponsors-EA4AAA?logo=githubsponsors&logoColor=white"></a>
+<a href="https://ko-fi.com/sudonoob"><img alt="Ko-fi" src="https://img.shields.io/badge/Ko--fi-FF5E5B?logo=kofi&logoColor=white"></a>
+<a href="https://liberapay.com/sudo_noob/donate"><img alt="Liberapay" src="https://img.shields.io/badge/Liberapay-F6C915?logo=liberapay&logoColor=black"></a>
+
+- **[GitHub Sponsors](https://github.com/sponsors/riv3ty)** – monthly or one-time
+- **[Ko-fi](https://ko-fi.com/sudonoob)** – buy a coffee, no account needed
+- **[Liberapay](https://liberapay.com/sudo_noob/donate)** – recurring, non-profit platform
 <!-- support:end -->
 
 ## Contributing
