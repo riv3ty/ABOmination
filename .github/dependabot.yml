@@ -13,3 +13,8 @@ updates:
   - package-ecosystem: docker
     directory: /
     schedule: { interval: weekly }
+    ignore:
+      # Neue Node-Hauptversion (z. B. 24 → 26) nur bewusst wechseln, wenn sie LTS ist;
+      # Updates innerhalb von Node 24 (Sicherheitsfixes) kommen weiterhin
+      - dependency-name: node
+        update-types: ["version-update:semver-major"]
