@@ -39,7 +39,7 @@ jobs:
             org.opencontainers.image.title=ABOmination
             org.opencontainers.image.description=Subscriptions & installments, end-to-end encrypted – self-hosted server
             org.opencontainers.image.licenses=LicenseRef-ABOmination-Personal-Use
-      - uses: docker/build-push-action@v6
+      - uses: docker/build-push-action@v7
         with:
           context: .
           platforms: linux/amd64,linux/arm64
