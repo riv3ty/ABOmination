@@ -83,6 +83,41 @@ describe("computeView", () => {
   });
 });
 
+describe("Bereits bezahlt (paidThrough)", () => {
+  it("Abo springt zum nächsten Termin; gespeichertes Datum bleibt, Monatsenden verrutschen nicht", () => {
+    const s = sub({ nextDate: "2026-01-31", paidThrough: "2026-03-31" });
+    const [v] = computeView([s], toEur, T);                                 // T = 10.03.2026 → fällig wäre der 31.03.
+    expect(toISO(v.next)).toBe("2026-04-30");
+    expect(v.nextDate).toBe("2026-01-31");
+    const [w] = computeView([{ ...s, paidThrough: "2026-04-30" }], toEur, T);
+    expect(toISO(w.next)).toBe("2026-05-31");                               // nicht 30.05. (kein Verrutschen)
+  });
+
+  it("Ratenzahlung: vorab bezahlte Rate zählt sofort, auch die letzte", () => {
+    const base = sub({ kind: "installment", totalPayments: 6, paidCount: 2, price: 50, nextDate: "2026-03-20" });
+    const [a] = computeView([base], toEur, T);
+    const [b] = computeView([{ ...base, paidThrough: "2026-03-20" }], toEur, T);
+    expect([a.paid, a.remaining]).toEqual([2, 4]);
+    expect([b.paid, b.remaining, b.remainingAmt]).toEqual([3, 3, 150]);
+    expect(toISO(b.next)).toBe("2026-04-20");
+    expect(toISO(b.endDate)).toBe(toISO(a.endDate));                        // Enddatum bleibt gleich
+    const [c] = computeView([{ ...base, paidThrough: "2026-07-20" }], toEur, T);
+    expect(c.state).toBe("done");
+  });
+
+  it("nach Ablauf des Termins wird nichts doppelt gezählt", () => {
+    const base = sub({ kind: "installment", totalPayments: 6, paidCount: 2, price: 50, nextDate: "2026-03-20", paidThrough: "2026-03-20" });
+    const [v] = computeView([base], toEur, parseISO("2026-03-25"));          // Termin ist inzwischen vorbei
+    expect([v.paid, v.remaining]).toEqual([3, 3]);
+  });
+
+  it("ungültige Werte werden verworfen, alte Markierungen sind wirkungslos", () => {
+    expect(sub({ paidThrough: "morgen" }).paidThrough).toBe("");
+    const [v] = computeView([sub({ nextDate: "2026-03-20", paidThrough: "2026-02-01" })], toEur, T);
+    expect(toISO(v.next)).toBe("2026-03-20");
+  });
+});
+
 describe("Kategorien und Geld", () => {
   it("catName/catColor", () => {
     expect(catName({ category: "  " })).toBe("Ohne Kategorie");

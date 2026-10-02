@@ -1,78 +1,279 @@
 {
-  "updated": "2026-09-26",
+  "updated": "2026-10-03",
   "stages": [
     {
       "id": "shipped",
-      "title": { "en": "Shipped", "de": "Erledigt" },
+      "title": {
+        "en": "Shipped",
+        "de": "Erledigt"
+      },
       "items": [
-        { "en": ["End-to-end encrypted server accounts", "Sync across devices; the server only ever stores ciphertext. Conflicts are merged per entry."],
-          "de": ["Ende-zu-Ende-verschlüsselte Server-Konten", "Abgleich zwischen Geräten; der Server speichert nur verschlüsselte Daten. Konflikte werden pro Eintrag zusammengeführt."] },
-        { "en": ["Self-hosting with Docker", "Hardened container, invite-only registration, backups, reverse-proxy guides."],
-          "de": ["Selbst hosten mit Docker", "Gehärteter Container, Registrierung nur per Einladung, Backups, Anleitungen für Reverse Proxys."] },
-        { "en": ["Installable web app (PWA)", "Works offline, installs on Android, iOS and desktop."],
-          "de": ["Installierbare Web-App (PWA)", "Funktioniert offline, installierbar auf Android, iOS und Desktop."] },
-        { "en": ["Installments with interest", "Amortization schedule, remaining debt, early-payoff simulator."],
-          "de": ["Ratenkäufe mit Zinsen", "Tilgungsplan, Restschuld, Simulator für Sondertilgungen."] },
-        { "en": ["Bank statement import", "Detects recurring payments in CSV exports from German banks."],
-          "de": ["Kontoauszug-Import", "Erkennt wiederkehrende Zahlungen in CSV-Exporten deutscher Banken."] }
+        {
+          "en": [
+            "Mark payments as already paid",
+            "One click in the reminder – the next due date moves on, installments count immediately, with undo."
+          ],
+          "de": [
+            "Zahlungen als bereits bezahlt markieren",
+            "Ein Klick in der Erinnerung – der nächste Termin rückt weiter, Raten zählen sofort, mit Rückgängig."
+          ]
+        },
+        {
+          "en": [
+            "End-to-end encrypted server accounts",
+            "Sync across devices; the server only ever stores ciphertext. Conflicts are merged per entry."
+          ],
+          "de": [
+            "Ende-zu-Ende-verschlüsselte Server-Konten",
+            "Abgleich zwischen Geräten; der Server speichert nur verschlüsselte Daten. Konflikte werden pro Eintrag zusammengeführt."
+          ]
+        },
+        {
+          "en": [
+            "Self-hosting with Docker",
+            "Hardened container, invite-only registration, backups, reverse-proxy guides."
+          ],
+          "de": [
+            "Selbst hosten mit Docker",
+            "Gehärteter Container, Registrierung nur per Einladung, Backups, Anleitungen für Reverse Proxys."
+          ]
+        },
+        {
+          "en": [
+            "Installable web app (PWA)",
+            "Works offline, installs on Android, iOS and desktop."
+          ],
+          "de": [
+            "Installierbare Web-App (PWA)",
+            "Funktioniert offline, installierbar auf Android, iOS und Desktop."
+          ]
+        },
+        {
+          "en": [
+            "Installments with interest",
+            "Amortization schedule, remaining debt, early-payoff simulator."
+          ],
+          "de": [
+            "Ratenkäufe mit Zinsen",
+            "Tilgungsplan, Restschuld, Simulator für Sondertilgungen."
+          ]
+        },
+        {
+          "en": [
+            "Bank statement import",
+            "Detects recurring payments in CSV exports from German banks."
+          ],
+          "de": [
+            "Kontoauszug-Import",
+            "Erkennt wiederkehrende Zahlungen in CSV-Exporten deutscher Banken."
+          ]
+        }
       ]
     },
     {
       "id": "now",
-      "title": { "en": "In progress", "de": "In Arbeit" },
+      "title": {
+        "en": "In progress",
+        "de": "In Arbeit"
+      },
       "items": [
-        { "en": ["Native Android app", "Kotlin & Jetpack Compose: fingerprint unlock, reminders in the background, home-screen widget – same encrypted account."],
-          "de": ["Native Android-App", "Kotlin & Jetpack Compose: Entsperren per Fingerabdruck, Erinnerungen im Hintergrund, Widget – mit demselben verschlüsselten Konto."] },
-        { "en": ["Website, live demo & newsletter", "Try ABOmination in the browser and follow the project."],
-          "de": ["Website, Live-Demo & Newsletter", "ABOmination im Browser ausprobieren und das Projekt verfolgen."] }
+        {
+          "en": [
+            "Native Android app",
+            "Kotlin & Jetpack Compose: fingerprint unlock, reminders in the background, home-screen widget – same encrypted account."
+          ],
+          "de": [
+            "Native Android-App",
+            "Kotlin & Jetpack Compose: Entsperren per Fingerabdruck, Erinnerungen im Hintergrund, Widget – mit demselben verschlüsselten Konto."
+          ]
+        },
+        {
+          "en": [
+            "Website, live demo & newsletter",
+            "Try ABOmination in the browser and follow the project."
+          ],
+          "de": [
+            "Website, Live-Demo & Newsletter",
+            "ABOmination im Browser ausprobieren und das Projekt verfolgen."
+          ]
+        }
       ]
     },
     {
       "id": "next",
-      "title": { "en": "Next", "de": "Als Nächstes" },
+      "title": {
+        "en": "Next",
+        "de": "Als Nächstes"
+      },
       "items": [
-        { "en": ["Passkeys", "Unlock with a passkey (WebAuthn PRF) instead of typing the password."],
-          "de": ["Passkeys", "Entsperren per Passkey (WebAuthn PRF) statt Passworteingabe."] },
-        { "en": ["Encrypted backups", "Password-protected JSON export in addition to the plain one."],
-          "de": ["Verschlüsselte Sicherungen", "Passwortgeschützter JSON-Export zusätzlich zum unverschlüsselten."] },
-        { "en": ["Price history & increase alerts", "Track price changes per subscription and get notified about increases."],
-          "de": ["Preisverlauf & Preiserhöhungen", "Preisänderungen je Abo verfolgen und bei Erhöhungen benachrichtigt werden."] },
-        { "en": ["Cancellation assistant", "Generate a cancellation letter or e-mail with the right deadline."],
-          "de": ["Kündigungsassistent", "Kündigungsschreiben oder -mail mit der passenden Frist erzeugen."] },
-        { "en": ["Device management", "See signed-in devices and sign them out from the app."],
-          "de": ["Geräteverwaltung", "Angemeldete Geräte sehen und direkt in der App abmelden."] },
-        { "en": ["English interface", "The app is German today; add English and a language switch."],
-          "de": ["Englische Oberfläche", "Die App ist heute deutsch; Englisch und Sprachumschaltung ergänzen."] }
+        {
+          "en": [
+            "Passkeys",
+            "Unlock with a passkey (WebAuthn PRF) instead of typing the password."
+          ],
+          "de": [
+            "Passkeys",
+            "Entsperren per Passkey (WebAuthn PRF) statt Passworteingabe."
+          ]
+        },
+        {
+          "en": [
+            "Encrypted backups",
+            "Password-protected JSON export in addition to the plain one."
+          ],
+          "de": [
+            "Verschlüsselte Sicherungen",
+            "Passwortgeschützter JSON-Export zusätzlich zum unverschlüsselten."
+          ]
+        },
+        {
+          "en": [
+            "Price history & increase alerts",
+            "Track price changes per subscription and get notified about increases."
+          ],
+          "de": [
+            "Preisverlauf & Preiserhöhungen",
+            "Preisänderungen je Abo verfolgen und bei Erhöhungen benachrichtigt werden."
+          ]
+        },
+        {
+          "en": [
+            "Cancellation assistant",
+            "Generate a cancellation letter or e-mail with the right deadline."
+          ],
+          "de": [
+            "Kündigungsassistent",
+            "Kündigungsschreiben oder -mail mit der passenden Frist erzeugen."
+          ]
+        },
+        {
+          "en": [
+            "Device management",
+            "See signed-in devices and sign them out from the app."
+          ],
+          "de": [
+            "Geräteverwaltung",
+            "Angemeldete Geräte sehen und direkt in der App abmelden."
+          ]
+        },
+        {
+          "en": [
+            "English interface",
+            "The app is German today; add English and a language switch."
+          ],
+          "de": [
+            "Englische Oberfläche",
+            "Die App ist heute deutsch; Englisch und Sprachumschaltung ergänzen."
+          ]
+        }
       ]
     },
     {
       "id": "later",
-      "title": { "en": "Later", "de": "Später" },
+      "title": {
+        "en": "Later",
+        "de": "Später"
+      },
       "items": [
-        { "en": ["Shared household", "Share selected subscriptions end-to-end encrypted with family members."],
-          "de": ["Gemeinsamer Haushalt", "Ausgewählte Abos Ende-zu-Ende-verschlüsselt mit Familienmitgliedern teilen."] },
-        { "en": ["Push reminders for the web app", "Reminders even when the browser is closed – without revealing due dates to the server."],
-          "de": ["Push-Erinnerungen in der Web-App", "Erinnerungen auch bei geschlossenem Browser – ohne dem Server Termine zu verraten."] },
-        { "en": ["Contracts & receipts", "Attach encrypted PDFs and photos to a subscription."],
-          "de": ["Verträge & Belege", "Verschlüsselte PDFs und Fotos an ein Abo anhängen."] },
-        { "en": ["Budgets & yearly report", "Spending goals per category and a year-in-review."],
-          "de": ["Budgets & Jahresbericht", "Ausgabenziele je Kategorie und ein Jahresrückblick."] },
-        { "en": ["More import formats", "CAMT/MT940 statements and more bank CSV layouts."],
-          "de": ["Mehr Importformate", "CAMT-/MT940-Kontoauszüge und weitere Bank-CSV-Formate."] },
-        { "en": ["Admin web interface", "Manage invites and accounts in the browser instead of the command line."],
-          "de": ["Admin-Oberfläche", "Einladungen und Konten im Browser statt per Kommandozeile verwalten."] }
+        {
+          "en": [
+            "Shared household",
+            "Share selected subscriptions end-to-end encrypted with family members."
+          ],
+          "de": [
+            "Gemeinsamer Haushalt",
+            "Ausgewählte Abos Ende-zu-Ende-verschlüsselt mit Familienmitgliedern teilen."
+          ]
+        },
+        {
+          "en": [
+            "Push reminders for the web app",
+            "Reminders even when the browser is closed – without revealing due dates to the server."
+          ],
+          "de": [
+            "Push-Erinnerungen in der Web-App",
+            "Erinnerungen auch bei geschlossenem Browser – ohne dem Server Termine zu verraten."
+          ]
+        },
+        {
+          "en": [
+            "Contracts & receipts",
+            "Attach encrypted PDFs and photos to a subscription."
+          ],
+          "de": [
+            "Verträge & Belege",
+            "Verschlüsselte PDFs und Fotos an ein Abo anhängen."
+          ]
+        },
+        {
+          "en": [
+            "Budgets & yearly report",
+            "Spending goals per category and a year-in-review."
+          ],
+          "de": [
+            "Budgets & Jahresbericht",
+            "Ausgabenziele je Kategorie und ein Jahresrückblick."
+          ]
+        },
+        {
+          "en": [
+            "More import formats",
+            "CAMT/MT940 statements and more bank CSV layouts."
+          ],
+          "de": [
+            "Mehr Importformate",
+            "CAMT-/MT940-Kontoauszüge und weitere Bank-CSV-Formate."
+          ]
+        },
+        {
+          "en": [
+            "Admin web interface",
+            "Manage invites and accounts in the browser instead of the command line."
+          ],
+          "de": [
+            "Admin-Oberfläche",
+            "Einladungen und Konten im Browser statt per Kommandozeile verwalten."
+          ]
+        }
       ]
     },
     {
       "id": "exploring",
-      "title": { "en": "Exploring", "de": "Ideen" },
+      "title": {
+        "en": "Exploring",
+        "de": "Ideen"
+      },
       "items": [
-        { "en": ["iOS app", "Native iPhone app after Android."],
-          "de": ["iOS-App", "Native iPhone-App nach Android."] },
-        { "en": ["Browser extension", "Suggest adding a subscription right at checkout."],
-          "de": ["Browser-Erweiterung", "Abo direkt beim Abschluss im Onlineshop erfassen."] },
-        { "en": ["Calendar feed", "Optional subscribable calendar (opt-in, as it reveals dates to the server)."],
-          "de": ["Kalender-Abo", "Optionaler abonnierbarer Kalender (freiwillig, da er dem Server Termine zeigt)."] }
+        {
+          "en": [
+            "iOS app",
+            "Native iPhone app after Android."
+          ],
+          "de": [
+            "iOS-App",
+            "Native iPhone-App nach Android."
+          ]
+        },
+        {
+          "en": [
+            "Browser extension",
+            "Suggest adding a subscription right at checkout."
+          ],
+          "de": [
+            "Browser-Erweiterung",
+            "Abo direkt beim Abschluss im Onlineshop erfassen."
+          ]
+        },
+        {
+          "en": [
+            "Calendar feed",
+            "Optional subscribable calendar (opt-in, as it reveals dates to the server)."
+          ],
+          "de": [
+            "Kalender-Abo",
+            "Optionaler abonnierbarer Kalender (freiwillig, da er dem Server Termine zeigt)."
+          ]
+        }
       ]
     }
   ]

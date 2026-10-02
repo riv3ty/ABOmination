@@ -104,6 +104,16 @@ function renderAch() {
       <div><b>${esc(a.title)}</b><div class="muted">${esc(a.desc)}</div>${ts ? `<div class="muted" style="margin-top:3px">${fmtDate(new Date(ts))}</div>` : ""}</div></div>`;
   }).join("");
 }
+// Kurzer Hinweis unten rechts, optional mit Aktion (z. B. „Rückgängig“)
+function showToast(icon, text, actionLabel, onAction, ms = 8000) {
+  const el = document.createElement("div");
+  el.className = "toast";
+  el.innerHTML = `<span class="ach-ic">${esc(icon)}</span><div style="flex:1"><span class="big">${esc(text)}</span></div>`
+    + (actionLabel ? `<button class="btn small" type="button">${esc(actionLabel)}</button>` : "");
+  const timer = setTimeout(() => el.remove(), ms);
+  el.querySelector("button")?.addEventListener("click", () => { clearTimeout(timer); el.remove(); onAction?.(); });
+  $("#toasts").appendChild(el);
+}
 function showAchToasts(list) {
   const wrap = $("#toasts");
   list.forEach((a, i) => setTimeout(() => {
@@ -246,9 +256,12 @@ function render() {
     const dl = deadline ? daysBetween(today(), deadline) : null;
     const warn = dl !== null && dl >= 0 && dl <= 14 ? `<div class="warn">⚠ Kündigen bis ${fmtDate(deadline)} (${whenText(dl)})</div>` : "";
     const foreign = s.currency !== settings.base ? `<div class="muted small">≈ ${mb(s.priceBase)}</div>` : "";
+    // Vorab als bezahlt markiert (Termin liegt noch in der Zukunft) – mit Möglichkeit zum Zurücksetzen
+    const prepaid = s.paidThrough && parseISO(s.paidThrough) >= today()
+      ? `<div class="muted small">✓ Vorab bezahlt bis ${fmtDate(parseISO(s.paidThrough))} · <button class="linkbtn" data-unpaid="${esc(s.id)}">zurücksetzen</button></div>` : "";
     return `<tr>
       <td><div class="name">${esc(s.name)}</div>
-        <div class="muted small"><span class="chip" style="border-color:${catColor(catName(s))}">${esc(catName(s))}</span>${s.inst ? ` <span class="chip">Ratenzahlung</span>` : ""}${s.account ? ` <span class="chip">🏦 ${esc(s.account)}</span>` : ""}${s.payment ? " · " + esc(s.payment) : ""}</div>${prog}${warn}</td>
+        <div class="muted small"><span class="chip" style="border-color:${catColor(catName(s))}">${esc(catName(s))}</span>${s.inst ? ` <span class="chip">Ratenzahlung</span>` : ""}${s.account ? ` <span class="chip">🏦 ${esc(s.account)}</span>` : ""}${s.payment ? " · " + esc(s.payment) : ""}</div>${prog}${prepaid}${warn}</td>
       <td class="num">${money(s.price, s.currency)}<div class="muted small">${CYCLES[s.cycle].label}</div>${foreign}</td>
       <td class="num hide-m">${mb(s.monthly)}</td>
       <td>${s.state === "active" ? `${fmtDate(s.next)}<div class="muted small">${whenText(s.inDays)}</div>` : "–"}</td>
@@ -463,7 +476,9 @@ function renderOpt(all) {
 function checkReminders() {
   const rem = computeReminders();
   $("#reminders").innerHTML = rem.length
-    ? `<div class="banner">${rem.map(r => `<div>${r.icon} <strong>${esc(r.title)}</strong><div class="b-body">${esc(r.body)}</div></div>`).join("")}</div>` : "";
+    ? `<div class="banner">${rem.map(r => `<div class="rem"><div>${r.icon} <strong>${esc(r.title)}</strong><div class="b-body">${esc(r.body)}</div></div>`
+        + (r.type === "pay" ? `<button class="btn small" data-paid="${esc(r.subId)}" data-date="${esc(r.date)}" title="Diese Zahlung als bereits erledigt markieren">✓ Bereits bezahlt</button>` : "")
+        + `</div>`).join("")}</div>` : "";
   if (settings.notif && "Notification" in window && Notification.permission === "granted") {
     const done = lsGet(NOTIF_KEY, {}), now = Date.now();
     for (const k in done) if (now - done[k] > 90 * 86400000) delete done[k];
@@ -474,6 +489,23 @@ function checkReminders() {
     lsSet(NOTIF_KEY, done);
   }
 }
+
+// „Bereits bezahlt“: Termin bis einschließlich `date` als erledigt merken (Abo springt zum nächsten Termin,
+// bei Raten zählt die Rate als bezahlt). Rückgängig über den Hinweis oder „zurücksetzen“ in der Tabelle.
+function setPaidThrough(id, paidThrough) {
+  subs = subs.map(x => x.id === id ? { ...x, paidThrough, updatedAt: Date.now() } : x);
+  save(); render();
+}
+function markPaid(id, date) {
+  const s = subs.find(x => x.id === id); if (!s) return;
+  const prev = s.paidThrough || "";
+  setPaidThrough(id, date > prev ? date : prev);
+  showToast("✓", `${s.name} als bezahlt markiert`, "Rückgängig", () => setPaidThrough(id, prev));
+}
+$("#reminders").addEventListener("click", e => {
+  const b = e.target.closest("[data-paid]");
+  if (b) markPaid(b.dataset.paid, b.dataset.date);
+});
 
 /* ================= Kontoauszug-Import (Erkennung: lib/bank.js) ================= */
 async function readText(file) {
@@ -591,6 +623,7 @@ form.addEventListener("submit", e => {
   }
   const item = normalizeSub({
     updatedAt: Date.now(),
+    paidThrough: editId ? subs.find(s => s.id === editId)?.paidThrough : "",      // „Bereits bezahlt“ beim Bearbeiten behalten
     id: editId || uid(), name: f.name.trim(), price: parseFloat(f.price), cycle: f.cycle, currency: f.currency,
     nextDate: f.nextDate, category: f.category.trim(), status: f.status,
     noticeDays: parseInt(f.noticeDays), payment: f.payment.trim(), notes: f.notes.trim(), account: f.account.trim(),
@@ -1111,7 +1144,8 @@ $("#btnSync").onclick = () => {
 
 /* ================= Tabelle / Filter ================= */
 $("#rows").addEventListener("click", e => {
-  const ed = e.target.closest("[data-edit]"), del = e.target.closest("[data-del]");
+  const ed = e.target.closest("[data-edit]"), del = e.target.closest("[data-del]"), unpaid = e.target.closest("[data-unpaid]");
+  if (unpaid) { setPaidThrough(unpaid.dataset.unpaid, ""); return; }
   if (ed) openDlg(ed.dataset.edit);
   if (del) removeSub(del.dataset.del);
 });

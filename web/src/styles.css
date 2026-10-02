@@ -79,6 +79,10 @@ b,strong{font-weight:700}
   -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);box-shadow:var(--shadow)}
 .banner div{padding:3px 0}
 .banner .b-body{color:var(--muted);font-size:13px}
+/* Erinnerung mit Knopf „Bereits bezahlt“ */
+.banner .rem{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.banner .rem .btn{flex:none}
+.linkbtn{background:none;border:0;padding:0;font:inherit;color:var(--accent-ink);cursor:pointer;text-decoration:underline}
 
 /* Balken (Kategorien): dünn und ruhig */
 .bar-row{display:grid;grid-template-columns:120px 1fr auto;gap:14px;align-items:center;margin:14px 0;font-size:14px}

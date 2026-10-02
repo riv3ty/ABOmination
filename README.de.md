@@ -36,7 +36,7 @@
 
 - **Ehrliches Dashboard** – Monats- und Jahressumme, die nächsten 30 Tage als Zeitleiste, Kosten nach Kategorie und Bankkonto, mehrere Währungen mit EZB-Kursen.
 - **Ratenkäufe richtig gerechnet** – Tilgungsplan, gezahlte und offene Zinsen, Restschuld und ein Simulator für Sondertilgungen.
-- **Keine Frist verpassen** – Hinweise vor Zahlungen und Kündigungsfristen, Kalender-Export (`.ics`) für Outlook, Google und Apple.
+- **Keine Frist verpassen** – Hinweise vor Zahlungen und Kündigungsfristen (mit einem Klick als *bereits bezahlt* markieren), Kalender-Export (`.ics`) für Outlook, Google und Apple.
 - **Kontoauszug-Import** – wiederkehrende Zahlungen werden in CSV-Exporten automatisch erkannt.
 - **Spartipps** – selten genutzte, doppelte oder überlappende Abos und günstigere Jahrestarife.
 - **Datenschutz eingebaut** – AES-256-GCM-Verschlüsselung im Browser, kein Tracking, keine Anfragen an Dritte.

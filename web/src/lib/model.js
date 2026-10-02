@@ -26,6 +26,8 @@ export function normalizeSub(s) {
     principal: inst ? Math.max(0, Math.round((Number(s.principal) || 0) * 100) / 100) : 0,
     interestRate: inst ? Math.min(100, Math.max(0, Number(s.interestRate) || 0)) : 0,
     usage: USAGE[s.usage] ? s.usage : "", yearlyAlt: inst ? 0 : Math.max(0, Number(s.yearlyAlt) || 0),
+    // „Bereits bezahlt“: Termine bis einschließlich dieses Datums gelten als erledigt (vorzeitig bezahlt)
+    paidThrough: ISO_DATE.test(String(s.paidThrough || "")) ? String(s.paidThrough) : "",
     updatedAt: Math.max(0, Number(s.updatedAt) || 0)                     // letzte Änderung (Abgleich zwischen Geräten)
   };
 }
@@ -35,8 +37,15 @@ export function clean(list) { return (Array.isArray(list) ? list : []).map(norma
 // convert(betrag, währung) rechnet in die Hauptwährung um; t = heutiges Datum (für Tests einstellbar).
 export function computeView(subs, convert, t = today()) {
   return subs.map(s => {
-    const { date: next, k } = nextInfo(s, t);
+    const { date: nextDue, k: elapsed } = nextInfo(s, t);
     const inst = s.kind === "installment";
+    // Vorzeitig als bezahlt markierte Termine (paidThrough) überspringen. Der gespeicherte Anker (nextDate)
+    // bleibt unverändert, damit Monatsenden nicht verrutschen; k = Index des nächsten offenen Termins.
+    let k = elapsed, next = nextDue;
+    if (s.paidThrough) {
+      const pt = parseISO(s.paidThrough), anchor = parseISO(s.nextDate);
+      while (next <= pt && k < 5000) next = addCycle(anchor, s.cycle, ++k);
+    }
     // Ratenzahlung: verstrichene Termine zählen automatisch als bezahlt.
     // Mit exaktem Betrag (paidAmount) wird in Geld gerechnet, sonst in ganzen Raten (bisheriges Verhalten).
     const byAmount = inst && s.paidAmount !== null;

@@ -37,7 +37,7 @@
 
 - **Honest dashboard** – monthly and yearly totals, the next 30 days on a timeline, spending by category and bank account, multi-currency with ECB exchange rates.
 - **Installments done right** – amortization schedule, interest paid and outstanding, remaining debt and an early-payoff simulator.
-- **Never miss a deadline** – reminders before payments and cancellation deadlines, calendar export (`.ics`) for Outlook, Google and Apple.
+- **Never miss a deadline** – reminders before payments and cancellation deadlines (mark a payment as *already paid* with one click), calendar export (`.ics`) for Outlook, Google and Apple.
 - **Bank statement import** – recurring payments are detected automatically in CSV exports.
 - **Savings tips** – rarely used, duplicated or overlapping subscriptions and cheaper yearly plans.
 - **Privacy by design** – AES-256-GCM encryption in the browser, no tracking, no third-party requests.

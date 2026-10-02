@@ -1,6 +1,6 @@
 # Roadmap
 
-[English](ROADMAP.md) · **Deutsch** · Stand: 2026-09-26
+[English](ROADMAP.md) · **Deutsch** · Stand: 2026-10-03
 
 Wohin sich ABOmination entwickelt. Prioritäten können sich ändern – Ideen und Feedback gern in den [Issues](https://github.com/riv3ty/ABOmination/issues).
 
@@ -11,6 +11,7 @@ Wohin sich ABOmination entwickelt. Prioritäten können sich ändern – Ideen u
 
 ## ✅ Erledigt
 
+- **Zahlungen als bereits bezahlt markieren** – Ein Klick in der Erinnerung – der nächste Termin rückt weiter, Raten zählen sofort, mit Rückgängig.
 - **Ende-zu-Ende-verschlüsselte Server-Konten** – Abgleich zwischen Geräten; der Server speichert nur verschlüsselte Daten. Konflikte werden pro Eintrag zusammengeführt.
 - **Selbst hosten mit Docker** – Gehärteter Container, Registrierung nur per Einladung, Backups, Anleitungen für Reverse Proxys.
 - **Installierbare Web-App (PWA)** – Funktioniert offline, installierbar auf Android, iOS und Desktop.

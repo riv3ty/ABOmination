@@ -46,6 +46,12 @@ describe("Erinnerungen", () => {
     const r = computeReminders(list, { remindDays: 3, noticeRemind: 7 }, T);
     expect(r.map(x => x.key)).toEqual(["n|2026-03-11|cancel", "p|2026-03-12|pay"]);
     expect(r[0].title).toMatch(/Kündigungsfrist endet morgen/);
+    expect(r[1]).toMatchObject({ type: "pay", subId: "p", date: "2026-03-12" });     // für den Knopf „Bereits bezahlt“
+  });
+
+  it("„Bereits bezahlt“ entfernt die Zahlungs-Erinnerung", () => {
+    const list = view([{ id: "p", name: "Bald", nextDate: "2026-03-12", paidThrough: "2026-03-12" }]);
+    expect(computeReminders(list, { remindDays: 3, noticeRemind: 7 }, T)).toEqual([]);
   });
 });
 
