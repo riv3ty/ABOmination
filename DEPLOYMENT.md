@@ -30,7 +30,7 @@ docker compose ps                             # should be "healthy" after ~10 s
 curl -s http://127.0.0.1:8080/api/health      # {"ok":true,...}
 ```
 
-To pin a version instead of `latest`, set e.g. `ABO_VERSION=0.4.0` in `.env`.
+To pin a version instead of `latest`, set e.g. `ABO_VERSION=0.5.0` in `.env`.
 
 ### Option B: build it yourself
 

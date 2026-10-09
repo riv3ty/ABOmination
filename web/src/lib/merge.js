@@ -1,9 +1,9 @@
 // Zwei Tresor-Stände zusammenführen (z. B. Handy offline geändert, Browser gleichzeitig auch).
-// Abos pro Eintrag nach updatedAt, Löschungen über Grabsteine (meta.deleted), Einstellungen nach changedAt,
+// Abos pro Eintrag nach updatedAt, Löschungen über Grabsteine (meta.deleted), Einstellungen und Gehalt nach changedAt,
 // Errungenschaften vereinigt. Bei Gleichstand gewinnt der lokale Stand.
 export const KEYS = {
   SUBS: "abo-manager-v1", META: "abo-manager-meta", SETTINGS: "abo-manager-settings",
-  SYNC: "abo-manager-sync", ACH: "abo-manager-achievements"
+  SYNC: "abo-manager-sync", ACH: "abo-manager-achievements", INCOME: "abo-manager-income"
 };
 export const TOMBSTONE_DAYS = 180;
 
@@ -38,7 +38,7 @@ export function mergeAch(a, b) {
 }
 
 export function mergeData(local = {}, remote = {}, now = Date.now()) {
-  const { SUBS, META, SETTINGS, SYNC, ACH } = KEYS;
+  const { SUBS, META, SETTINGS, SYNC, ACH, INCOME } = KEYS;
   const lm = local[META] || {}, rm = remote[META] || {};
   const deleted = {};
   for (const src of [lm.deleted, rm.deleted])
@@ -46,7 +46,7 @@ export function mergeData(local = {}, remote = {}, now = Date.now()) {
   const out = { ...remote, ...local };                       // unbekannte Schlüssel: lokal vor entfernt
   out[SUBS] = mergeSubs(local[SUBS], remote[SUBS], deleted);
   out[META] = { ...rm, ...lm, updatedAt: Math.max(ts(lm.updatedAt), ts(rm.updatedAt)), deleted };
-  for (const k of [SETTINGS, SYNC]) { const v = newer(local[k], remote[k]); if (v !== undefined) out[k] = v; }
+  for (const k of [SETTINGS, SYNC, INCOME]) { const v = newer(local[k], remote[k]); if (v !== undefined) out[k] = v; }
   const a = mergeAch(local[ACH], remote[ACH]); if (a !== undefined) out[ACH] = a;
   return out;
 }

@@ -35,17 +35,29 @@ web/src/app.js            App-Oberfläche, Dialoge, Cloud-Sync (startet erst nac
 web/src/server/store.js   Server-Konto: Anmeldung, Offline-Kopie, Abgleich mit Konflikt-Zusammenführung
 web/src/cryptoutil.js     Schlüsselableitung, AES-GCM
 web/src/pwa.js            Manifest/Service Worker einbinden, „App installieren“
-web/src/lib/              Reine Logik ohne DOM/Zustand (Datum, Kredit, Auswertung, Optimierung, ICS, Kontoauszug, Zusammenführen, Sicherung)
+web/src/lib/              Reine Logik ohne DOM/Zustand (Datum, Kredit, Auswertung, Optimierung, ICS, Kontoauszug, Zusammenführen, Sicherung, Gehalt)
+web/src/lib/pap/          Lohnsteuer: erzeugt aus dem amtlichen Programmablaufplan des BMF (siehe unten) + exaktes BigDecimal
 web/public/               sw.js, manifest.webmanifest, icons/ (werden unverändert nach dist/ kopiert)
 web/tests/                Unit-Tests zu lib/
 server/src/               API-Server (app.js, routes/, db.js, cli.js)
 server/tests/             API-Tests
 e2e/run.js                Ende-zu-Ende-Test (Puppeteer)
 site/                     Website-Vorlagen (zweisprachig; gebaut nach / = Englisch und /de/ = Deutsch)
-scripts/                  Icons, Screenshots, Beispieldaten, Roadmap, Website-Build
+scripts/                  Icons, Screenshots, Beispieldaten, Roadmap, Website-Build, Lohnsteuer-Generator (build-pap.js, pap/*.xml)
 docs/                     Screenshots, Roadmap-Quelle + erzeugte SVGs, diese Datei
 Dockerfile, compose.yaml  Container-Betrieb (siehe DEPLOYMENT.de.md)
 ```
+
+## Lohnsteuer (jährliche Aktualisierung)
+
+Der Gehaltsrechner (`web/src/lib/salary.js`) berechnet Lohnsteuer und Solidaritätszuschlag mit dem amtlichen Programmablaufplan (PAP) des Bundesfinanzministeriums. Das BMF veröffentlicht ihn jedes Jahr als XML-Pseudocode mit Java-`BigDecimal`-Ausdrücken; `scripts/build-pap.js` übersetzt ihn nach `web/src/lib/pap/lohnsteuer<Jahr>.js` (diese Datei nicht von Hand ändern).
+
+Für ein neues Steuerjahr:
+
+1. XML von [bmf-steuerrechner.de](https://www.bmf-steuerrechner.de) (Programmablaufpläne → XML) nach `scripts/pap/Lohnsteuer<Jahr>.xml` laden.
+2. `node scripts/build-pap.js scripts/pap/Lohnsteuer<Jahr>.xml`
+3. In `salary.js` das neue Modul einbinden, `SALARY_YEAR` und die Sozialversicherungswerte in `SV` anpassen (Beitragsbemessungsgrenzen, Sätze, Mini-/Midijob-Grenzen).
+4. Erwartungswerte in `web/tests/salary.test.js` aus einer unabhängigen Quelle (z. B. BMF-Rechner) aktualisieren und `npm test` ausführen.
 
 ## Server ohne Docker
 

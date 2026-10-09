@@ -35,17 +35,29 @@ web/src/app.js            App UI, dialogs, cloud sync (starts after unlocking)
 web/src/server/store.js   Server account: login, offline copy, sync with conflict merge
 web/src/cryptoutil.js     Key derivation, AES-GCM
 web/src/pwa.js            Manifest/service worker registration, "install app"
-web/src/lib/              Pure logic without DOM/state (dates, loans, view model, optimizer, ICS, bank import, merge, backup)
+web/src/lib/              Pure logic without DOM/state (dates, loans, view model, optimizer, ICS, bank import, merge, backup, salary)
+web/src/lib/pap/          Wage tax: generated from the official BMF program flowchart (see below) + exact BigDecimal
 web/public/               sw.js, manifest.webmanifest, icons/ (copied to dist/ as-is)
 web/tests/                Unit tests for lib/
 server/src/               API server (app.js, routes/, db.js, cli.js)
 server/tests/             API tests
 e2e/run.js                End-to-end test (Puppeteer)
 site/                     Website templates (bilingual; built into / = English and /de/ = German)
-scripts/                  Icons, screenshots, demo data, roadmap, website build
+scripts/                  Icons, screenshots, demo data, roadmap, website build, wage-tax generator (build-pap.js, pap/*.xml)
 docs/                     Screenshots, roadmap source + generated SVGs, this file
 Dockerfile, compose.yaml  Container deployment (see DEPLOYMENT.md)
 ```
+
+## Wage tax (yearly update)
+
+The salary calculator (`web/src/lib/salary.js`) computes wage tax and solidarity surcharge with the official *Programmablaufplan* (PAP) of the German Federal Ministry of Finance. The ministry publishes it every year as XML pseudocode with Java `BigDecimal` expressions; `scripts/build-pap.js` translates it into `web/src/lib/pap/lohnsteuer<year>.js` (do not edit that file by hand).
+
+For a new tax year:
+
+1. Download the XML from [bmf-steuerrechner.de](https://www.bmf-steuerrechner.de) (Programmablaufpläne → XML) to `scripts/pap/Lohnsteuer<year>.xml`.
+2. `node scripts/build-pap.js scripts/pap/Lohnsteuer<year>.xml`
+3. Point `salary.js` to the new module and update `SALARY_YEAR` and the social-security values in `SV` (contribution ceilings, rates, mini-/midijob limits).
+4. Update the expected values in `web/tests/salary.test.js` from an independent source (e.g. the BMF calculator) and run `npm test`.
 
 ## Server without Docker
 

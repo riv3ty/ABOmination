@@ -1,6 +1,6 @@
 # Roadmap
 
-**English** · [Deutsch](ROADMAP.de.md) · Last updated: 2026-10-03
+**English** · [Deutsch](ROADMAP.de.md) · Last updated: 2026-10-08
 
 Where ABOmination is heading. Priorities can change – ideas and feedback are welcome in the [issues](https://github.com/riv3ty/ABOmination/issues).
 
@@ -11,6 +11,7 @@ Where ABOmination is heading. Priorities can change – ideas and feedback are w
 
 ## ✅ Shipped
 
+- **Salary calculator & budget** – Gross to net like a German payslip (official BMF wage-tax algorithm 2026) – and what's left after subscriptions and installments.
 - **Mark payments as already paid** – One click in the reminder – the next due date moves on, installments count immediately, with undo.
 - **End-to-end encrypted server accounts** – Sync across devices; the server only ever stores ciphertext. Conflicts are merged per entry.
 - **Self-hosting with Docker** – Hardened container, invite-only registration, backups, reverse-proxy guides.

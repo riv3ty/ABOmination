@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { mergeData, KEYS } from "../src/lib/merge.js";
 
-const { SUBS, META, SETTINGS, ACH } = KEYS;
+const { SUBS, META, SETTINGS, ACH, INCOME } = KEYS;
 const NOW = Date.UTC(2026, 8, 25);
 const s = (id, updatedAt, extra = {}) => ({ id, name: id, updatedAt, ...extra });
 const data = (subs, meta = {}, extra = {}) => ({ [SUBS]: subs, [META]: { updatedAt: 0, ...meta }, ...extra });
@@ -38,6 +38,12 @@ describe("mergeData", () => {
     const m = mergeData(data([], {}, { [SETTINGS]: { base: "EUR", changedAt: 5 } }), data([], {}, { [SETTINGS]: { base: "CHF", changedAt: 7 } }), NOW);
     expect(m[SETTINGS].base).toBe("CHF");
     expect(mergeData(data([]), data([], {}, { [SETTINGS]: { base: "USD" } }), NOW)[SETTINGS].base).toBe("USD");
+  });
+
+  it("Gehalt: neuere Seite nach changedAt, auch ein Entfernen-Merker", () => {
+    const l = data([], {}, { [INCOME]: { gross: 4000, changedAt: 5 } }), r = data([], {}, { [INCOME]: { removed: true, changedAt: 8 } });
+    expect(mergeData(l, r, NOW)[INCOME]).toEqual({ removed: true, changedAt: 8 });
+    expect(mergeData(r, data([], {}, { [INCOME]: { gross: 5000, changedAt: 9 } }), NOW)[INCOME].gross).toBe(5000);
   });
 
   it("Errungenschaften werden vereinigt", () => {

@@ -24,6 +24,16 @@ describe("Sicherung (JSON)", () => {
     expect(() => parseBackup({ foo: 1 })).toThrow(/Abo-Liste/);
   });
 
+  it("nimmt Gehaltsangaben bereinigt mit", () => {
+    const b = buildBackup({ subs: [], meta: {}, income: { gross: 4200, stkl: 3, changedAt: 7, evil: "<b>" } });
+    expect(b.income).toMatchObject({ gross: 4200, stkl: 3 });
+    expect(b.income.changedAt).toBeUndefined();
+    expect(b.income.evil).toBeUndefined();
+    expect(parseBackup(JSON.parse(JSON.stringify(b))).income).toMatchObject({ gross: 4200, stkl: 3 });
+    expect(buildBackup({ subs: [], meta: {} }).income).toBeNull();
+    expect(parseBackup({ subs: [], income: { gross: 0 } }).income).toBeNull();
+  });
+
   it("verwirft ungültige Einstellungen", () => {
     expect(sanitizeSettings({ base: "XXX", remindDays: 99, noticeRemind: -1, notif: "ja", autoLock: 7, evil: "<script>" })).toBeNull();
     expect(sanitizeSettings({ base: "EUR", remindDays: 3.5, autoLock: 0 })).toEqual({ base: "EUR", autoLock: 0 });

@@ -291,6 +291,7 @@ describe("Web-App ausliefern", () => {
     expect(csp).toContain(h("alert(1)"));
     expect(csp).toContain(h("x()"));
     expect(csp).toContain("frame-ancestors 'none'");
+    expect(buildCsp("<script>a()\r\nb()\r</script>")).toContain(h("a()\nb()\n"));     // wie der Browser: Zeilenenden normalisiert
   });
 
   it("liefert index.html mit CSP aus", async () => {

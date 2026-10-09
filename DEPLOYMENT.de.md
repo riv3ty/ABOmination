@@ -28,7 +28,7 @@ docker compose ps                             # Status sollte nach ~10 s "health
 curl -s http://127.0.0.1:8080/api/health      # {"ok":true,...}
 ```
 
-Eine feste Version statt `latest`: in `.env` z. B. `ABO_VERSION=0.4.0` eintragen.
+Eine feste Version statt `latest`: in `.env` z. B. `ABO_VERSION=0.5.0` eintragen.
 
 ### Variante B: selbst bauen
 

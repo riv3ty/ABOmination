@@ -29,6 +29,7 @@ export function demoData(today = new Date()) {
         category: "Mobilität", nextDate: inDays(21) })
     ].map(s => s.kind === "installment" ? { ...s, price: rate(s.principal, s.totalPayments, s.interestRate) } : s),
     settings: { base: "EUR", remindDays: 3, noticeRemind: 14, notif: false, autoLock: 15 },
+    income: { gross: 3900, period: "month", stkl: 1, state: "NW", kvz: 2.9, kids: 0, church: false, birthYear: 1993, kv: "gkv", rv: true, av: true },
     achievements: null
   };
 }

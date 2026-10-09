@@ -36,6 +36,7 @@
 
 - **Ehrliches Dashboard** – Monats- und Jahressumme, die nächsten 30 Tage als Zeitleiste, Kosten nach Kategorie und Bankkonto, mehrere Währungen mit EZB-Kursen.
 - **Ratenkäufe richtig gerechnet** – Tilgungsplan, gezahlte und offene Zinsen, Restschuld und ein Simulator für Sondertilgungen.
+- **Gehalt & Budget** – Brutto-Monats- oder Jahresgehalt eintragen und das Netto wie auf der Lohnabrechnung sehen: Lohnsteuer und Soli nach dem amtlichen Programmablaufplan des BMF 2026 (centgenau), Kirchensteuer und Sozialabgaben – und was nach Abos und Raten übrig bleibt.
 - **Keine Frist verpassen** – Hinweise vor Zahlungen und Kündigungsfristen (mit einem Klick als *bereits bezahlt* markieren), Kalender-Export (`.ics`) für Outlook, Google und Apple.
 - **Kontoauszug-Import** – wiederkehrende Zahlungen werden in CSV-Exporten automatisch erkannt.
 - **Spartipps** – selten genutzte, doppelte oder überlappende Abos und günstigere Jahrestarife.

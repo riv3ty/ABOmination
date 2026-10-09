@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-03",
+  "updated": "2026-10-08",
   "stages": [
     {
       "id": "shipped",
@@ -8,6 +8,16 @@
         "de": "Erledigt"
       },
       "items": [
+        {
+          "en": [
+            "Salary calculator & budget",
+            "Gross to net like a German payslip (official BMF wage-tax algorithm 2026) – and what's left after subscriptions and installments."
+          ],
+          "de": [
+            "Gehaltsrechner & Budget",
+            "Brutto-Netto wie auf der Lohnabrechnung (amtlicher BMF-Lohnsteuer-Algorithmus 2026) – und was nach Abos und Raten übrig bleibt."
+          ]
+        },
         {
           "en": [
             "Mark payments as already paid",

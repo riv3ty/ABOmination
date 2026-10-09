@@ -43,6 +43,8 @@
       <article class="tile t-open reveal" id="tOpen" hidden></article>
     </div>
 
+    <article class="tile t-salary reveal" id="tSalary"></article>
+
     <article class="tile t-time reveal">
       <div class="tile-head"><span class="ic-c" data-ic="calendar"></span><h2>Zeitleiste · nächste 30 Tage</h2></div>
       <div class="tl-scroll"><div id="timeline"></div></div>
@@ -280,6 +282,50 @@
       </div>
     </section>
   </div>
+</dialog>
+
+<!-- Gehalt (Brutto-Netto-Rechner, lib/salary.js) -->
+<dialog id="dlgSalary" class="wide">
+  <form class="sal" id="salForm" method="dialog">
+    <div class="dhead"><h2>Gehalt · Brutto-Netto 2026</h2><button type="button" class="btn small" id="salClose">Schließen</button></div>
+    <div class="sal-grid">
+      <div class="sal-in">
+        <div class="sal-row">
+          <label>Bruttogehalt (€)<input name="gross" type="number" min="0" max="10000000" step="0.01" inputmode="decimal" placeholder="z. B. 4.200" required></label>
+          <label>Zeitraum<select name="period"><option value="month">pro Monat</option><option value="year">pro Jahr</option></select></label>
+        </div>
+        <div class="sal-row">
+          <label>Steuerklasse<select name="stkl"><option value="1">I – ledig</option><option value="2">II – alleinerziehend</option><option value="3">III – verheiratet (höheres Einkommen)</option><option value="4">IV – verheiratet (gleiches Einkommen)</option><option value="5">V – verheiratet (geringeres Einkommen)</option><option value="6">VI – Zweitjob</option></select></label>
+          <label>Bundesland<select name="state"></select></label>
+        </div>
+        <div class="sal-row">
+          <label>Kinderfreibeträge<select name="zkf"></select></label>
+          <label title="Für den Beitrag zur Pflegeversicherung: kinderlos ab 23 zahlt einen Zuschlag, ab dem 2. Kind unter 25 sinkt der Beitrag">Kinder (Pflegeversicherung)<input name="kids" type="number" min="0" max="20" step="1" value="0"></label>
+        </div>
+        <div class="sal-row">
+          <label>Geburtsjahr (optional)<input name="birthYear" type="number" min="1900" max="2100" step="1" placeholder="z. B. 1990"></label>
+          <label>Steuerfreibetrag pro Jahr (€)<input name="allowance" type="number" min="0" step="0.01" placeholder="0"></label>
+        </div>
+        <label class="check"><input type="checkbox" name="church"> Kirchensteuerpflichtig</label>
+        <div class="sal-row">
+          <label>Krankenversicherung<select name="kv"><option value="gkv">gesetzlich</option><option value="pkv">privat</option></select></label>
+          <label class="gkv-only">Zusatzbeitrag (%)<input name="kvz" type="number" min="0" max="10" step="0.01" value="2.9"></label>
+        </div>
+        <div class="sal-row pkv-only" hidden>
+          <label>PKV-Beitrag pro Monat (€)<input name="pkvPremium" type="number" min="0" step="0.01" placeholder="Kranken + Pflege"></label>
+          <label>Arbeitgeberzuschuss (€)<input name="pkvSubsidy" type="number" min="0" step="0.01" placeholder="automatisch"></label>
+        </div>
+        <label class="check"><input type="checkbox" name="rv" checked> Rentenversichert</label>
+        <label class="check"><input type="checkbox" name="av" checked> Arbeitslosenversichert</label>
+      </div>
+      <div class="sal-out" id="salOut" aria-live="polite"></div>
+    </div>
+    <p class="muted small">Lohnsteuer und Solidaritätszuschlag nach dem amtlichen Programmablaufplan des BMF für 2026 (wie der BMF-Lohnsteuerrechner), Sozialabgaben mit den Sätzen und Beitragsbemessungsgrenzen 2026. Ohne Gewähr – maßgeblich ist deine Lohnabrechnung. Die Angaben werden verschlüsselt mit deinen Abos gespeichert.</p>
+    <div class="foot">
+      <button type="button" class="btn danger" id="salRemove">Entfernen</button>
+      <button type="submit" class="btn primary">Speichern</button>
+    </div>
+  </form>
 </dialog>
 
 <!-- Errungenschaften -->

@@ -17,8 +17,9 @@ export const VERSION = JSON.parse(fs.readFileSync(new URL("../../package.json", 
 
 // Content-Security-Policy für die Web-App. Inline-Skripte (Build als Einzeldatei) werden per Hash erlaubt.
 export function buildCsp(html) {
+  // Browser normalisieren Zeilenenden (CRLF/CR → LF), bevor sie den Hash bilden – sonst passt er bei CRLF-Dateien nicht
   const hashes = [...html.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g)]
-    .map(m => `'sha256-${crypto.createHash("sha256").update(m[1]).digest("base64")}'`);
+    .map(m => `'sha256-${crypto.createHash("sha256").update(m[1].replace(/\r\n?/g, "\n")).digest("base64")}'`);
   return [
     "default-src 'self'",
     `script-src 'self' ${hashes.join(" ")} https://accounts.google.com`,       // Google-Anmeldung (Drive-Sync)

@@ -13,16 +13,18 @@ import { buildIcs } from "./lib/ics.js";
 import { analyzeStatement } from "./lib/bank.js";
 import { buildBackup, parseBackup } from "./lib/backup.js";
 import { mergeAch } from "./lib/merge.js";
+import { calcSalary, sanitizeIncome, leftover, STATES, SALARY_YEAR, INCOME_DEFAULT } from "./lib/salary.js";
 
 /* ================= Konstanten ================= */
 const KEY = "abo-manager-v1", META_KEY = "abo-manager-meta", SET_KEY = "abo-manager-settings",
-      RATES_KEY = "abo-manager-rates", NOTIF_KEY = "abo-manager-notified", ACH_KEY = "abo-manager-achievements";
+      RATES_KEY = "abo-manager-rates", NOTIF_KEY = "abo-manager-notified", ACH_KEY = "abo-manager-achievements",
+      INCOME_KEY = "abo-manager-income";
 
 
 /* ================= Speicher ================= */
 // Private Daten (Abos, Einstellungen, Sync-Zugang) liegen verschlüsselt im Profil-Tresor (Vault),
 // alles andere (Wechselkurse, Benachrichtigungs-Merker) unverschlüsselt im localStorage.
-const PRIVATE_KEYS = ["abo-manager-v1", "abo-manager-meta", "abo-manager-settings", "abo-manager-sync", "abo-manager-achievements"];
+const PRIVATE_KEYS = ["abo-manager-v1", "abo-manager-meta", "abo-manager-settings", "abo-manager-sync", "abo-manager-achievements", "abo-manager-income"];
 const lsGet = (k, fb) => {
   if (PRIVATE_KEYS.includes(k)) return Vault.get(k, fb);
   try { const v = JSON.parse(localStorage.getItem(k)); return v ?? fb; } catch { return fb; }
@@ -34,6 +36,7 @@ const lsSet = (k, v) => {
 
 // Zustand; befüllt in loadState() (erst nach dem Entsperren ist der Tresor lesbar)
 let subs = [], meta = { updatedAt: 0 }, settings = {}, ratesInfo = null, rates = FALLBACK_RATES;
+let income = null;                  // Gehaltsangaben (lib/salary.js) oder null
 let sort = { key: "next", dir: 1 };
 let editId = null;
 
@@ -134,6 +137,8 @@ function persist() { lsSet(KEY, subs); lsSet(META_KEY, meta); }
 function save() { meta.updatedAt = Date.now(); persist(); schedulePush(); }
 // changedAt: beim Zusammenführen zweier Stände (Server-Sync) gewinnt die zuletzt geänderte Seite
 const saveSettings = () => { settings.changedAt = Date.now(); return lsSet(SET_KEY, settings); };
+// Entfernen speichert einen Merker statt nichts, damit der Abgleich das Gehalt nicht vom anderen Gerät zurückholt
+const saveIncome = () => lsSet(INCOME_KEY, income ? { ...income, changedAt: Date.now() } : { removed: true, changedAt: Date.now() });
 
 
 /* ================= Währungen ================= */
@@ -236,6 +241,7 @@ function render() {
   $("#accList").innerHTML = accs.map(a => `<option value="${esc(a)}">`).join("");
   renderAccounts(active);
   renderInstallments(all);
+  renderSalary(perMonth);
 
   const q = $("#q").value.trim().toLowerCase(), fs = $("#fStatus").value, fc = $("#fCat").value, fk = $("#fKind").value, fa = $("#fAcc").value;
   const list = all.filter(s =>
@@ -471,6 +477,102 @@ function renderOpt(all) {
       : `<div class="muted">Keine Auffälligkeiten gefunden.</div>`)
     + (unknown ? `<p class="muted small" style="margin-bottom:0">Für gezieltere Tipps: trage bei „Bearbeiten“ die Nutzung ein (${unknown} Abo${unknown > 1 ? "s" : ""} ohne Angabe).</p>` : "");
 }
+
+/* ================= Gehalt: Brutto-Netto (lib/salary.js) und was nach Abos übrig bleibt ================= */
+const eur = v => money(v, "EUR");
+const pctFmt = v => v.toLocaleString("de-DE", { maximumFractionDigits: 2 }) + " %";
+const fixedMonthlyEur = () => convert(view().filter(s => s.state === "active").reduce((a, s) => a + s.monthly, 0), settings.base, "EUR");
+function renderSalary(perMonth) {
+  const el = $("#tSalary");
+  const head = `<div class="tile-head"><span class="ic-c">${ICON.coins}</span><h2>Gehalt &amp; Budget</h2><span class="sub">pro Monat · Steuerjahr ${SALARY_YEAR}</span>
+    <button class="btn small" data-salary>${income ? "Bearbeiten" : "Gehalt eintragen"}</button></div>`;
+  if (!income || !(income.gross > 0)) {
+    el.innerHTML = head + `<div class="sal-empty"><p class="muted">Trag dein Bruttogehalt ein: ABOmination rechnet dein Netto aus – Lohnsteuer, Soli, Kirchensteuer und Sozialabgaben wie der Rechner des Finanzministeriums – und zeigt, wie viel nach Abos und Raten übrig bleibt.</p></div>`;
+    return;
+  }
+  const m = calcSalary(income).month, fix = convert(perMonth, settings.base, "EUR"), { left } = leftover(m.net, fix);
+  const share = (v, of) => (of > 0 ? Math.round(v / of * 100) : 0) + " %";
+  const parts = [["tax", "Steuern", m.tax], ["sv", "Sozialabgaben", m.social], ["fix", "Abos & Raten", Math.min(fix, m.net)], ["rest", "Übrig", Math.max(0, left)]]
+    .filter(([, , v]) => v > 0.005);
+  el.innerHTML = head + `
+    <div class="sal-kpis">
+      <div><div class="eyebrow">Brutto</div><div class="num-serif">${eur(m.gross)}</div></div>
+      <div><div class="eyebrow">Netto</div><div class="num-serif">${eur(m.net)}</div><div class="muted small" style="margin-top:8px">${share(m.net, m.gross)} vom Brutto</div></div>
+      <div><div class="eyebrow">Abos &amp; Raten</div><div class="num-serif">${eur(fix)}</div><div class="muted small" style="margin-top:8px">${share(fix, m.net)} vom Netto</div></div>
+      <div class="${left < 0 ? "neg" : "left"}"><div class="eyebrow">Übrig</div><div class="num-serif">${eur(left)}</div><div class="muted small" style="margin-top:8px">${left < 0 ? "Die Fixkosten übersteigen dein Netto" : share(left, m.net) + " vom Netto"}</div></div>
+    </div>
+    <div class="mix-bar sal-bar">${parts.map(([c, l, v]) => `<i class="${c}" style="flex:${v.toFixed(2)}" title="${esc(l)}: ${esc(eur(v))}"></i>`).join("")}</div>
+    <div class="mix-leg">${parts.map(([c, l, v]) => `<span><i class="${c}"></i>${esc(l)} ${esc(eur(v))}</span>`).join("")}</div>
+    ${settings.base !== "EUR" ? `<p class="muted small" style="margin-bottom:0">Gehalt in Euro; Abos aus ${esc(settings.base)} umgerechnet.</p>` : ""}`;
+}
+$("#tSalary").addEventListener("click", e => { if (e.target.closest("[data-salary]")) openSalary(); });
+
+const dlgSal = $("#dlgSalary"), salForm = $("#salForm"), se = salForm.elements;
+se.state.innerHTML = Object.entries(STATES).map(([k, v]) => `<option value="${k}">${esc(v)}</option>`).join("");
+se.zkf.innerHTML = [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 5, 6].map(v => `<option value="${v}">${String(v).replace(".", ",")}</option>`).join("");
+function readSalForm() {
+  const n = (v, fb) => (v === "" ? fb : Number(v));
+  return sanitizeIncome({
+    gross: n(se.gross.value, 0), period: se.period.value, stkl: Number(se.stkl.value), state: se.state.value,
+    zkf: Number(se.zkf.value), kids: parseInt(se.kids.value) || 0, birthYear: parseInt(se.birthYear.value) || 0,
+    allowance: n(se.allowance.value, 0), church: se.church.checked, kv: se.kv.value, kvz: n(se.kvz.value, undefined),
+    pkvPremium: n(se.pkvPremium.value, 0), pkvSubsidy: n(se.pkvSubsidy.value, null), rv: se.rv.checked, av: se.av.checked
+  });
+}
+function openSalary() {
+  const v = income || INCOME_DEFAULT;
+  for (const k of ["period", "stkl", "state", "zkf", "kids", "kv", "kvz"]) se[k].value = String(v[k]);
+  se.gross.value = v.gross || ""; se.birthYear.value = v.birthYear || ""; se.allowance.value = v.allowance || "";
+  se.pkvPremium.value = v.pkvPremium || ""; se.pkvSubsidy.value = v.pkvSubsidy ?? "";
+  se.church.checked = v.church; se.rv.checked = v.rv; se.av.checked = v.av;
+  $("#salRemove").hidden = !income;
+  syncSalForm();
+  dlgSal.showModal();
+  se.gross.focus();
+}
+function syncSalForm() {
+  const pkv = se.kv.value === "pkv";
+  salForm.querySelectorAll(".pkv-only").forEach(x => { x.hidden = !pkv; });
+  salForm.querySelectorAll(".gkv-only").forEach(x => { x.hidden = pkv; });
+  se.zkf.disabled = Number(se.stkl.value) >= 5;                       // Kinderfreibeträge nur in Steuerklasse I–IV
+  renderSalOut(readSalForm());
+}
+// Ergebnis wie bei BruNo: Monat und Jahr nebeneinander, darunter die Fixkosten aus den Abos
+function renderSalOut(v) {
+  const out = $("#salOut");
+  if (!(v.gross > 0)) { out.innerHTML = `<p class="muted small" style="margin:0">Gib dein Bruttogehalt ein – das Ergebnis erscheint sofort hier.</p>`; return; }
+  const r = calcSalary(v), m = r.month, y = r.year, fix = fixedMonthlyEur(), left = leftover(m.net, fix).left;
+  const row = (label, k, cls = "") => `<tr class="${cls}"><th>${label}</th><td>${eur(m[k])}</td><td>${eur(y[k])}</td></tr>`;
+  const rate = x => (x ? ` <small>${pctFmt(x)}</small>` : "");
+  const pkv = v.kv === "pkv";
+  out.innerHTML = `<table class="sal-tab"><thead><tr><th></th><th>Monat</th><th>Jahr</th></tr></thead><tbody>
+    ${row("Brutto", "gross")}
+    ${row("Lohnsteuer", "lst", "sub")}${row("Solidaritätszuschlag", "soli", "sub")}${v.church ? row("Kirchensteuer" + rate(r.rates.church), "kist", "sub") : ""}
+    ${row("Steuern", "tax", "sum")}
+    ${row(pkv ? "Private KV/PV <small>abzgl. Zuschuss</small>" : "Krankenversicherung" + rate(r.rates.kv), "kv", "sub")}
+    ${pkv ? "" : row("Pflegeversicherung" + rate(r.rates.pv), "pv", "sub")}
+    ${row("Rentenversicherung" + rate(r.rates.rv), "rv", "sub")}${r.kind === "minijob" ? "" : row("Arbeitslosenversicherung" + rate(r.rates.av), "av", "sub")}
+    ${row("Sozialabgaben", "social", "sum")}
+    ${row("Netto", "net", "net")}
+    <tr class="sub"><th>Abos &amp; Raten</th><td>${eur(fix)}</td><td>${eur(fix * 12)}</td></tr>
+    <tr class="sum"><th>Übrig</th><td>${eur(left)}</td><td>${eur(left * 12)}</td></tr>
+  </tbody></table>`
+    + (pkv && v.pkvSubsidy === null ? `<p class="muted small" style="margin:8px 0 0">Arbeitgeberzuschuss angenommen: ${eur(r.pkvSubsidy)} pro Monat.</p>` : "")
+    + (r.notes.length ? `<ul class="sal-notes">${r.notes.map(n => `<li>${esc(n)}</li>`).join("")}</ul>` : "");
+}
+salForm.addEventListener("input", syncSalForm);
+salForm.addEventListener("change", syncSalForm);
+salForm.addEventListener("submit", e => {
+  e.preventDefault();
+  const v = readSalForm();
+  if (!(v.gross > 0)) return;
+  income = v; saveIncome(); dlgSal.close(); render();
+});
+$("#salClose").onclick = () => dlgSal.close();
+$("#salRemove").onclick = () => {
+  if (!confirm("Gehaltsangaben entfernen?")) return;
+  income = null; saveIncome(); dlgSal.close(); render();
+};
 
 /* ================= Erinnerungen ================= */
 function checkReminders() {
@@ -1183,7 +1285,7 @@ function download(name, text, type) {
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }
 $("#btnExport").onclick = () => {
-  download(`abos-${toISO(today())}.json`, JSON.stringify(buildBackup({ subs, meta, settings, achievements: ach }), null, 2), "application/json");
+  download(`abos-${toISO(today())}.json`, JSON.stringify(buildBackup({ subs, meta, settings, achievements: ach, income }), null, 2), "application/json");
   ach.exportedJson = true; saveAch(); checkAchievements(subs, view());
 };
 $("#btnCsv").onclick = () => {
@@ -1201,7 +1303,7 @@ $("#fileImport").addEventListener("change", async e => {
   let b;
   try { b = parseBackup(JSON.parse(await file.text())); }
   catch { return alert("Datei konnte nicht gelesen werden. Erwartet wird eine JSON-Sicherung aus dieser App."); }
-  const extra = [b.settings && "Einstellungen werden übernommen", b.achievements && "Errungenschaften werden zusammengeführt"].filter(Boolean);
+  const extra = [b.settings && "Einstellungen werden übernommen", b.income && "Gehaltsangaben werden übernommen", b.achievements && "Errungenschaften werden zusammengeführt"].filter(Boolean);
   if (confirm(`${b.subs.length} Abos importieren? Die aktuellen Daten (${subs.length}) werden ersetzt.${extra.length ? "\n" + extra.join(", ") + "." : ""}`)) applyBackup(b);
 });
 // Sicherung übernehmen: Abos ersetzen (ersetzte als gelöscht markieren), Einstellungen übernehmen, Errungenschaften zusammenführen
@@ -1211,6 +1313,7 @@ function applyBackup(b) {
   meta.deleted = { ...meta.deleted, ...Object.fromEntries(subs.filter(s => !keep.has(s.id)).map(s => [s.id, now])) };
   if (b.settings) { settings = { ...settings, ...b.settings }; saveSettings(); Vault.bump(); }
   if (b.achievements) { ach = mergeAch(ach, b.achievements); saveAch(); }
+  if (b.income) { income = b.income; saveIncome(); }
   subs = c; save(); render(); maybeRefreshRates();
 }
 // Demo (Website): Beispieldaten in ein frisch angelegtes lokales Profil laden
@@ -1237,6 +1340,7 @@ const ICON = {
   lock: svg('<rect x="4" y="10" width="16" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>'),
   cloud: svg('<path d="M7 18a4.5 4.5 0 0 1-.6-8.96A6 6 0 0 1 18 9.5a4 4 0 0 1-.5 8.5z"/>'),
   plus: svg('<path d="M12 5v14M5 12h14"/>'),
+  coins: svg('<ellipse cx="9" cy="6" rx="6" ry="2.5"/><path d="M3 6v4c0 1.4 2.7 2.5 6 2.5s6-1.1 6-2.5V6"/><path d="M3 10v4c0 1.4 2.7 2.5 6 2.5"/><ellipse cx="17" cy="15" rx="4" ry="1.8"/><path d="M13 15v3.2c0 1 1.8 1.8 4 1.8s4-.8 4-1.8V15"/>'),
   gear: svg('<circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1"/>')
 };
 // Zeitleiste der nächsten 30 Tage: Punkte nach Tagen positioniert, Karten auf 3 Bahnen verteilt (überlappungsarm)
@@ -1295,6 +1399,8 @@ function initTheme() {
 /* ================= Start ================= */
 function loadState() {
   subs = clean(lsGet(KEY, []));
+  const inc = lsGet(INCOME_KEY, null);
+  income = inc?.removed ? null : sanitizeIncome(inc);
   meta = Object.assign({ updatedAt: 0 }, lsGet(META_KEY, {}));
   settings = Object.assign({ base: "EUR", remindDays: 3, noticeRemind: 7, notif: false, autoLock: 15 }, lsGet(SET_KEY, {}));
   ratesInfo = lsGet(RATES_KEY, null);          // { date, rates, fetchedAt }
