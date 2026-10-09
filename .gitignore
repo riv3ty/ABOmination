@@ -16,3 +16,6 @@ data/
 
 # Website-Build (GitHub Pages)
 _site/
+
+# Lokale Claude-Code-Einstellungen
+.claude/settings.local.json
