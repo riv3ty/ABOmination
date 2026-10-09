@@ -59,6 +59,14 @@ For a new tax year:
 3. Point `salary.js` to the new module and update `SALARY_YEAR` and the social-security values in `SV` (contribution ceilings, rates, mini-/midijob limits).
 4. Update the expected values in `web/tests/salary.test.js` from an independent source (e.g. the BMF calculator) and run `npm test`.
 
+## Releases
+
+1. Bump the version: `npm version X.Y.Z --no-git-tag-version` and the `ABO_VERSION` examples (.env.example, compose.yaml, DEPLOYMENT*.md).
+2. Commit with a message like `Version X.Y.Z: …` – its body becomes the release notes.
+3. `git tag vX.Y.Z && git push origin main vX.Y.Z`
+
+The tag triggers `docker.yml` (images `X.Y.Z`, `X.Y`, `X`) and `release.yml` (GitHub release with notes, a generated changelog and the single-file app `abomination-X.Y.Z.html`). The tag must match `package.json`. For an existing tag without a release, run the *Release* workflow manually and enter the tag.
+
 ## Server without Docker
 
 ```bash

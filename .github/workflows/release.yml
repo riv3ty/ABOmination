@@ -1,0 +1,58 @@
+# GitHub-Release bei jedem Versions-Tag (v1.2.3): Notizen aus der Commit-Nachricht + automatisch erzeugte Änderungsliste,
+# dazu die App als Einzeldatei (dist/index.html) zum Herunterladen. Nachholen für einen bestehenden Tag: "Run workflow" mit dem Tag.
+name: Release
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Bestehender Tag, z. B. v0.5.0"
+        required: true
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      TAG: ${{ inputs.tag || github.ref_name }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+      - name: Tag passt zur Version in package.json
+        run: |
+          VER="${TAG#v}"
+          PKG=$(node -p "require('./package.json').version")
+          [ "$VER" = "$PKG" ] || { echo "::error::Tag $TAG passt nicht zu package.json ($PKG)"; exit 1; }
+          echo "VER=$VER" >> "$GITHUB_ENV"
+      - run: npm ci
+      - run: npm run check
+      - name: Release-Notizen
+        run: |
+          {
+            git log -1 --format=%b | grep -v '^Co-Authored-By:'
+            echo
+            echo "### Docker"
+            echo '```bash'
+            echo "docker pull ghcr.io/${GITHUB_REPOSITORY,,}:$VER"
+            echo '```'
+            echo "Oder in \`.env\`: \`ABO_VERSION=$VER\`, dann \`docker compose pull && docker compose up -d\` – siehe [DEPLOYMENT.md](https://github.com/$GITHUB_REPOSITORY/blob/main/DEPLOYMENT.md)."
+            echo
+            echo "**abomination-$VER.html**: die komplette App als einzelne Datei (lokaler Modus, im Browser öffnen)."
+          } > notes.md
+          cp dist/index.html "abomination-$VER.html"
+      - name: Release anlegen oder aktualisieren
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" "abomination-$VER.html" --clobber
+          else
+            gh release create "$TAG" "abomination-$VER.html" --verify-tag --title "ABOmination $VER" \
+              --notes-file notes.md --generate-notes --latest
+          fi

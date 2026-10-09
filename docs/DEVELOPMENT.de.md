@@ -59,6 +59,14 @@ Für ein neues Steuerjahr:
 3. In `salary.js` das neue Modul einbinden, `SALARY_YEAR` und die Sozialversicherungswerte in `SV` anpassen (Beitragsbemessungsgrenzen, Sätze, Mini-/Midijob-Grenzen).
 4. Erwartungswerte in `web/tests/salary.test.js` aus einer unabhängigen Quelle (z. B. BMF-Rechner) aktualisieren und `npm test` ausführen.
 
+## Releases
+
+1. Version anheben: `npm version X.Y.Z --no-git-tag-version` sowie die `ABO_VERSION`-Beispiele (.env.example, compose.yaml, DEPLOYMENT*.md).
+2. Committen mit einer Nachricht wie `Version X.Y.Z: …` – der Text darunter wird zu den Release-Notizen.
+3. `git tag vX.Y.Z && git push origin main vX.Y.Z`
+
+Der Tag startet `docker.yml` (Images `X.Y.Z`, `X.Y`, `X`) und `release.yml` (GitHub-Release mit Notizen, automatisch erzeugter Änderungsliste und der App als Einzeldatei `abomination-X.Y.Z.html`). Der Tag muss zur Version in `package.json` passen. Für einen bestehenden Tag ohne Release den Workflow *Release* von Hand starten und den Tag eintragen.
+
 ## Server ohne Docker
 
 ```bash
