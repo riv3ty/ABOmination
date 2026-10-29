@@ -5,6 +5,7 @@ import { clean } from "./model.js";
 import { CURRENCIES } from "./constants.js";
 import { sanitizeIncome } from "./salary.js";
 import { normalizeLists } from "./lists.js";
+import { normalizeLayout, isDefault } from "./layout.js";
 
 export const BACKUP_VERSION = 3;
 const AUTOLOCK = [0, 5, 15, 30, 60];
@@ -19,6 +20,7 @@ export function sanitizeSettings(s) {
   if (int(s.noticeRemind, 0, 60)) out.noticeRemind = s.noticeRemind;
   if (typeof s.notif === "boolean") out.notif = s.notif;
   if (AUTOLOCK.includes(s.autoLock)) out.autoLock = s.autoLock;
+  if (s.layout && !isDefault(s.layout)) out.layout = normalizeLayout(s.layout);
   return Object.keys(out).length ? out : null;
 }
 

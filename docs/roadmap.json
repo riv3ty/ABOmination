@@ -10,6 +10,16 @@
       "items": [
         {
           "en": [
+            "Customizable dashboard",
+            "Show, hide and rearrange the tiles the way you like."
+          ],
+          "de": [
+            "Dashboard nach Wunsch",
+            "Kacheln ein- und ausblenden und per Ziehen nach Vorliebe anordnen."
+          ]
+        },
+        {
+          "en": [
             "Your own lists: accounts, providers & payment methods",
             "Create bank accounts, providers and payment methods once and pick them from a dropdown."
           ],
@@ -129,12 +139,12 @@
       "items": [
         {
           "en": [
-            "Customizable dashboard",
-            "Show, hide and rearrange the tiles the way you like."
+            "Push notifications",
+            "Reminders even with the app closed – the server only delivers them and cannot read them."
           ],
           "de": [
-            "Dashboard nach Wunsch",
-            "Kacheln ein- und ausblenden und per Ziehen nach Vorliebe anordnen."
+            "Push-Benachrichtigungen",
+            "Erinnerungen auch bei geschlossener App – der Server stellt sie nur zu und kann sie nicht lesen."
           ]
         }
       ]
@@ -146,16 +156,6 @@
         "de": "Als Nächstes"
       },
       "items": [
-        {
-          "en": [
-            "Push notifications",
-            "Reminders even with the app closed – the server only delivers them and cannot read them."
-          ],
-          "de": [
-            "Push-Benachrichtigungen",
-            "Erinnerungen auch bei geschlossener App – der Server stellt sie nur zu und kann sie nicht lesen."
-          ]
-        },
         {
           "en": [
             "Deals & price search",

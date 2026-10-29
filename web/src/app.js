@@ -14,6 +14,7 @@ import { analyzeStatement } from "./lib/bank.js";
 import { buildBackup, parseBackup } from "./lib/backup.js";
 import { mergeAch } from "./lib/merge.js";
 import { evaluate, formatNumber } from "./lib/calc.js";
+import { TILES, SIZE_LABEL, defaultLayout, normalizeLayout, isDefault, sizeOf, move, toggleHidden, cycleSize } from "./lib/layout.js";
 import { LIST_TYPES, emptyLists, normalizeLists, seedFromSubs, namesOf, addItem, renameItem, removeItem, usageCount, renameInSubs, cleanName } from "./lib/lists.js";
 import { calcSalary, sanitizeIncome, leftover, STATES, SALARY_YEAR, INCOME_DEFAULT } from "./lib/salary.js";
 
@@ -286,6 +287,7 @@ function render() {
 
   checkReminders();
   checkAchievements(subs, all);
+  applyLayout();
 }
 
 /* ================= Bankkonten ================= */
@@ -1522,6 +1524,7 @@ const ICON = {
   plus: svg('<path d="M12 5v14M5 12h14"/>'),
   coins: svg('<ellipse cx="9" cy="6" rx="6" ry="2.5"/><path d="M3 6v4c0 1.4 2.7 2.5 6 2.5s6-1.1 6-2.5V6"/><path d="M3 10v4c0 1.4 2.7 2.5 6 2.5"/><ellipse cx="17" cy="15" rx="4" ry="1.8"/><path d="M13 15v3.2c0 1 1.8 1.8 4 1.8s4-.8 4-1.8V15"/>'),
   calc: svg('<rect x="5" y="3" width="14" height="18" rx="3"/><path d="M8.5 7.5h7"/><path d="M9 12h.01M12 12h.01M15 12h.01M9 15.5h.01M12 15.5h.01M15 15.5h.01M9 19h.01M12 19h.01"/>'),
+  grid: svg('<rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/>'),
   gear: svg('<circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1"/>')
 };
 // Zeitleiste der nächsten 30 Tage: Punkte nach Tagen positioniert, Karten auf 3 Bahnen verteilt (überlappungsarm)
@@ -1558,6 +1561,89 @@ function renderAchTile() {
     </div>`;
 }
 $("#achTile").addEventListener("click", e => { if (e.target.closest("[data-open-ach]")) $("#btnAch").click(); });
+
+/* ================= Dashboard nach Wunsch (lib/layout.js) ================= */
+let editing = false;
+const layout = () => normalizeLayout(settings.layout);
+function setLayout(l) {
+  if (isDefault(l)) delete settings.layout; else settings.layout = l;
+  saveSettings(); applyLayout();
+}
+// Reihenfolge, Breite und Sichtbarkeit auf die Kacheln anwenden; im Bearbeiten-Modus Bedienleisten einblenden
+function applyLayout() {
+  const l = layout(), bento = $(".bento");
+  for (const id of l.order) {
+    const el = document.getElementById(id); if (!el) continue;
+    bento.appendChild(el);
+    const span = sizeOf(l, id), def = TILES.find(t => t.id === id).size;
+    if (span !== def) el.style.setProperty("--span", span); else el.style.removeProperty("--span");
+    const off = l.hidden.includes(id);
+    el.classList.toggle("tile-off", off && !editing);
+    el.classList.toggle("tile-dim", off && editing);
+    el.querySelector(":scope > .tile-edit")?.remove();
+    if (editing) el.insertAdjacentHTML("afterbegin", tileEditHtml(TILES.find(t => t.id === id), l, off));
+  }
+}
+const GRIP = svg('<circle cx="9" cy="6" r="1.3"/><circle cx="15" cy="6" r="1.3"/><circle cx="9" cy="12" r="1.3"/><circle cx="15" cy="12" r="1.3"/><circle cx="9" cy="18" r="1.3"/><circle cx="15" cy="18" r="1.3"/>');
+const EYE = svg('<path d="M2.5 12s3.5-6.5 9.5-6.5S21.5 12 21.5 12s-3.5 6.5-9.5 6.5S2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/>');
+const EYE_OFF = svg('<path d="M3 3l18 18"/><path d="M10.6 5.6A9.7 9.7 0 0 1 12 5.5c6 0 9.5 6.5 9.5 6.5a17 17 0 0 1-3.2 4M6.4 6.9C3.9 8.6 2.5 12 2.5 12s3.5 6.5 9.5 6.5c1.6 0 3-.4 4.2-1"/>');
+function tileEditHtml(t, l, off) {
+  const i = l.order.indexOf(t.id);
+  return `<div class="tile-edit" data-tile="${t.id}">
+    <button type="button" class="te-handle" aria-label="${esc(t.label)} verschieben (ziehen)" title="Ziehen zum Verschieben">${GRIP}</button>
+    <span class="te-name">${esc(t.label)}${off ? ` <span class="muted">· ausgeblendet</span>` : ""}</span>
+    <button type="button" class="te-btn" data-te="up" aria-label="${esc(t.label)} nach vorne"${i === 0 ? " disabled" : ""}>↑</button>
+    <button type="button" class="te-btn" data-te="down" aria-label="${esc(t.label)} nach hinten"${i === l.order.length - 1 ? " disabled" : ""}>↓</button>
+    <button type="button" class="te-btn te-size" data-te="size" title="Breite umschalten" aria-label="Breite von ${esc(t.label)}: ${SIZE_LABEL[sizeOf(l, t.id)]}">${SIZE_LABEL[sizeOf(l, t.id)]}</button>
+    <button type="button" class="te-btn" data-te="eye" aria-pressed="${!off}" title="${off ? "Einblenden" : "Ausblenden"}" aria-label="${esc(t.label)} ${off ? "einblenden" : "ausblenden"}">${off ? EYE_OFF : EYE}</button>
+  </div>`;
+}
+function setEditing(on) {
+  editing = on;
+  document.body.classList.toggle("editing", on);
+  $("#editBar").hidden = !on; $("#btnLayout").hidden = on;
+  if (on) { $("#dlgSet").close(); window.scrollTo({ top: $(".bento").offsetTop - 90, behavior: reducedMotion() ? "auto" : "smooth" }); }
+  render();                                                      // render() ruft applyLayout() auf
+}
+$("#btnLayout").onclick = $("#btnLayout2").onclick = () => setEditing(true);
+$("#layoutDone").onclick = () => setEditing(false);
+$("#layoutReset").onclick = () => setLayout(defaultLayout());
+document.addEventListener("keydown", e => { if (editing && e.key === "Escape" && !document.querySelector("dialog[open]")) setEditing(false); });
+$(".bento").addEventListener("click", e => {
+  const b = e.target.closest("[data-te]"); if (!b || !editing) return;
+  const id = b.closest(".tile-edit").dataset.tile, l = layout(), act = b.dataset.te;
+  setLayout(act === "up" ? move(l, id, -1) : act === "down" ? move(l, id, 1) : act === "size" ? cycleSize(l, id) : toggleHidden(l, id));
+  document.querySelector(`.tile-edit[data-tile="${id}"] [data-te="${act}"]`)?.focus();
+}, true);
+
+// Ziehen am Griff (Maus und Touch): Kachel wandert live mit, gespeichert wird beim Loslassen
+let drag = null;
+$(".bento").addEventListener("pointerdown", e => {
+  const h = e.target.closest(".te-handle"); if (!h || !editing) return;
+  e.preventDefault();
+  const tile = h.closest(".tile");
+  drag = { tile, id: tile.id, scroll: 0 };
+  tile.classList.add("dragging");
+  h.setPointerCapture(e.pointerId);
+});
+$(".bento").addEventListener("pointermove", e => {
+  if (!drag) return;
+  drag.scroll = e.clientY < 90 ? -14 : e.clientY > innerHeight - 90 ? 14 : 0;   // am Rand mitscrollen
+  if (drag.scroll) window.scrollBy(0, drag.scroll);
+  const over = document.elementFromPoint(e.clientX, e.clientY)?.closest(".bento > .tile");
+  if (!over || over === drag.tile) return;
+  const tiles = [...$(".bento").children], after = tiles.indexOf(over) > tiles.indexOf(drag.tile);
+  over.insertAdjacentElement(after ? "afterend" : "beforebegin", drag.tile);
+});
+function endDrag() {
+  if (!drag) return;
+  drag.tile.classList.remove("dragging");
+  const order = [...$(".bento").children].map(el => el.id).filter(id => TILES.some(t => t.id === id));
+  drag = null;
+  setLayout({ ...layout(), order });
+}
+$(".bento").addEventListener("pointerup", endDrag);
+$(".bento").addEventListener("pointercancel", endDrag);
 
 function initTheme() {
   document.querySelectorAll("[data-ic]").forEach(el => { el.innerHTML = ICON[el.dataset.ic] || ""; });

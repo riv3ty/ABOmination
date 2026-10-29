@@ -46,18 +46,18 @@
 
     <article class="tile t-salary reveal" id="tSalary"></article>
 
-    <article class="tile t-time reveal">
+    <article class="tile t-time reveal" id="tTime">
       <div class="tile-head"><span class="ic-c" data-ic="calendar"></span><h2>Zeitleiste · nächste 30 Tage</h2></div>
       <div class="tl-scroll"><div id="timeline"></div></div>
       <div id="upcoming"></div>
     </article>
 
-    <article class="tile t-cats reveal">
+    <article class="tile t-cats reveal" id="tCats">
       <div class="tile-head"><span class="ic-c" data-ic="pie"></span><h2>Kosten nach Kategorie</h2><span class="sub">pro Monat</span></div>
       <div id="cats"></div>
     </article>
 
-    <article class="tile t-accts reveal">
+    <article class="tile t-accts reveal" id="tAccts">
       <div class="tile-head"><span class="ic-c" data-ic="bank"></span><h2>Abgänge pro Bankkonto</h2><span class="sub">pro Monat</span></div>
       <div id="accts"></div>
     </article>
@@ -74,6 +74,12 @@
       <div id="instSummary"></div><div id="instList"></div>
     </article>
   </main>
+
+  <div class="dash-more"><button class="btn small" id="btnLayout"><span class="ic" data-ic="grid"></span>Dashboard anpassen</button></div>
+  <div class="edit-bar" id="editBar" hidden role="region" aria-label="Dashboard anpassen">
+    <p><b>Dashboard anpassen</b><span class="muted"> · Kacheln am Griff ziehen oder mit ↑ ↓ verschieben, mit dem Auge ein- und ausblenden<span class="eb-desk">, Breite umschalten</span>.</span></p>
+    <div class="eb-btns"><button class="btn small" id="layoutReset">Zurücksetzen</button><button class="btn small primary" id="layoutDone">Fertig</button></div>
+  </div>
 
   <section class="section reveal" id="verwalten">
     <div class="section-head"><div class="eyebrow">Verwalten</div><h2 class="h-display">Alle Abos</h2></div>
@@ -235,6 +241,12 @@
       </div>
       <p class="muted small srv-only">Deine Daten werden auf diesem Gerät mit deinem Passwort verschlüsselt (AES-256), bevor sie zum Server gehen; der Server kann sie nicht lesen. Eine verschlüsselte Offline-Kopie bleibt auf diesem Gerät, bis du dich abmeldest. Es gibt <b>keinen Passwort-Reset</b>. JSON-Sicherungen sind <b>nicht</b> verschlüsselt.</p>
       <p class="muted small local-only">Deine Daten sind in diesem Browser mit deinem Passwort verschlüsselt (AES-256). Es gibt <b>keinen Passwort-Reset</b>: Wer das Passwort vergisst, kann die Daten nicht wiederherstellen (außer aus einer Sicherung oder dem Cloud-Sync). JSON-Sicherungen und Cloud-Sync sind <b>nicht</b> verschlüsselt.</p>
+    </section>
+
+    <section>
+      <h3>Dashboard</h3>
+      <p class="muted small" style="margin-top:0">Kacheln ein- und ausblenden, verschieben und ihre Breite ändern.</p>
+      <div class="row-btns"><button class="btn small" id="btnLayout2">Dashboard anpassen</button></div>
     </section>
 
     <section>

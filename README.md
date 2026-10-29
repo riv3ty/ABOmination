@@ -35,7 +35,7 @@
 
 ## Highlights
 
-- **Honest dashboard** – monthly and yearly totals, the next 30 days on a timeline, spending by category and bank account, multi-currency with ECB exchange rates.
+- **Honest dashboard** – monthly and yearly totals, the next 30 days on a timeline, spending by category and bank account, multi-currency with ECB exchange rates – show, hide and arrange the tiles the way you like.
 - **Installments done right** – amortization schedule, interest paid and outstanding, remaining debt and an early-payoff simulator.
 - **Salary & budget** – enter your gross salary (monthly or yearly) and get your net pay as in a German payslip: wage tax and solidarity surcharge from the official BMF program flowchart 2026 (to the cent), church tax and social security – plus what's left after subscriptions and installments.
 - **Your own lists & a calculator** – create bank accounts, providers and payment methods once and pick them from a dropdown; a built-in calculator puts results straight into the price field.

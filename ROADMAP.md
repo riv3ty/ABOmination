@@ -11,6 +11,7 @@ Where ABOmination is heading. Priorities can change – ideas and feedback are w
 
 ## ✅ Shipped
 
+- **Customizable dashboard** – Show, hide and rearrange the tiles the way you like.
 - **Your own lists: accounts, providers & payment methods** – Create bank accounts, providers and payment methods once and pick them from a dropdown.
 - **Built-in calculator** – Quick calculations right in the app – results can be put straight into a price field.
 - **Mobile-friendly app** – Compact header, subscription cards instead of a table, dialogs as bottom sheets, bigger touch targets.
@@ -25,11 +26,10 @@ Where ABOmination is heading. Priorities can change – ideas and feedback are w
 
 ## 🚧 In progress
 
-- **Customizable dashboard** – Show, hide and rearrange the tiles the way you like.
+- **Push notifications** – Reminders even with the app closed – the server only delivers them and cannot read them.
 
 ## ⏭️ Next
 
-- **Push notifications** – Reminders even with the app closed – the server only delivers them and cannot read them.
 - **Deals & price search** – Current MyDealz deals for your subscriptions, plus a product search that opens Idealo, Geizhals and MyDealz.
 - **Native Android app** – Kotlin & Jetpack Compose: fingerprint unlock, reminders in the background, home-screen widget – same encrypted account.
 - **Passkeys** – Unlock with a passkey (WebAuthn PRF) instead of typing the password.

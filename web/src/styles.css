@@ -253,7 +253,7 @@ input[readonly]{opacity:.75;cursor:default}
 }
 
 /* ============ Bento-Layout ============ */
-.bento{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:18px;grid-auto-flow:dense;margin-bottom:110px}
+.bento{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:18px;grid-auto-flow:dense;margin-bottom:18px}
 #stats{display:contents}
 .t-hero{grid-column:span 8;grid-row:span 2;min-height:430px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;padding:46px 46px 38px;
   background:radial-gradient(120% 95% at 0% 0%,rgba(139,92,246,.24),transparent 56%),radial-gradient(90% 80% at 100% 100%,rgba(99,102,241,.14),transparent 62%),var(--surface)}
@@ -448,7 +448,8 @@ form.sal label.check{flex-direction:row;align-items:center;gap:8px;color:var(--t
   input[type=range]{height:28px}
 
   /* Kacheln kompakter */
-  .bento{gap:12px;margin-bottom:56px}
+  .bento{gap:12px;margin-bottom:12px}
+  .dash-more{margin-bottom:44px}
   .card,.tile{padding:20px;border-radius:20px}
   .tile-head{margin-bottom:16px;gap:10px}
   .tile-head h2{font-size:15px}
@@ -571,4 +572,40 @@ form.sal label.check{flex-direction:row;align-items:center;gap:8px;color:var(--t
   .nav .bank-desk{display:none}
   .ck{height:56px}
   #dlgCalc{width:100%}
+}
+
+/* ============ Dashboard nach Wunsch ============ */
+.dash-more{display:flex;justify-content:center;margin:0 0 92px}
+@media (min-width:1001px){
+  .bento > .tile[style*="--span"]{grid-column:span var(--span)}
+  .bento > .t-hero[style*="--span:12"]{grid-row:auto}
+}
+.tile-off{display:none!important}
+body.editing .bento > .tile{outline:2px dashed color-mix(in srgb,var(--accent) 45%,transparent);outline-offset:3px;padding-top:68px}
+body.editing .bento > .tile > :not(.tile-edit){pointer-events:none}
+body.editing .bento > .tile.tile-dim > :not(.tile-edit){opacity:.35}
+body.editing .bento > .tile.dragging{opacity:.75;outline-style:solid;outline-color:var(--accent);z-index:3}
+body.editing .reveal{opacity:1!important;transform:none!important}
+.tile-edit{position:absolute;inset:12px 12px auto 12px;z-index:5;display:flex;align-items:center;gap:6px;padding:6px 6px 6px 4px;border-radius:14px;
+  background:var(--card);border:1px solid var(--line-strong);box-shadow:var(--shadow)}
+.te-name{flex:1;min-width:0;font:700 13px var(--f-head);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.te-handle,.te-btn{flex:none;height:36px;min-width:36px;display:grid;place-items:center;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--text);cursor:pointer;font:700 14px var(--f-head);padding:0 8px}
+.te-handle{cursor:grab;touch-action:none;color:var(--muted);border-color:transparent;background:none}
+.te-handle:active{cursor:grabbing}
+.te-btn:disabled{opacity:.35;cursor:default}
+.te-btn:hover:not(:disabled),.te-handle:hover{border-color:var(--accent)}
+.te-handle:focus-visible,.te-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.te-handle svg,.te-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.te-handle svg circle{fill:currentColor;stroke:none}
+.edit-bar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom));z-index:80;width:min(760px,calc(100vw - 32px));
+  display:flex;gap:14px;align-items:center;justify-content:space-between;padding:12px 14px 12px 18px;border-radius:18px;background:var(--glass);
+  border:1px solid var(--accent);box-shadow:var(--shadow);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
+.edit-bar p{margin:0;font-size:13.5px}
+.eb-btns{display:flex;gap:8px;flex:none}
+body.editing .fab{display:none}
+@media (max-width:1000px){ .te-size,.eb-desk{display:none} }
+@media (max-width:640px){
+  .edit-bar{flex-direction:column;align-items:stretch;gap:10px}
+  .eb-btns .btn{flex:1}
+  body.editing .wrap{padding-bottom:calc(170px + env(safe-area-inset-bottom))}
 }
