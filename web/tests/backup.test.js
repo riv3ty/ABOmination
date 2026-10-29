@@ -34,6 +34,14 @@ describe("Sicherung (JSON)", () => {
     expect(parseBackup({ subs: [], income: { gross: 0 } }).income).toBeNull();
   });
 
+  it("nimmt eigene Listen ohne Grabsteine mit", () => {
+    const lists = { items: [{ id: "account-a", type: "account", name: "Giro", updatedAt: 5 }, { id: "x y", type: "account", name: "kaputt" }], deleted: { "account-z": 3 } };
+    const b = buildBackup({ subs: [], meta: {}, lists });
+    expect(b.lists).toEqual({ items: [{ id: "account-a", type: "account", name: "Giro", updatedAt: 5 }] });
+    expect(parseBackup(JSON.parse(JSON.stringify(b))).lists.items).toHaveLength(1);
+    expect(parseBackup({ subs: [] }).lists).toBeNull();
+  });
+
   it("verwirft ungültige Einstellungen", () => {
     expect(sanitizeSettings({ base: "XXX", remindDays: 99, noticeRemind: -1, notif: "ja", autoLock: 7, evil: "<script>" })).toBeNull();
     expect(sanitizeSettings({ base: "EUR", remindDays: 3.5, autoLock: 0 })).toEqual({ base: "EUR", autoLock: 0 });

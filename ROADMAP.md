@@ -11,6 +11,8 @@ Where ABOmination is heading. Priorities can change – ideas and feedback are w
 
 ## ✅ Shipped
 
+- **Your own lists: accounts, providers & payment methods** – Create bank accounts, providers and payment methods once and pick them from a dropdown.
+- **Built-in calculator** – Quick calculations right in the app – results can be put straight into a price field.
 - **Mobile-friendly app** – Compact header, subscription cards instead of a table, dialogs as bottom sheets, bigger touch targets.
 - **Website, live demo & newsletter** – Try ABOmination in the browser and follow the project.
 - **Salary calculator & budget** – Gross to net like a German payslip (official BMF wage-tax algorithm 2026) – and what's left after subscriptions and installments.
@@ -23,12 +25,10 @@ Where ABOmination is heading. Priorities can change – ideas and feedback are w
 
 ## 🚧 In progress
 
-- **Your own lists: accounts, providers & payment methods** – Create bank accounts, providers and payment methods once and pick them from a dropdown.
-- **Built-in calculator** – Quick calculations right in the app – results can be put straight into a price field.
+- **Customizable dashboard** – Show, hide and rearrange the tiles the way you like.
 
 ## ⏭️ Next
 
-- **Customizable dashboard** – Show, hide and rearrange the tiles the way you like.
 - **Push notifications** – Reminders even with the app closed – the server only delivers them and cannot read them.
 - **Deals & price search** – Current MyDealz deals for your subscriptions, plus a product search that opens Idealo, Geizhals and MyDealz.
 - **Native Android app** – Kotlin & Jetpack Compose: fingerprint unlock, reminders in the background, home-screen widget – same encrypted account.

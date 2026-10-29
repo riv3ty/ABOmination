@@ -13,18 +13,20 @@ import { buildIcs } from "./lib/ics.js";
 import { analyzeStatement } from "./lib/bank.js";
 import { buildBackup, parseBackup } from "./lib/backup.js";
 import { mergeAch } from "./lib/merge.js";
+import { evaluate, formatNumber } from "./lib/calc.js";
+import { LIST_TYPES, emptyLists, normalizeLists, seedFromSubs, namesOf, addItem, renameItem, removeItem, usageCount, renameInSubs, cleanName } from "./lib/lists.js";
 import { calcSalary, sanitizeIncome, leftover, STATES, SALARY_YEAR, INCOME_DEFAULT } from "./lib/salary.js";
 
 /* ================= Konstanten ================= */
 const KEY = "abo-manager-v1", META_KEY = "abo-manager-meta", SET_KEY = "abo-manager-settings",
       RATES_KEY = "abo-manager-rates", NOTIF_KEY = "abo-manager-notified", ACH_KEY = "abo-manager-achievements",
-      INCOME_KEY = "abo-manager-income";
+      INCOME_KEY = "abo-manager-income", LISTS_KEY = "abo-manager-lists";
 
 
 /* ================= Speicher ================= */
 // Private Daten (Abos, Einstellungen, Sync-Zugang) liegen verschlüsselt im Profil-Tresor (Vault),
 // alles andere (Wechselkurse, Benachrichtigungs-Merker) unverschlüsselt im localStorage.
-const PRIVATE_KEYS = ["abo-manager-v1", "abo-manager-meta", "abo-manager-settings", "abo-manager-sync", "abo-manager-achievements", "abo-manager-income"];
+const PRIVATE_KEYS = ["abo-manager-v1", "abo-manager-meta", "abo-manager-settings", "abo-manager-sync", "abo-manager-achievements", "abo-manager-income", "abo-manager-lists"];
 const lsGet = (k, fb) => {
   if (PRIVATE_KEYS.includes(k)) return Vault.get(k, fb);
   try { const v = JSON.parse(localStorage.getItem(k)); return v ?? fb; } catch { return fb; }
@@ -37,6 +39,7 @@ const lsSet = (k, v) => {
 // Zustand; befüllt in loadState() (erst nach dem Entsperren ist der Tresor lesbar)
 let subs = [], meta = { updatedAt: 0 }, settings = {}, ratesInfo = null, rates = FALLBACK_RATES;
 let income = null;                  // Gehaltsangaben (lib/salary.js) oder null
+let lists = emptyLists();           // eigene Listen: Bankkonten, Anbieter, Zahlungsmittel (lib/lists.js)
 let sort = { key: "next", dir: 1 };
 let editId = null;
 
@@ -137,6 +140,7 @@ function persist() { lsSet(KEY, subs); lsSet(META_KEY, meta); }
 function save() { meta.updatedAt = Date.now(); persist(); schedulePush(); }
 // changedAt: beim Zusammenführen zweier Stände (Server-Sync) gewinnt die zuletzt geänderte Seite
 const saveSettings = () => { settings.changedAt = Date.now(); return lsSet(SET_KEY, settings); };
+const saveLists = () => lsSet(LISTS_KEY, lists);
 // Entfernen speichert einen Merker statt nichts, damit der Abgleich das Gehalt nicht vom anderen Gerät zurückholt
 const saveIncome = () => lsSet(INCOME_KEY, income ? { ...income, changedAt: Date.now() } : { removed: true, changedAt: Date.now() });
 
@@ -241,7 +245,6 @@ function render() {
   const curAcc = $("#fAcc").value;
   $("#fAcc").innerHTML = `<option value="">Alle Bankkonten</option>` + accs.map(a => `<option${a === curAcc ? " selected" : ""}>${esc(a)}</option>`).join("")
     + (subs.some(s => !s.account) && accs.length ? `<option value="${NO_ACC_FILTER}"${curAcc === NO_ACC_FILTER ? " selected" : ""}>Ohne Bankkonto</option>` : "");
-  $("#accList").innerHTML = accs.map(a => `<option value="${esc(a)}">`).join("");
   renderAccounts(active);
   renderInstallments(all);
   renderSalary(perMonth);
@@ -250,7 +253,7 @@ function render() {
   const list = all.filter(s =>
     (!fs || s.state === fs) && (!fc || catName(s) === fc) && (!fk || s.kind === fk) &&
     (!fa || (fa === NO_ACC_FILTER ? !s.account : s.account.toLowerCase() === fa.toLowerCase())) &&
-    (!q || [s.name, s.category, s.payment, s.account, s.notes].some(x => (x || "").toLowerCase().includes(q))));
+    (!q || [s.name, s.category, s.payment, s.account, s.provider, s.notes].some(x => (x || "").toLowerCase().includes(q))));
   const get = { name: s => s.name.toLowerCase(), price: s => s.priceBase, monthly: s => s.monthly, next: s => +s.next, status: s => s.state };
   list.sort((a, b) => { const x = get[sort.key](a), y = get[sort.key](b); return (x > y ? 1 : x < y ? -1 : 0) * sort.dir; });
 
@@ -270,7 +273,7 @@ function render() {
       ? `<div class="muted small">✓ Vorab bezahlt bis ${fmtDate(parseISO(s.paidThrough))} · <button class="linkbtn" data-unpaid="${esc(s.id)}">zurücksetzen</button></div>` : "";
     return `<tr>
       <td><div class="name">${esc(s.name)}</div>
-        <div class="muted small"><span class="chip" style="border-color:${catColor(catName(s))}">${esc(catName(s))}</span>${s.inst ? ` <span class="chip">Ratenzahlung</span>` : ""}${s.account ? ` <span class="chip">🏦 ${esc(s.account)}</span>` : ""}${s.payment ? " · " + esc(s.payment) : ""}</div>${prog}${prepaid}${warn}</td>
+        <div class="muted small"><span class="chip" style="border-color:${catColor(catName(s))}">${esc(catName(s))}</span>${s.inst ? ` <span class="chip">Ratenzahlung</span>` : ""}${s.account ? ` <span class="chip">🏦 ${esc(s.account)}</span>` : ""}${[s.provider && s.provider.toLowerCase() !== s.name.toLowerCase() ? s.provider : "", s.payment].filter(Boolean).map(x => " · " + esc(x)).join("")}</div>${prog}${prepaid}${warn}</td>
       <td class="num">${money(s.price, s.currency)}<div class="muted small">${CYCLES[s.cycle].label}</div>${foreign}</td>
       <td class="num hide-m">${mb(s.monthly)}</td>
       <td>${s.state === "active" ? `${fmtDate(s.next)}<div class="muted small">${whenText(s.inDays)}</div>` : "–"}</td>
@@ -481,6 +484,162 @@ function renderOpt(all) {
     + (unknown ? `<p class="muted small" style="margin-bottom:0">Für gezieltere Tipps: trage bei „Bearbeiten“ die Nutzung ein (${unknown} Abo${unknown > 1 ? "s" : ""} ohne Angabe).</p>` : "");
 }
 
+/* ================= Taschenrechner (lib/calc.js) ================= */
+const dlgCalc = $("#dlgCalc"), calcIn = $("#calcIn"), calcOut = $("#calcOut");
+let calcTarget = null;                       // Eingabefeld, in das „Übernehmen“ das Ergebnis schreibt
+const calcHist = [];
+// Ergebnis schon beim Tippen zeigen; Fehler erst beim „=“
+function calcPreview() {
+  const src = calcIn.value.trim();
+  calcOut.classList.remove("err");
+  if (!src) { calcOut.innerHTML = "&nbsp;"; return null; }
+  try { const v = evaluate(src); calcOut.textContent = "= " + formatNumber(v); return v; }
+  catch { calcOut.innerHTML = "&nbsp;"; return null; }
+}
+function calcInsert(text) {
+  const s = calcIn.selectionStart ?? calcIn.value.length, e = calcIn.selectionEnd ?? s;
+  calcIn.setRangeText(text, s, e, "end");
+  calcIn.focus(); calcPreview();
+}
+function calcEquals() {
+  const src = calcIn.value.trim(); if (!src) return null;
+  try {
+    const v = evaluate(src), res = formatNumber(v);
+    if (src !== res) { calcHist.unshift({ src, res }); calcHist.length = Math.min(calcHist.length, 6); renderCalcHist(); }
+    calcIn.value = res; calcPreview();
+    return v;
+  } catch (err) { calcOut.textContent = err.message; calcOut.classList.add("err"); return null; }
+}
+function renderCalcHist() {
+  $("#calcHist").innerHTML = calcHist.map((h, i) => `<li><button type="button" class="linkbtn" data-h="${i}">${esc(h.src)} = <b>${esc(h.res)}</b></button></li>`).join("");
+}
+// Öffnen – optional für ein Eingabefeld (dann mit dessen Wert vorbelegt und mit „Übernehmen“)
+function openCalc(target) {
+  calcTarget = target || null;
+  const label = target?.closest("label")?.firstChild?.textContent?.trim() || target?.closest("label")?.textContent?.trim().split("\n")[0];
+  $("#calcTarget").hidden = !target; $("#calcTarget").textContent = target ? `Ergebnis für: ${label || "Feld"}` : "";
+  $("#calcUse").hidden = !target;
+  calcIn.value = target && target.value !== "" ? formatNumber(Number(target.value)) : "";
+  calcPreview();
+  dlgCalc.showModal();
+  calcIn.focus(); calcIn.setSelectionRange(calcIn.value.length, calcIn.value.length);
+}
+$("#btnCalc").onclick = () => openCalc();
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-calc]"); if (!b) return;
+  openCalc(b.closest("form").elements[b.dataset.calc]);
+});
+$("#calcClose").onclick = () => dlgCalc.close();
+calcIn.addEventListener("input", calcPreview);
+$("#calcForm").addEventListener("submit", e => { e.preventDefault(); calcEquals(); });
+dlgCalc.addEventListener("click", e => {
+  const k = e.target.closest("[data-k]")?.dataset.k, q = e.target.closest("[data-q]")?.dataset.q, h = e.target.closest("[data-h]")?.dataset.h;
+  if (k === "C") { calcIn.value = ""; calcPreview(); calcIn.focus(); }
+  else if (k === "back") {
+    const s = calcIn.selectionStart, end = calcIn.selectionEnd;
+    if (s !== end) calcIn.setRangeText("", s, end, "end");
+    else if (s > 0) { const cut = calcIn.value.slice(0, s).match(/ ?[÷×−+%] ?$/)?.[0].length || 1; calcIn.setRangeText("", s - cut, s, "end"); }
+    calcIn.focus(); calcPreview();
+  }
+  else if (k) calcInsert(k);
+  else if (q) {
+    // Schnelltaste auf die ganze bisherige Rechnung anwenden (bei + und − vorher einklammern)
+    const cur = calcIn.value.trim();
+    calcIn.value = !cur ? q.replace(/^[×÷+] /, "") : (/[+\-−]/.test(cur.replace(/^-/, "")) && !q.startsWith("+") ? `(${cur}) ${q}` : `${cur} ${q}`);
+    calcEquals();
+  }
+  else if (h !== undefined) { calcIn.value = calcHist[h].src; calcPreview(); calcIn.focus(); }
+});
+$("#calcUse").onclick = () => {
+  const v = calcIn.value.trim() ? calcEquals() : null;
+  if (v === null || !calcTarget) return;
+  calcTarget.value = String(Math.round(v * 100) / 100);
+  calcTarget.dispatchEvent(new Event("input", { bubbles: true }));    // Ratenrechner, Gehalt usw. neu berechnen
+  dlgCalc.close();
+  calcTarget.focus();
+};
+$("#btnBank2").onclick = () => $("#fileBank").click();
+
+/* ================= Eigene Listen: Bankkonten, Anbieter, Zahlungsmittel (lib/lists.js) ================= */
+const LIST_NEW = "__new__";
+// Auswahlmenü füllen: „keine Angabe“, die Einträge der Liste, ein alter Wert, der (noch) nicht in der Liste steht, und „Neu anlegen“
+function fillListSelect(sel, type, current = "") {
+  const names = namesOf(lists, type), def = LIST_TYPES[type];
+  const legacy = current && !names.some(n => n.toLowerCase() === current.toLowerCase()) ? current : "";
+  sel.innerHTML = `<option value="">– keine Angabe –</option>`
+    + names.map(n => `<option>${esc(n)}</option>`).join("")
+    + (legacy ? `<option>${esc(legacy)}</option>` : "")
+    + `<option value="${LIST_NEW}">＋ ${esc(def.one)} neu anlegen …</option>`;
+  sel.value = names.find(n => n.toLowerCase() === current.toLowerCase()) || legacy || "";
+  syncListNew(sel);
+}
+// Bei „Neu anlegen“ erscheint darunter ein Eingabefeld
+function syncListNew(sel) {
+  const inp = sel.parentElement.querySelector(".list-new"); if (!inp) return;
+  const on = sel.value === LIST_NEW;
+  inp.hidden = !on; inp.required = on; inp.placeholder = LIST_TYPES[sel.dataset.list].placeholder;
+  if (!on) inp.value = "";
+}
+document.addEventListener("change", e => {
+  const sel = e.target.closest("select[data-list]"); if (!sel) return;
+  syncListNew(sel);
+  if (sel.value === LIST_NEW) sel.parentElement.querySelector(".list-new")?.focus();
+});
+// Gewählten Wert lesen; ein neu eingegebener Name wird dabei in die Liste aufgenommen
+function readListValue(sel) {
+  const type = sel.dataset.list;
+  if (sel.value !== LIST_NEW) return sel.value;
+  const r = addItem(lists, type, sel.parentElement.querySelector(".list-new")?.value || "");
+  if (r.lists !== lists) { lists = r.lists; saveLists(); }
+  return r.item ? r.item.name : "";
+}
+
+let listTab = "account";
+function renderLists() {
+  $("#listTabs").innerHTML = Object.entries(LIST_TYPES).map(([t, d]) =>
+    `<button class="seg${t === listTab ? " active" : ""}" data-tab="${t}" role="tab" aria-selected="${t === listTab}">${d.icon} ${esc(d.label)} <span class="seg-n">${namesOf(lists, t).length}</span></button>`).join("");
+  const def = LIST_TYPES[listTab];
+  $("#listNew").placeholder = def.placeholder;
+  const items = lists.items.filter(i => i.type === listTab).sort((a, b) => a.name.localeCompare(b.name, "de"));
+  $("#listItems").innerHTML = items.length ? items.map(i => {
+    const n = usageCount(subs, listTab, i.name);
+    return `<div class="li-row" data-id="${esc(i.id)}">
+      <input class="li-name" value="${esc(i.name)}" maxlength="60" aria-label="${esc(def.one)} umbenennen">
+      <span class="muted small li-use">${n ? `${n} Abo${n > 1 ? "s" : ""}` : "nicht genutzt"}</span>
+      <button class="btn small danger" type="button" data-li-del aria-label="${esc(i.name)} löschen">✕</button></div>`;
+  }).join("") : `<p class="muted small">Noch keine ${esc(def.label)} angelegt.</p>`;
+}
+function openLists(tab) { if (tab) listTab = tab; renderLists(); $("#dlgLists").showModal(); }
+$("#btnLists").onclick = () => openLists();
+$("#listsClose").onclick = () => $("#dlgLists").close();
+$("#dlgLists").addEventListener("close", () => render());           // Umbenennungen in Tabelle und Kacheln zeigen
+$("#listTabs").addEventListener("click", e => { const b = e.target.closest("[data-tab]"); if (b) { listTab = b.dataset.tab; renderLists(); } });
+$("#listAdd").addEventListener("submit", e => {
+  e.preventDefault();
+  const r = addItem(lists, listTab, $("#listNew").value);
+  if (r.lists !== lists) { lists = r.lists; saveLists(); }
+  $("#listNew").value = ""; renderLists(); $("#listNew").focus();
+});
+// Umbenennen beim Verlassen des Feldes; die Abos mit dem alten Namen bekommen den neuen
+$("#listItems").addEventListener("change", e => {
+  const inp = e.target.closest(".li-name"); if (!inp) return;
+  const id = inp.closest(".li-row").dataset.id, it = lists.items.find(i => i.id === id); if (!it) return;
+  const name = cleanName(inp.value);
+  if (!name || name === it.name) { inp.value = it.name; return; }
+  try { lists = renameItem(lists, id, name); }
+  catch (err) { alert(err.message); inp.value = it.name; return; }
+  const before = subs; subs = renameInSubs(subs, it.type, it.name, name);
+  saveLists(); if (subs.some((s, i) => s !== before[i])) save();
+  renderLists();
+});
+$("#listItems").addEventListener("click", e => {
+  const b = e.target.closest("[data-li-del]"); if (!b) return;
+  const id = b.closest(".li-row").dataset.id, it = lists.items.find(i => i.id === id); if (!it) return;
+  const n = usageCount(subs, it.type, it.name);
+  if (n && !confirm(`„${it.name}“ wird in ${n} Abo${n > 1 ? "s" : ""} verwendet. Aus der Liste löschen? Die Abos behalten den Namen als Text.`)) return;
+  lists = removeItem(lists, id); saveLists(); renderLists();
+});
+
 /* ================= Gehalt: Brutto-Netto (lib/salary.js) und was nach Abos übrig bleibt ================= */
 const eur = v => money(v, "EUR");
 const pctFmt = v => v.toLocaleString("de-DE", { maximumFractionDigits: 2 }) + " %";
@@ -634,7 +793,7 @@ function showBankDialog(res) {
     bankFound = res.found;
     body.innerHTML = `<p class="muted small">${res.outgoing} Ausgaben gelesen, ${res.found.length} wiederkehrende Zahlungen erkannt. Prüfe die Vorschläge und passe Namen bei Bedarf an. Beträge werden in ${settings.base} angenommen.</p>
       <label style="display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted);margin:8px 0 12px">Von welchem Bankkonto stammt dieser Auszug? (optional)
-        <input type="text" id="bankAcc" list="accList" placeholder="z. B. Girokonto Sparkasse" maxlength="60"></label>
+        <select id="bankAcc" data-list="account"></select><input class="list-new" data-new="account" maxlength="60" hidden></label>
       <div style="overflow-x:auto"><table><thead><tr><th></th><th>Name</th><th class="num">Betrag</th><th>Intervall</th><th>Nächste</th><th class="num">Buchungen</th></tr></thead><tbody>
       ${res.found.map((f, i) => `<tr>
         <td><input type="checkbox" data-i="${i}" ${f.exists ? "" : "checked"}></td>
@@ -643,6 +802,7 @@ function showBankDialog(res) {
       </tbody></table></div>
       <div class="foot"><button class="btn primary" id="bankAdd">Ausgewählte hinzufügen</button></div>`;
   }
+  if ($("#bankAcc")) fillListSelect($("#bankAcc"), "account");
   $("#dlgBank").showModal();
 }
 $("#btnBank").onclick = () => $("#fileBank").click();
@@ -654,7 +814,7 @@ $("#fileBank").addEventListener("change", async e => {
 });
 $("#bankBody").addEventListener("click", e => {
   if (e.target.id !== "bankAdd") return;
-  const added = [], account = ($("#bankAcc")?.value || "").trim();
+  const added = [], account = $("#bankAcc") ? readListValue($("#bankAcc")).trim() : "";
   $("#bankBody").querySelectorAll("input[type=checkbox]:checked").forEach(cb => {
     const i = +cb.dataset.i, f = bankFound[i];
     const name = $("#bankBody").querySelector(`[data-name="${i}"]`).value.trim() || f.name;
@@ -674,6 +834,7 @@ function openDlg(id) {
   $("#dlgTitle").textContent = s ? "Abo bearbeiten" : "Abo hinzufügen";
   form.reset();
   const v = s || { kind: "subscription", cycle: "monthly", status: "active", currency: settings.base, nextDate: toISO(today()) };
+  for (const [t, d] of Object.entries(LIST_TYPES)) fillListSelect(form.elements[d.field], t, v[d.field] || "");
   for (const el of form.elements) if (el.name && v[el.name] !== undefined) el.value = v[el.name];
   if (v.kind === "installment") {
     const byAmount = v.paidAmount !== null && v.paidAmount !== undefined;
@@ -693,6 +854,7 @@ function syncFormKind() {
   form.querySelectorAll(".sub-only").forEach(e => { e.hidden = inst; e.querySelectorAll("input,select").forEach(i => i.disabled = inst); });
   form.elements.totalPayments.required = inst;
   $("#lblNext").textContent = inst ? "Nächste Rate am" : "Nächste Zahlung";
+  $("#lblProvider").textContent = inst ? "Händler / Anbieter" : "Anbieter";
   syncPaidUnit();
   updateLoanCalc();
 }
@@ -738,7 +900,8 @@ form.addEventListener("submit", e => {
     paidThrough: editId ? subs.find(s => s.id === editId)?.paidThrough : "",      // „Bereits bezahlt“ beim Bearbeiten behalten
     id: editId || uid(), name: f.name.trim(), price: parseFloat(f.price), cycle: f.cycle, currency: f.currency,
     nextDate: f.nextDate, category: f.category.trim(), status: f.status,
-    noticeDays: parseInt(f.noticeDays), payment: f.payment.trim(), notes: f.notes.trim(), account: f.account.trim(),
+    noticeDays: parseInt(f.noticeDays), payment: readListValue(form.elements.payment), notes: f.notes.trim(), account: readListValue(form.elements.account),
+    provider: readListValue(form.elements.provider),
     kind: f.kind, totalPayments: parseInt(f.totalPayments),
     paidCount: f.paidUnit === "amount" ? 0 : parseInt(f.paidValue),
     paidAmount: f.paidUnit === "amount" && f.paidValue !== "" ? parseFloat(f.paidValue) : null,
@@ -1297,15 +1460,15 @@ function download(name, text, type) {
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }
 $("#btnExport").onclick = () => {
-  download(`abos-${toISO(today())}.json`, JSON.stringify(buildBackup({ subs, meta, settings, achievements: ach, income }), null, 2), "application/json");
+  download(`abos-${toISO(today())}.json`, JSON.stringify(buildBackup({ subs, meta, settings, achievements: ach, income, lists }), null, 2), "application/json");
   ach.exportedJson = true; saveAch(); checkAchievements(subs, view());
 };
 $("#btnCsv").onclick = () => {
   const cell = v => `"${String(v ?? "").replace(/"/g, '""')}"`, num = v => v.toFixed(2).replace(".", ",");
-  const head = ["Name","Art","Kategorie","Preis","Währung","Abrechnung",`Pro Monat (${settings.base})`,"Nächste Zahlung","Status","Raten bezahlt/gesamt","Kaufpreis","Zinssatz p. a. (%)","Gesamtkosten Raten","Nutzung","Bankkonto","Zahlungsart","Kündigungsfrist (Tage)","Notizen"];
+  const head = ["Name","Art","Kategorie","Preis","Währung","Abrechnung",`Pro Monat (${settings.base})`,"Nächste Zahlung","Status","Raten bezahlt/gesamt","Kaufpreis","Zinssatz p. a. (%)","Gesamtkosten Raten","Nutzung","Anbieter","Bankkonto","Zahlungsmittel","Kündigungsfrist (Tage)","Notizen"];
   const rows = view().map(s => [s.name, s.inst ? "Ratenzahlung" : "Abo", s.category, num(s.price), s.currency, CYCLES[s.cycle].label, num(s.monthly),
     toISO(s.next), STATUS[s.state], s.inst ? `${s.paid}/${s.totalPayments}` : "",
-    s.loan ? num(s.principal) : "", s.loan && s.interestRate > 0 ? String(s.interestRate).replace(".", ",") : "", s.loan ? num(s.loan.total) : "", USAGE[s.usage] || "", s.account, s.payment, s.noticeDays, s.notes]);
+    s.loan ? num(s.principal) : "", s.loan && s.interestRate > 0 ? String(s.interestRate).replace(".", ",") : "", s.loan ? num(s.loan.total) : "", USAGE[s.usage] || "", s.provider, s.account, s.payment, s.noticeDays, s.notes]);
   download(`abos-${toISO(today())}.csv`, "\ufeff" + [head, ...rows].map(r => r.map(cell).join(";")).join("\r\n"), "text/csv;charset=utf-8");
 };
 $("#btnImport").onclick = () => $("#fileImport").click();
@@ -1315,7 +1478,7 @@ $("#fileImport").addEventListener("change", async e => {
   let b;
   try { b = parseBackup(JSON.parse(await file.text())); }
   catch { return alert("Datei konnte nicht gelesen werden. Erwartet wird eine JSON-Sicherung aus dieser App."); }
-  const extra = [b.settings && "Einstellungen werden übernommen", b.income && "Gehaltsangaben werden übernommen", b.achievements && "Errungenschaften werden zusammengeführt"].filter(Boolean);
+  const extra = [b.settings && "Einstellungen werden übernommen", b.income && "Gehaltsangaben werden übernommen", "eigene Listen werden ergänzt", b.achievements && "Errungenschaften werden zusammengeführt"].filter(Boolean);
   if (confirm(`${b.subs.length} Abos importieren? Die aktuellen Daten (${subs.length}) werden ersetzt.${extra.length ? "\n" + extra.join(", ") + "." : ""}`)) applyBackup(b);
 });
 // Sicherung übernehmen: Abos ersetzen (ersetzte als gelöscht markieren), Einstellungen übernehmen, Errungenschaften zusammenführen
@@ -1326,6 +1489,11 @@ function applyBackup(b) {
   if (b.settings) { settings = { ...settings, ...b.settings }; saveSettings(); Vault.bump(); }
   if (b.achievements) { ach = mergeAch(ach, b.achievements); saveAch(); }
   if (b.income) { income = b.income; saveIncome(); }
+  // Listen ergänzen: Einträge aus der Sicherung und alle Namen, die in den eingelesenen Abos stehen
+  const before = lists;
+  for (const it of b.lists?.items || []) lists = addItem(lists, it.type, it.name).lists;
+  for (const it of seedFromSubs(c).items) lists = addItem(lists, it.type, it.name).lists;
+  if (lists !== before) saveLists();
   subs = c; save(); render(); maybeRefreshRates();
 }
 // Demo (Website): Beispieldaten in ein frisch angelegtes lokales Profil laden
@@ -1353,6 +1521,7 @@ const ICON = {
   cloud: svg('<path d="M7 18a4.5 4.5 0 0 1-.6-8.96A6 6 0 0 1 18 9.5a4 4 0 0 1-.5 8.5z"/>'),
   plus: svg('<path d="M12 5v14M5 12h14"/>'),
   coins: svg('<ellipse cx="9" cy="6" rx="6" ry="2.5"/><path d="M3 6v4c0 1.4 2.7 2.5 6 2.5s6-1.1 6-2.5V6"/><path d="M3 10v4c0 1.4 2.7 2.5 6 2.5"/><ellipse cx="17" cy="15" rx="4" ry="1.8"/><path d="M13 15v3.2c0 1 1.8 1.8 4 1.8s4-.8 4-1.8V15"/>'),
+  calc: svg('<rect x="5" y="3" width="14" height="18" rx="3"/><path d="M8.5 7.5h7"/><path d="M9 12h.01M12 12h.01M15 12h.01M9 15.5h.01M12 15.5h.01M15 15.5h.01M9 19h.01M12 19h.01"/>'),
   gear: svg('<circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1"/>')
 };
 // Zeitleiste der nächsten 30 Tage: Punkte nach Tagen positioniert, Karten auf 3 Bahnen verteilt (überlappungsarm)
@@ -1411,6 +1580,9 @@ function initTheme() {
 /* ================= Start ================= */
 function loadState() {
   subs = clean(lsGet(KEY, []));
+  const rawLists = lsGet(LISTS_KEY, null);
+  lists = rawLists ? normalizeLists(rawLists) : seedFromSubs(subs);
+  if (!rawLists && lists.items.length) saveLists();
   const inc = lsGet(INCOME_KEY, null);
   income = inc?.removed ? null : sanitizeIncome(inc);
   meta = Object.assign({ updatedAt: 0 }, lsGet(META_KEY, {}));

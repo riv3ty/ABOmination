@@ -1,9 +1,10 @@
-// JSON-Sicherung: Abos, Einstellungen, Errungenschaften und Gehaltsangaben (Version 3).
+// JSON-Sicherung: Abos, Einstellungen, Errungenschaften, Gehaltsangaben und eigene Listen (Version 3).
 // Sync-Zugangsdaten (z. B. Nextcloud-App-Passwort) gehören bewusst NICHT hinein – die Datei ist unverschlüsselt.
 // Ältere Sicherungen (Version 2: { subs }, Version 1: reines Array) werden weiterhin gelesen.
 import { clean } from "./model.js";
 import { CURRENCIES } from "./constants.js";
 import { sanitizeIncome } from "./salary.js";
+import { normalizeLists } from "./lists.js";
 
 export const BACKUP_VERSION = 3;
 const AUTOLOCK = [0, 5, 15, 30, 60];
@@ -36,16 +37,17 @@ export function sanitizeAchievements(a) {
   return Object.keys(out).length ? out : null;
 }
 
-export function buildBackup({ subs, meta, settings, achievements, income }, now = Date.now()) {
+export function buildBackup({ subs, meta, settings, achievements, income, lists }, now = Date.now()) {
   const inc = sanitizeIncome(income);
   if (inc) delete inc.changedAt;
   return {
     app: "abo-manager", version: BACKUP_VERSION, exportedAt: now, updatedAt: meta?.updatedAt || 0,
-    subs, settings: sanitizeSettings(settings), achievements: sanitizeAchievements(achievements), income: inc
+    subs, settings: sanitizeSettings(settings), achievements: sanitizeAchievements(achievements), income: inc,
+    lists: lists ? { items: normalizeLists(lists).items } : null
   };
 }
 
-// Liefert { subs, settings, achievements, income, version }; wirft bei unbrauchbaren Daten
+// Liefert { subs, settings, achievements, income, lists, version }; wirft bei unbrauchbaren Daten
 export function parseBackup(data) {
   const list = Array.isArray(data) ? data : data?.subs;
   if (!Array.isArray(list)) throw new Error("Keine Abo-Liste gefunden.");
@@ -55,6 +57,7 @@ export function parseBackup(data) {
     subs: clean(list),
     settings: sanitizeSettings(obj.settings),
     achievements: sanitizeAchievements(obj.achievements),
-    income: obj.income?.gross > 0 ? sanitizeIncome(obj.income) : null
+    income: obj.income?.gross > 0 ? sanitizeIncome(obj.income) : null,
+    lists: obj.lists ? normalizeLists(obj.lists) : null
   };
 }

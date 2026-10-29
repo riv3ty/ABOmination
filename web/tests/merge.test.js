@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { mergeData, KEYS } from "../src/lib/merge.js";
 
-const { SUBS, META, SETTINGS, ACH, INCOME } = KEYS;
+const { SUBS, META, SETTINGS, ACH, INCOME, LISTS } = KEYS;
 const NOW = Date.UTC(2026, 8, 25);
 const s = (id, updatedAt, extra = {}) => ({ id, name: id, updatedAt, ...extra });
 const data = (subs, meta = {}, extra = {}) => ({ [SUBS]: subs, [META]: { updatedAt: 0, ...meta }, ...extra });
@@ -44,6 +44,14 @@ describe("mergeData", () => {
     const l = data([], {}, { [INCOME]: { gross: 4000, changedAt: 5 } }), r = data([], {}, { [INCOME]: { removed: true, changedAt: 8 } });
     expect(mergeData(l, r, NOW)[INCOME]).toEqual({ removed: true, changedAt: 8 });
     expect(mergeData(r, data([], {}, { [INCOME]: { gross: 5000, changedAt: 9 } }), NOW)[INCOME].gross).toBe(5000);
+  });
+
+  it("eigene Listen werden pro Eintrag zusammengeführt", () => {
+    const l = data([], {}, { [LISTS]: { items: [{ id: "account-a", type: "account", name: "Giro", updatedAt: 5 }], deleted: {} } });
+    const r = data([], {}, { [LISTS]: { items: [{ id: "account-a", type: "account", name: "Girokonto", updatedAt: 9 }, { id: "payment-b", type: "payment", name: "PayPal", updatedAt: 3 }], deleted: {} } });
+    const m = mergeData(l, r, NOW)[LISTS];
+    expect(m.items.map(i => i.name).sort()).toEqual(["Girokonto", "PayPal"]);
+    expect(mergeData(data([]), data([]), NOW)[LISTS]).toBeUndefined();
   });
 
   it("Errungenschaften werden vereinigt", () => {

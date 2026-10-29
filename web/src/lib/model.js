@@ -15,8 +15,8 @@ export function normalizeSub(s) {
     currency: CURRENCIES.includes(s.currency) ? s.currency : "EUR",
     nextDate: String(s.nextDate), category: String(s.category || ""),
     status: ["active", "paused", "cancelled"].includes(s.status) ? s.status : "active",
-    noticeDays: inst ? 0 : Math.max(0, Number(s.noticeDays) || 0), payment: String(s.payment || ""), notes: String(s.notes || ""),
-    account: String(s.account || "").trim().slice(0, 60),
+    noticeDays: inst ? 0 : Math.max(0, Number(s.noticeDays) || 0), payment: String(s.payment || "").trim().slice(0, 60), notes: String(s.notes || ""),
+    account: String(s.account || "").trim().slice(0, 60), provider: String(s.provider || "").trim().slice(0, 60),
     kind: inst ? "installment" : "subscription", totalPayments: total,
     // Bereits gezahlt: entweder als Anzahl Raten (paidCount) oder als exakter Betrag (paidAmount, dann ist paidCount nur abgeleitet)
     paidAmount: inst && s.paidAmount !== null && s.paidAmount !== undefined && s.paidAmount !== "" && Number.isFinite(Number(s.paidAmount))

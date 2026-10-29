@@ -10,6 +10,26 @@
       "items": [
         {
           "en": [
+            "Your own lists: accounts, providers & payment methods",
+            "Create bank accounts, providers and payment methods once and pick them from a dropdown."
+          ],
+          "de": [
+            "Eigene Listen: Konten, Anbieter & Zahlungsmittel",
+            "Bankkonten, Anbieter und Zahlungsmittel einmal anlegen und danach nur noch im Auswahlmenü wählen."
+          ]
+        },
+        {
+          "en": [
+            "Built-in calculator",
+            "Quick calculations right in the app – results can be put straight into a price field."
+          ],
+          "de": [
+            "Integrierter Taschenrechner",
+            "Schnell nachrechnen, ohne die App zu verlassen – Ergebnis direkt ins Preisfeld übernehmen."
+          ]
+        },
+        {
+          "en": [
             "Mobile-friendly app",
             "Compact header, subscription cards instead of a table, dialogs as bottom sheets, bigger touch targets."
           ],
@@ -109,22 +129,12 @@
       "items": [
         {
           "en": [
-            "Your own lists: accounts, providers & payment methods",
-            "Create bank accounts, providers and payment methods once and pick them from a dropdown."
+            "Customizable dashboard",
+            "Show, hide and rearrange the tiles the way you like."
           ],
           "de": [
-            "Eigene Listen: Konten, Anbieter & Zahlungsmittel",
-            "Bankkonten, Anbieter und Zahlungsmittel einmal anlegen und danach nur noch im Auswahlmenü wählen."
-          ]
-        },
-        {
-          "en": [
-            "Built-in calculator",
-            "Quick calculations right in the app – results can be put straight into a price field."
-          ],
-          "de": [
-            "Integrierter Taschenrechner",
-            "Schnell nachrechnen, ohne die App zu verlassen – Ergebnis direkt ins Preisfeld übernehmen."
+            "Dashboard nach Wunsch",
+            "Kacheln ein- und ausblenden und per Ziehen nach Vorliebe anordnen."
           ]
         }
       ]
@@ -136,16 +146,6 @@
         "de": "Als Nächstes"
       },
       "items": [
-        {
-          "en": [
-            "Customizable dashboard",
-            "Show, hide and rearrange the tiles the way you like."
-          ],
-          "de": [
-            "Dashboard nach Wunsch",
-            "Kacheln ein- und ausblenden und per Ziehen nach Vorliebe anordnen."
-          ]
-        },
         {
           "en": [
             "Push notifications",
