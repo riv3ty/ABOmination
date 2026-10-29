@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-08",
+  "updated": "2026-10-30",
   "stages": [
     {
       "id": "shipped",
@@ -8,6 +8,26 @@
         "de": "Erledigt"
       },
       "items": [
+        {
+          "en": [
+            "Mobile-friendly app",
+            "Compact header, subscription cards instead of a table, dialogs as bottom sheets, bigger touch targets."
+          ],
+          "de": [
+            "Optimierte Handy-Ansicht",
+            "Kompakte Kopfzeile, Abos als Karten statt Tabelle, Dialoge als Blatt von unten, größere Tippflächen."
+          ]
+        },
+        {
+          "en": [
+            "Website, live demo & newsletter",
+            "Try ABOmination in the browser and follow the project."
+          ],
+          "de": [
+            "Website, Live-Demo & Newsletter",
+            "ABOmination im Browser ausprobieren und das Projekt verfolgen."
+          ]
+        },
         {
           "en": [
             "Salary calculator & budget",
@@ -89,22 +109,22 @@
       "items": [
         {
           "en": [
-            "Native Android app",
-            "Kotlin & Jetpack Compose: fingerprint unlock, reminders in the background, home-screen widget – same encrypted account."
+            "Your own lists: accounts, providers & payment methods",
+            "Create bank accounts, providers and payment methods once and pick them from a dropdown."
           ],
           "de": [
-            "Native Android-App",
-            "Kotlin & Jetpack Compose: Entsperren per Fingerabdruck, Erinnerungen im Hintergrund, Widget – mit demselben verschlüsselten Konto."
+            "Eigene Listen: Konten, Anbieter & Zahlungsmittel",
+            "Bankkonten, Anbieter und Zahlungsmittel einmal anlegen und danach nur noch im Auswahlmenü wählen."
           ]
         },
         {
           "en": [
-            "Website, live demo & newsletter",
-            "Try ABOmination in the browser and follow the project."
+            "Built-in calculator",
+            "Quick calculations right in the app – results can be put straight into a price field."
           ],
           "de": [
-            "Website, Live-Demo & Newsletter",
-            "ABOmination im Browser ausprobieren und das Projekt verfolgen."
+            "Integrierter Taschenrechner",
+            "Schnell nachrechnen, ohne die App zu verlassen – Ergebnis direkt ins Preisfeld übernehmen."
           ]
         }
       ]
@@ -116,6 +136,46 @@
         "de": "Als Nächstes"
       },
       "items": [
+        {
+          "en": [
+            "Customizable dashboard",
+            "Show, hide and rearrange the tiles the way you like."
+          ],
+          "de": [
+            "Dashboard nach Wunsch",
+            "Kacheln ein- und ausblenden und per Ziehen nach Vorliebe anordnen."
+          ]
+        },
+        {
+          "en": [
+            "Push notifications",
+            "Reminders even with the app closed – the server only delivers them and cannot read them."
+          ],
+          "de": [
+            "Push-Benachrichtigungen",
+            "Erinnerungen auch bei geschlossener App – der Server stellt sie nur zu und kann sie nicht lesen."
+          ]
+        },
+        {
+          "en": [
+            "Deals & price search",
+            "Current MyDealz deals for your subscriptions, plus a product search that opens Idealo, Geizhals and MyDealz."
+          ],
+          "de": [
+            "Angebote & Preissuche",
+            "Aktuelle MyDealz-Deals passend zu deinen Abos, dazu eine Produktsuche mit Direktlinks zu Idealo, Geizhals und MyDealz."
+          ]
+        },
+        {
+          "en": [
+            "Native Android app",
+            "Kotlin & Jetpack Compose: fingerprint unlock, reminders in the background, home-screen widget – same encrypted account."
+          ],
+          "de": [
+            "Native Android-App",
+            "Kotlin & Jetpack Compose: Entsperren per Fingerabdruck, Erinnerungen im Hintergrund, Widget – mit demselben verschlüsselten Konto."
+          ]
+        },
         {
           "en": [
             "Passkeys",
@@ -193,16 +253,6 @@
           "de": [
             "Gemeinsamer Haushalt",
             "Ausgewählte Abos Ende-zu-Ende-verschlüsselt mit Familienmitgliedern teilen."
-          ]
-        },
-        {
-          "en": [
-            "Push reminders for the web app",
-            "Reminders even when the browser is closed – without revealing due dates to the server."
-          ],
-          "de": [
-            "Push-Erinnerungen in der Web-App",
-            "Erinnerungen auch bei geschlossenem Browser – ohne dem Server Termine zu verraten."
           ]
         },
         {

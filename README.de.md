@@ -41,7 +41,7 @@
 - **Kontoauszug-Import** – wiederkehrende Zahlungen werden in CSV-Exporten automatisch erkannt.
 - **Spartipps** – selten genutzte, doppelte oder überlappende Abos und günstigere Jahrestarife.
 - **Datenschutz eingebaut** – AES-256-GCM-Verschlüsselung im Browser, kein Tracking, keine Anfragen an Dritte.
-- **Läuft überall** – eine einzige HTML-Datei, eigener Docker-Server mit Konten und Abgleich, installierbare App (PWA), auch offline. Eine native Android-App ist in Arbeit.
+- **Läuft überall** – eine einzige HTML-Datei, eigener Docker-Server mit Konten und Abgleich, installierbare App (PWA), auch offline. Eine native Android-App ist geplant.
 
 <table>
   <tr>

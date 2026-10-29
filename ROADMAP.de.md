@@ -1,6 +1,6 @@
 # Roadmap
 
-[English](ROADMAP.md) · **Deutsch** · Stand: 2026-10-08
+[English](ROADMAP.md) · **Deutsch** · Stand: 2026-10-30
 
 Wohin sich ABOmination entwickelt. Prioritäten können sich ändern – Ideen und Feedback gern in den [Issues](https://github.com/riv3ty/ABOmination/issues).
 
@@ -11,6 +11,8 @@ Wohin sich ABOmination entwickelt. Prioritäten können sich ändern – Ideen u
 
 ## ✅ Erledigt
 
+- **Optimierte Handy-Ansicht** – Kompakte Kopfzeile, Abos als Karten statt Tabelle, Dialoge als Blatt von unten, größere Tippflächen.
+- **Website, Live-Demo & Newsletter** – ABOmination im Browser ausprobieren und das Projekt verfolgen.
 - **Gehaltsrechner & Budget** – Brutto-Netto wie auf der Lohnabrechnung (amtlicher BMF-Lohnsteuer-Algorithmus 2026) – und was nach Abos und Raten übrig bleibt.
 - **Zahlungen als bereits bezahlt markieren** – Ein Klick in der Erinnerung – der nächste Termin rückt weiter, Raten zählen sofort, mit Rückgängig.
 - **Ende-zu-Ende-verschlüsselte Server-Konten** – Abgleich zwischen Geräten; der Server speichert nur verschlüsselte Daten. Konflikte werden pro Eintrag zusammengeführt.
@@ -21,11 +23,15 @@ Wohin sich ABOmination entwickelt. Prioritäten können sich ändern – Ideen u
 
 ## 🚧 In Arbeit
 
-- **Native Android-App** – Kotlin & Jetpack Compose: Entsperren per Fingerabdruck, Erinnerungen im Hintergrund, Widget – mit demselben verschlüsselten Konto.
-- **Website, Live-Demo & Newsletter** – ABOmination im Browser ausprobieren und das Projekt verfolgen.
+- **Eigene Listen: Konten, Anbieter & Zahlungsmittel** – Bankkonten, Anbieter und Zahlungsmittel einmal anlegen und danach nur noch im Auswahlmenü wählen.
+- **Integrierter Taschenrechner** – Schnell nachrechnen, ohne die App zu verlassen – Ergebnis direkt ins Preisfeld übernehmen.
 
 ## ⏭️ Als Nächstes
 
+- **Dashboard nach Wunsch** – Kacheln ein- und ausblenden und per Ziehen nach Vorliebe anordnen.
+- **Push-Benachrichtigungen** – Erinnerungen auch bei geschlossener App – der Server stellt sie nur zu und kann sie nicht lesen.
+- **Angebote & Preissuche** – Aktuelle MyDealz-Deals passend zu deinen Abos, dazu eine Produktsuche mit Direktlinks zu Idealo, Geizhals und MyDealz.
+- **Native Android-App** – Kotlin & Jetpack Compose: Entsperren per Fingerabdruck, Erinnerungen im Hintergrund, Widget – mit demselben verschlüsselten Konto.
 - **Passkeys** – Entsperren per Passkey (WebAuthn PRF) statt Passworteingabe.
 - **Verschlüsselte Sicherungen** – Passwortgeschützter JSON-Export zusätzlich zum unverschlüsselten.
 - **Preisverlauf & Preiserhöhungen** – Preisänderungen je Abo verfolgen und bei Erhöhungen benachrichtigt werden.
@@ -36,7 +42,6 @@ Wohin sich ABOmination entwickelt. Prioritäten können sich ändern – Ideen u
 ## 🗓️ Später
 
 - **Gemeinsamer Haushalt** – Ausgewählte Abos Ende-zu-Ende-verschlüsselt mit Familienmitgliedern teilen.
-- **Push-Erinnerungen in der Web-App** – Erinnerungen auch bei geschlossenem Browser – ohne dem Server Termine zu verraten.
 - **Verträge & Belege** – Verschlüsselte PDFs und Fotos an ein Abo anhängen.
 - **Budgets & Jahresbericht** – Ausgabenziele je Kategorie und ein Jahresrückblick.
 - **Mehr Importformate** – CAMT-/MT940-Kontoauszüge und weitere Bank-CSV-Formate.

@@ -42,7 +42,7 @@
 - **Bank statement import** – recurring payments are detected automatically in CSV exports.
 - **Savings tips** – rarely used, duplicated or overlapping subscriptions and cheaper yearly plans.
 - **Privacy by design** – AES-256-GCM encryption in the browser, no tracking, no third-party requests.
-- **Runs everywhere** – single HTML file, self-hosted Docker server with accounts and sync, installable PWA that works offline. A native Android app is in progress.
+- **Runs everywhere** – single HTML file, self-hosted Docker server with accounts and sync, installable PWA that works offline. A native Android app is planned.
 
 <table>
   <tr>
