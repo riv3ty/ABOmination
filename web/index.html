@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>ABOmination</title>
 <meta name="description" content="Abos und Ratenzahlungen im Blick – Ende-zu-Ende-verschlüsselt.">
 <meta name="theme-color" content="#f4f4f5" media="(prefers-color-scheme: light)">
@@ -22,14 +22,14 @@
 <div id="auth" hidden></div>
 <div class="wrap">
   <header class="nav">
-    <h1 class="brand"><span class="brand-mark" data-ic="calendar"></span>ABOmination</h1>
+    <h1 class="brand"><span class="brand-mark" data-ic="calendar"></span><span class="brand-txt">ABOmination</span></h1>
     <div class="actions">
-      <button class="btn" id="btnLock" title="Sperren und abmelden"><span class="ic" data-ic="lock"></span><span id="userName"></span></button>
+      <button class="btn" id="btnLock" title="Sperren und abmelden"><span class="ic" data-ic="lock"></span><span id="userName" class="lbl-m"></span></button>
       <button class="btn" id="btnAch" title="Errungenschaften"><span class="ic" data-ic="trophy"></span><span id="achCount"></span></button>
       <button class="btn pill" id="btnSync" hidden></button>
       <button class="btn" id="btnBank"><span class="ic" data-ic="bank"></span><span class="lbl">Kontoauszug importieren</span></button>
       <button class="btn" id="btnSettings"><span class="ic" data-ic="gear"></span><span class="lbl">Einstellungen</span></button>
-      <button class="btn primary" id="btnAdd"><span class="ic" data-ic="plus"></span>Abo hinzufügen</button>
+      <button class="btn primary add-desk" id="btnAdd"><span class="ic" data-ic="plus"></span>Abo hinzufügen</button>
     </div>
   </header>
 
@@ -110,6 +110,7 @@
       <div class="empty" id="empty" hidden>Noch keine Abos. Klicke auf „Abo hinzufügen“ oder importiere einen Kontoauszug.</div>
     </div>
   </section>
+  <button class="fab" id="btnAddFab" aria-label="Abo hinzufügen" title="Abo hinzufügen"><span class="ic" data-ic="plus"></span></button>
   <p class="muted small foot-note local-only">Alle Daten werden lokal in diesem Browser gespeichert. Für Sicherung und Geräte-Sync: Einstellungen.</p>
   <p class="muted small foot-note srv-only">Deine Daten werden verschlüsselt mit dem Server abgeglichen und stehen auf all deinen Geräten bereit.</p>
 </div>
@@ -322,6 +323,7 @@
     </div>
     <p class="muted small">Lohnsteuer und Solidaritätszuschlag nach dem amtlichen Programmablaufplan des BMF für 2026 (wie der BMF-Lohnsteuerrechner), Sozialabgaben mit den Sätzen und Beitragsbemessungsgrenzen 2026. Ohne Gewähr – maßgeblich ist deine Lohnabrechnung. Die Angaben werden verschlüsselt mit deinen Abos gespeichert.</p>
     <div class="foot">
+      <div class="sal-sum" id="salSum" aria-hidden="true"></div>
       <button type="button" class="btn danger" id="salRemove">Entfernen</button>
       <button type="submit" class="btn primary">Speichern</button>
     </div>

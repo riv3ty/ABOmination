@@ -267,7 +267,7 @@ input[readonly]{opacity:.75;cursor:default}
 .t-inst{grid-column:span 12}
 .t-salary{grid-column:span 12}
 @media (max-width:1000px){
-  .t-hero,.t-cats,.t-accts,.t-opt,.t-ach{grid-column:span 12;grid-row:auto}
+  .t-hero,.t-hero.tall,.t-cats,.t-accts,.t-opt,.t-ach{grid-column:span 12;grid-row:auto}
   .t-year,.t-30,.t-open{grid-column:span 6}
   .t-hero{min-height:0}
 }
@@ -420,3 +420,112 @@ form.sal label.check{flex-direction:row;align-items:center;gap:8px;color:var(--t
 @media (max-width:1000px){.sal-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:760px){.sal-grid{grid-template-columns:1fr}.sal-out{position:static}}
 @media (max-width:480px){.sal-row{grid-template-columns:1fr}}
+
+/* ============ Handy-Ansicht (bis 640 px) ============ */
+.fab,.up-toggle,.sal-sum{display:none}
+@media (max-width:640px){
+  /* Kopfzeile: eine schlanke Zeile mit Symbol-Knöpfen; „Abo hinzufügen“ wird zum schwebenden Knopf */
+  .nav{top:8px;gap:8px;padding:8px 8px 8px 12px;margin-bottom:18px;border-radius:20px;flex-wrap:nowrap}
+  .nav .actions{flex-wrap:nowrap;gap:6px}
+  .nav .btn{min-height:40px;min-width:40px;padding:8px 10px}
+  .nav .lbl-m{display:none}
+  .nav .add-desk{display:none}
+  .brand{font-size:16px;gap:10px;min-width:0}
+  .fab{display:grid;place-items:center;position:fixed;z-index:70;right:max(16px,env(safe-area-inset-right));bottom:calc(16px + env(safe-area-inset-bottom));
+    width:58px;height:58px;border-radius:20px;border:0;color:#fff;background:linear-gradient(140deg,#a78bfa,#7c3aed);cursor:pointer;
+    box-shadow:0 16px 36px -10px rgba(124,58,237,.75)}
+  .fab svg{width:24px;height:24px;stroke-width:2.2}
+  .fab:active{transform:scale(.94)}
+  .wrap{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
+  .toast-wrap{bottom:calc(90px + env(safe-area-inset-bottom))}
+
+  /* Eingabefelder mit 16 px: sonst zoomt iOS beim Antippen hinein */
+  input,select,textarea{font-size:16px}
+  .btn{min-height:40px}
+  .btn.small{min-height:36px;padding:7px 12px;font-size:13px}
+  .seg{padding:7px 13px}
+  .acct-name{padding:6px 0}
+  input[type=range]{height:28px}
+
+  /* Kacheln kompakter */
+  .bento{gap:12px;margin-bottom:56px}
+  .card,.tile{padding:20px;border-radius:20px}
+  .tile-head{margin-bottom:16px;gap:10px}
+  .tile-head h2{font-size:15px}
+  .t-hero{padding:24px 22px 22px;gap:22px}
+  .t-hero .mix{margin:0}
+  .t-hero .lede{margin-bottom:0}
+  .t-hero .eyebrow[style]{margin-top:18px!important}
+  .lede{font-size:15px;margin:10px 0 0}
+  .iboxes{gap:8px}
+  .ibox{padding:10px 12px;border-radius:14px}
+  .t-year,.t-30{grid-column:span 6}
+  .t-open{grid-column:span 12}
+  .t-year,.t-30,.t-open{gap:10px}
+  .t-year .num-serif,.t-30 .num-serif,.t-open .num-serif{font-size:clamp(24px,7.4vw,34px)}
+  .t-year .ic-c,.t-30 .ic-c,.t-open .ic-c{display:none}
+  .t-salary .tile-head .sub{display:none}
+  .t-salary .tile-head .btn{margin-left:auto}
+  .sal-kpis{gap:14px 18px}
+  .sal-kpis .num-serif{font-size:clamp(22px,6.6vw,30px);margin-top:6px}
+  .sal-bar{margin:18px 0 12px}
+
+  /* Zahlungsliste: erst 5, Rest per Knopf */
+  #upcoming{margin-top:16px}
+  #upcoming:not(.all) .up.more{display:none}
+  #upcoming .up:nth-child(5){border-bottom:0}
+  #upcoming.all .up:nth-child(5){border-bottom:1px solid var(--line)}
+  .up-toggle{display:inline-flex;margin-top:10px;grid-column:1/-1;justify-self:start}
+
+  /* Spartipps: Ersparnis unter den Text statt daneben */
+  .tip{flex-direction:column;gap:4px;padding:14px 0}
+
+  /* Liste „Alle Abos“ als Karten statt Tabelle */
+  .section-head .h-display{margin-bottom:18px}
+  .table-card{padding:16px 18px}
+  .toolbar{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .toolbar input{grid-column:1/-1;min-width:0;width:100%}
+  .toolbar select{width:100%;min-width:0}
+  .table-card thead{display:none}
+  #rows tr{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"name price" "next actions";gap:8px 12px;padding:14px 0;border-bottom:1px solid var(--line)}
+  #rows tr:last-child{border-bottom:0}
+  #rows td{display:block;padding:0;border:0}
+  #rows td.hide-m{display:none}
+  #rows td:nth-child(1){grid-area:name;min-width:0}
+  #rows td:nth-child(2){grid-area:price;text-align:right}
+  #rows td:nth-child(4){grid-area:next;align-self:end;font-size:14px}
+  #rows td:nth-child(6){grid-area:actions;align-self:end}
+  #rows .prog{max-width:none}
+
+  /* Dialoge als Blatt von unten, Kopf und Fußzeile bleiben beim Scrollen sichtbar */
+  dialog,dialog.wide,#dlgSalary{width:100%;max-width:100%;max-height:calc(100dvh - 24px);margin:auto 0 0;border-radius:24px 24px 0 0;
+    border-bottom:0;background:var(--card);-webkit-backdrop-filter:none;backdrop-filter:none}
+  dialog[open]{animation:sheetIn .35s var(--ease-out)}
+  form.f,.box,form.sal{padding:20px 18px calc(16px + env(safe-area-inset-bottom))}
+  form.f{gap:12px}
+  form.f h2{position:sticky;top:-20px;z-index:2;background:var(--card);margin:-20px -18px 0;padding:20px 18px 10px}
+  .box .dhead,form.sal .dhead{position:sticky;top:-20px;z-index:2;background:var(--card);margin:-20px -18px 8px;padding:16px 18px 10px;border-bottom:1px solid var(--line)}
+  form.f .foot,form.sal .foot{position:sticky;bottom:calc(-16px - env(safe-area-inset-bottom));z-index:2;background:var(--card);
+    margin:4px -18px calc(-16px - env(safe-area-inset-bottom));padding:12px 18px calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--line)}
+  form.f .foot .btn,form.sal .foot .btn{flex:1}
+  .sal-sum{display:flex;flex-direction:column;justify-content:center;font-size:12.5px;color:var(--muted);line-height:1.35;flex:1.4;min-width:0}
+  .sal-sum b{color:var(--text);font-family:var(--f-head)}
+  .sal-sum:empty{display:none}
+  .sal-out{padding:14px}
+  .sal-out{padding:12px 12px 12px 14px}
+  .sal-tab th,.sal-tab td{font-size:12.5px}
+  .sal-tab td{padding-left:8px}
+  .sal-tab .sub th{padding-left:6px}
+  .sal-tab small{font-size:11px;display:block}
+  .sal-tab th{hyphens:auto;overflow-wrap:anywhere}
+  .sal-tab tr.net th,.sal-tab tr.net td{font-size:14px}
+  /* Ratenkäufe: Kennzahlen zweispaltig */
+  .inst-sum{justify-content:center}
+  .inst-stats{grid-template-columns:1fr 1fr;min-width:0;flex-basis:100%;gap:12px 14px}
+  .inst-stats .val{font-size:16px}
+  .ach-grid{grid-template-columns:1fr}
+}
+@keyframes sheetIn{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
+@media (max-width:420px){
+  .brand-txt{display:none}
+}

@@ -224,9 +224,12 @@ function render() {
     <div class="bar-track"><div class="bar-fill" style="width:${(v / max * 100).toFixed(1)}%;background:${catColor(c)}"></div></div>
     <span class="amt">${mb(v)}</span></div>`).join("") : `<div class="muted">Keine Daten.</div>`;
 
-  $("#upcoming").innerHTML = soon.length ? soon.map(s => `
-    <div class="up"><div><div class="name">${esc(s.name)}</div><div class="muted" style="font-size:13px">${fmtDate(s.next)} · ${whenText(s.inDays)}</div></div>
-    <div style="font-variant-numeric:tabular-nums;font-family:var(--f-head);font-weight:700">${money(s.due, s.currency)}</div></div>`).join("") : `<div class="muted">Keine Zahlungen in den nächsten 30 Tagen.</div>`;
+  const UP_SHORT = 5;
+  $("#upcoming").innerHTML = soon.length ? soon.map((s, i) => `
+    <div class="up${i >= UP_SHORT ? " more" : ""}"><div><div class="name">${esc(s.name)}</div><div class="muted" style="font-size:13px">${fmtDate(s.next)} · ${whenText(s.inDays)}</div></div>
+    <div style="font-variant-numeric:tabular-nums;font-family:var(--f-head);font-weight:700">${money(s.due, s.currency)}</div></div>`).join("")
+    + (soon.length > UP_SHORT ? `<button class="btn small up-toggle" type="button">Alle ${soon.length} Zahlungen anzeigen</button>` : "")
+    : `<div class="muted">Keine Zahlungen in den nächsten 30 Tagen.</div>`;
   renderTimeline(soon);
 
   const cats = [...new Set(subs.map(catName))].sort((a, b) => a.localeCompare(b, "de"));
@@ -505,6 +508,11 @@ function renderSalary(perMonth) {
     <div class="mix-leg">${parts.map(([c, l, v]) => `<span><i class="${c}"></i>${esc(l)} ${esc(eur(v))}</span>`).join("")}</div>
     ${settings.base !== "EUR" ? `<p class="muted small" style="margin-bottom:0">Gehalt in Euro; Abos aus ${esc(settings.base)} umgerechnet.</p>` : ""}`;
 }
+$("#upcoming").addEventListener("click", e => {
+  const b = e.target.closest(".up-toggle"); if (!b) return;
+  const all = $("#upcoming").classList.toggle("all");
+  b.textContent = all ? "Weniger anzeigen" : `Alle ${$("#upcoming").querySelectorAll(".up").length} Zahlungen anzeigen`;
+});
 $("#tSalary").addEventListener("click", e => { if (e.target.closest("[data-salary]")) openSalary(); });
 
 const dlgSal = $("#dlgSalary"), salForm = $("#salForm"), se = salForm.elements;
@@ -540,8 +548,10 @@ function syncSalForm() {
 // Ergebnis wie bei BruNo: Monat und Jahr nebeneinander, darunter die Fixkosten aus den Abos
 function renderSalOut(v) {
   const out = $("#salOut");
-  if (!(v.gross > 0)) { out.innerHTML = `<p class="muted small" style="margin:0">Gib dein Bruttogehalt ein – das Ergebnis erscheint sofort hier.</p>`; return; }
+  const sum = $("#salSum");
+  if (!(v.gross > 0)) { out.innerHTML = `<p class="muted small" style="margin:0">Gib dein Bruttogehalt ein – das Ergebnis erscheint sofort hier.</p>`; sum.textContent = ""; return; }
   const r = calcSalary(v), m = r.month, y = r.year, fix = fixedMonthlyEur(), left = leftover(m.net, fix).left;
+  sum.innerHTML = `<span>Netto <b>${eur(m.net)}</b></span><span>Übrig <b>${eur(left)}</b></span>`;
   const row = (label, k, cls = "") => `<tr class="${cls}"><th>${label}</th><td>${eur(m[k])}</td><td>${eur(y[k])}</td></tr>`;
   const rate = x => (x ? ` <small>${pctFmt(x)}</small>` : "");
   const pkv = v.kv === "pkv";
@@ -746,7 +756,7 @@ form.addEventListener("submit", e => {
   save(); dlg.close(); render(); maybeRefreshRates();
 });
 $("#btnCancel").onclick = () => dlg.close();
-$("#btnAdd").onclick = () => openDlg();
+$("#btnAdd").onclick = $("#btnAddFab").onclick = () => openDlg();
 const curOptions = CURRENCIES.map(c => `<option>${c}</option>`).join("");
 form.elements.currency.innerHTML = curOptions;
 $("#setBase").innerHTML = curOptions;
@@ -1176,14 +1186,16 @@ const SRV_STATUS = { ok: ["Synchronisiert", "ok"], saving: ["Speichert …", ""]
 function renderServerSync() {
   const st = Vault.store, [label, cls] = SRV_STATUS[st.status] || SRV_STATUS.ok, b = $("#btnSync");
   b.hidden = false; b.className = "btn pill " + cls;
-  b.innerHTML = `<span class="ic">${ICON.cloud}</span><span>${label}</span>`;
+  b.innerHTML = `<span class="ic">${ICON.cloud}</span><span class="lbl-m">${label}</span>`;
+  b.setAttribute("aria-label", label);
   b.title = st.message || (st.status === "ok" ? "Mit dem Server abgeglichen. Klicken = jetzt abgleichen." : "");
 }
 function renderSync() {
   if (Vault.mode === "server") return renderServerSync();
   const L = { off: ["☁ Sync aus", ""], ok: ["☁ Sync aktiv", "ok"], "needs-permission": ["☁ Sync fortsetzen", "warn"], error: ["☁ Sync-Fehler", "err"] }[syncState];
   const b = $("#btnSync");
-  b.hidden = false; b.innerHTML = `<span class="ic">${ICON.cloud}</span><span>${L[0].replace("☁ ", "")}</span>`; b.className = "btn pill " + L[1];
+  b.hidden = false; b.innerHTML = `<span class="ic">${ICON.cloud}</span><span class="lbl-m">${L[0].replace("☁ ", "")}</span>`; b.className = "btn pill " + L[1];
+  b.setAttribute("aria-label", L[0].replace("☁ ", ""));
   renderSyncPanel();
 }
 function syncForm(sel) {
