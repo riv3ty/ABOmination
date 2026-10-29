@@ -41,7 +41,7 @@
 - **Your own lists & a calculator** – create bank accounts, providers and payment methods once and pick them from a dropdown; a built-in calculator puts results straight into the price field.
 - **Never miss a deadline** – reminders before payments and cancellation deadlines (mark a payment as *already paid* with one click), calendar export (`.ics`) for Outlook, Google and Apple, and end-to-end encrypted push notifications with your own server.
 - **Bank statement import** – recurring payments are detected automatically in CSV exports.
-- **Savings tips** – rarely used, duplicated or overlapping subscriptions and cheaper yearly plans.
+- **Savings tips & deals** – rarely used, duplicated or overlapping subscriptions, cheaper yearly plans, current MyDealz deals for your subscriptions and a price search that opens Idealo, Geizhals and MyDealz.
 - **Privacy by design** – AES-256-GCM encryption in the browser, no tracking, no third-party requests.
 - **Runs everywhere** – single HTML file, self-hosted Docker server with accounts and sync, installable PWA that works offline. A native Android app is planned.
 

@@ -11,6 +11,7 @@ export const TILES = [
   { id: "tAccts", label: "Abgänge pro Bankkonto", size: 7 },
   { id: "optTile", label: "Optimierung", size: 7 },
   { id: "achTile", label: "Errungenschaften", size: 5 },
+  { id: "dealTile", label: "Angebote & Preissuche", size: 12 },
   { id: "instCard", label: "Ratenkäufe", size: 12 }
 ];
 export const SIZES = [4, 6, 8, 12];                 // ⅓ · ½ · ⅔ · ganz

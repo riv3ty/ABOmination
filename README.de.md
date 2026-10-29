@@ -40,7 +40,7 @@
 - **Eigene Listen & Taschenrechner** – Bankkonten, Anbieter und Zahlungsmittel einmal anlegen und im Auswahlmenü wählen; der eingebaute Rechner übernimmt Ergebnisse direkt ins Preisfeld.
 - **Keine Frist verpassen** – Hinweise vor Zahlungen und Kündigungsfristen (mit einem Klick als *bereits bezahlt* markieren), Kalender-Export (`.ics`) für Outlook, Google und Apple sowie Ende-zu-Ende-verschlüsselte Push-Benachrichtigungen mit eigenem Server.
 - **Kontoauszug-Import** – wiederkehrende Zahlungen werden in CSV-Exporten automatisch erkannt.
-- **Spartipps** – selten genutzte, doppelte oder überlappende Abos und günstigere Jahrestarife.
+- **Spartipps & Angebote** – selten genutzte, doppelte oder überlappende Abos, günstigere Jahrestarife, aktuelle MyDealz-Deals zu deinen Abos und eine Preissuche mit Direktlinks zu Idealo, Geizhals und MyDealz.
 - **Datenschutz eingebaut** – AES-256-GCM-Verschlüsselung im Browser, kein Tracking, keine Anfragen an Dritte.
 - **Läuft überall** – eine einzige HTML-Datei, eigener Docker-Server mit Konten und Abgleich, installierbare App (PWA), auch offline. Eine native Android-App ist geplant.
 

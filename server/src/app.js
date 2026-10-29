@@ -13,6 +13,7 @@ import authRoutes from "./routes/auth.js";
 import vaultRoutes from "./routes/vault.js";
 import ratesRoutes from "./routes/rates.js";
 import pushRoutes from "./routes/push.js";
+import dealsRoutes from "./routes/deals.js";
 import { vapidKeys, makeSender, startScheduler } from "./push.js";
 
 export const VERSION = JSON.parse(fs.readFileSync(new URL("../../package.json", import.meta.url), "utf8")).version;   // eine Quelle für die Versionsnummer
@@ -79,6 +80,7 @@ export async function buildApp({ config, db, logger = { level: config.logLevel }
   await app.register(ratesRoutes, { fetchImpl });
   const keys = vapidKeys(db), send = pushSend || makeSender(keys, config.pushSubject);
   await app.register(pushRoutes, { db, keys, send });
+  await app.register(dealsRoutes, { fetchImpl, version: VERSION });
 
   // Web-App ausliefern (dist/ aus dem Build), falls vorhanden
   const index = path.join(config.staticDir, "index.html");

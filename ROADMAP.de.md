@@ -11,6 +11,7 @@ Wohin sich ABOmination entwickelt. Prioritäten können sich ändern – Ideen u
 
 ## ✅ Erledigt
 
+- **Angebote & Preissuche** – Aktuelle MyDealz-Deals passend zu deinen Abos, dazu eine Produktsuche mit Direktlinks zu Idealo, Geizhals und MyDealz.
 - **Push-Benachrichtigungen** – Erinnerungen auch bei geschlossener App – der Server stellt sie nur zu und kann sie nicht lesen.
 - **Dashboard nach Wunsch** – Kacheln ein- und ausblenden und per Ziehen nach Vorliebe anordnen.
 - **Eigene Listen: Konten, Anbieter & Zahlungsmittel** – Bankkonten, Anbieter und Zahlungsmittel einmal anlegen und danach nur noch im Auswahlmenü wählen.
@@ -27,7 +28,6 @@ Wohin sich ABOmination entwickelt. Prioritäten können sich ändern – Ideen u
 
 ## 🚧 In Arbeit
 
-- **Angebote & Preissuche** – Aktuelle MyDealz-Deals passend zu deinen Abos, dazu eine Produktsuche mit Direktlinks zu Idealo, Geizhals und MyDealz.
 
 ## ⏭️ Als Nächstes
 

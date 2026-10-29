@@ -28,7 +28,7 @@ docker compose ps                             # Status sollte nach ~10 s "health
 curl -s http://127.0.0.1:8080/api/health      # {"ok":true,...}
 ```
 
-Eine feste Version statt `latest`: in `.env` z. B. `ABO_VERSION=0.8.0` eintragen.
+Eine feste Version statt `latest`: in `.env` z. B. `ABO_VERSION=0.9.0` eintragen.
 
 ### Variante B: selbst bauen
 
@@ -193,5 +193,5 @@ docker compose start app
 - Der Container läuft als unprivilegierter Benutzer, mit schreibgeschütztem Dateisystem (außer `/data`), ohne Zusatzrechte.
 - Nur `authKey`-Hashes (scrypt) und verschlüsselte Tresore liegen auf dem Server; Passwort und Datenschlüssel verlassen das Gerät nie.
 - Sperre nach Fehlversuchen, Rate-Limits, begrenzte parallele Passwortprüfungen, CSRF-Schutz, strenge Content-Security-Policy.
-- Keine Aufrufe fremder Dienste aus dem Browser: Schriften sind eingebettet, Wechselkurse holt der Server (ausgehend zu `api.frankfurter.dev` und für Push-Benachrichtigungen zu den Push-Diensten der Browser).
+- Keine Aufrufe fremder Dienste aus dem Browser: Schriften sind eingebettet, Wechselkurse holt der Server (ausgehend zu `api.frankfurter.dev`, für Push-Benachrichtigungen zu den Push-Diensten der Browser und – wenn Angebote eingeschaltet sind – zu `www.mydealz.de`).
 - Details zum Protokoll: [server/API.de.md](server/API.de.md).

@@ -16,6 +16,8 @@ import { mergeAch } from "./lib/merge.js";
 import { evaluate, formatNumber } from "./lib/calc.js";
 import { pushSupported, needsInstall, newPushKey, storeDeviceKey, currentSubscription, enablePush, disablePush, pushStatus, uploadSchedule, sendTest } from "./push.js";
 import { buildPushPlan } from "./lib/pushplan.js";
+import { groupsForSubs, pickDeals, searchDeals, searchLinks } from "./lib/deals.js";
+import { api as dealsApi } from "./server/store.js";
 import { TILES, SIZE_LABEL, defaultLayout, normalizeLayout, isDefault, sizeOf, move, toggleHidden, cycleSize } from "./lib/layout.js";
 import { LIST_TYPES, emptyLists, normalizeLists, seedFromSubs, namesOf, addItem, renameItem, removeItem, usageCount, renameInSubs, cleanName } from "./lib/lists.js";
 import { calcSalary, sanitizeIncome, leftover, STATES, SALARY_YEAR, INCOME_DEFAULT } from "./lib/salary.js";
@@ -289,6 +291,7 @@ function render() {
 
   checkReminders();
   checkAchievements(subs, all);
+  renderDeals(); maybeLoadDeals();
   applyLayout();
 }
 
@@ -1599,6 +1602,7 @@ const ICON = {
   coins: svg('<ellipse cx="9" cy="6" rx="6" ry="2.5"/><path d="M3 6v4c0 1.4 2.7 2.5 6 2.5s6-1.1 6-2.5V6"/><path d="M3 10v4c0 1.4 2.7 2.5 6 2.5"/><ellipse cx="17" cy="15" rx="4" ry="1.8"/><path d="M13 15v3.2c0 1 1.8 1.8 4 1.8s4-.8 4-1.8V15"/>'),
   calc: svg('<rect x="5" y="3" width="14" height="18" rx="3"/><path d="M8.5 7.5h7"/><path d="M9 12h.01M12 12h.01M15 12h.01M9 15.5h.01M12 15.5h.01M15 15.5h.01M9 19h.01M12 19h.01"/>'),
   grid: svg('<rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/>'),
+  tag: svg('<path d="M3 12V4.5A1.5 1.5 0 0 1 4.5 3H12l9 9-9 9z"/><circle cx="7.5" cy="7.5" r="1.4"/>'),
   gear: svg('<circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1"/>')
 };
 // Zeitleiste der nächsten 30 Tage: Punkte nach Tagen positioniert, Karten auf 3 Bahnen verteilt (überlappungsarm)
@@ -1635,6 +1639,79 @@ function renderAchTile() {
     </div>`;
 }
 $("#achTile").addEventListener("click", e => { if (e.target.closest("[data-open-ach]")) $("#btnAch").click(); });
+
+/* ================= Angebote & Preissuche (lib/deals.js, Server: /api/deals) ================= */
+let deals = { key: "", at: 0, resp: null, loading: false, error: "" }, dealQuery = "", dealMore = false;
+const DEALS_TTL = 30 * 60000;
+const ago = ms => {
+  const h = Math.round((Date.now() - ms) / 3600000);
+  return h < 1 ? "gerade eben" : h < 24 ? `vor ${h} Std.` : h < 48 ? "gestern" : `vor ${Math.round(h / 24)} Tagen`;
+};
+// Deals laden, wenn eingeschaltet und (neue Abo-Gruppen oder Stand älter als 30 Minuten)
+async function maybeLoadDeals(force = false) {
+  if (Vault.mode !== "server" || !settings.deals || deals.loading) return;
+  const groups = groupsForSubs(view()), key = groups.map(g => g.slug).join(",");
+  if (!force && key === deals.key && Date.now() - deals.at < DEALS_TTL) return;
+  deals.loading = true; deals.error = ""; renderDeals();
+  try {
+    const resp = await dealsApi("GET", "/api/deals?groups=" + encodeURIComponent(key));
+    deals = { key, at: Date.now(), resp, groups, loading: false, error: "" };
+  } catch (e) { deals.loading = false; deals.error = e.message || "Angebote konnten nicht geladen werden."; deals.at = Date.now(); }
+  renderDeals();
+}
+const dealRow = d => `<a class="deal" href="${esc(d.url)}" target="_blank" rel="noopener noreferrer">
+    <span class="deal-t">${esc(d.title)}</span>
+    <span class="deal-m">${[d.merchant, d.for ? "passt zu " + d.for : d.category, d.date ? ago(d.date) : ""].filter(Boolean).map(esc).join(" · ")}</span>
+    ${d.price ? `<b class="deal-p">${esc(d.price)}</b>` : ""}</a>`;
+function renderDeals() {
+  const el = $("#dealTile"); if (!el) return;
+  // Wird neu gezeichnet, während jemand im Suchfeld tippt: Text und Cursor behalten
+  const typing = document.activeElement?.id === "dealQ" ? { v: $("#dealQ").value, pos: $("#dealQ").selectionStart } : null;
+  const srv = Vault.mode === "server";
+  let body;
+  if (!srv) body = `<p class="muted small">Passende Deals zu deinen Abos gibt es mit einem Server-Konto. Die Preissuche öffnet Idealo, Geizhals oder MyDealz direkt.</p>`;
+  else if (!settings.deals) body = `<div class="deal-optin"><p class="muted small">Aktuelle Deals von MyDealz zu deinen Abos anzeigen, z. B. günstigere Streaming- oder Handytarife. Dein Server lädt dafür passende Kategorien bei MyDealz; welche Abos du hast, erfährt MyDealz nicht.</p>
+      <button class="btn small primary" type="button" data-deals="on">Deals zu meinen Abos anzeigen</button></div>`;
+  else if (deals.loading && !deals.resp) body = `<p class="muted small">Lade Angebote …</p>`;
+  else if (deals.error && !deals.resp) body = `<p class="muted small">${esc(deals.error)} <button class="linkbtn" type="button" data-deals="reload">Erneut versuchen</button></p>`;
+  else {
+    const mine = pickDeals(deals.resp, deals.groups || []), shown = mine.slice(0, dealMore ? 15 : 5);
+    const top = (deals.resp?.trending || []).slice(0, 5);
+    body = (mine.length
+      ? `<div class="eyebrow deal-h">Passend zu deinen Abos</div><div class="deal-list">${shown.map(dealRow).join("")}</div>`
+        + (mine.length > 5 ? `<button class="btn small" type="button" data-deals="more">${dealMore ? "Weniger anzeigen" : `Alle ${Math.min(15, mine.length)} anzeigen`}</button>` : "")
+      : `<p class="muted small">Gerade keine Deals zu deinen Abos.</p>`)
+      + (top.length ? `<div class="eyebrow deal-h">Gerade beliebt bei MyDealz</div><div class="deal-list">${top.map(dealRow).join("")}</div>` : "")
+      + `<p class="muted small deal-foot">Quelle: MyDealz · Stand ${new Date(deals.at).toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })}
+        · <button class="linkbtn" type="button" data-deals="reload">aktualisieren</button> · <button class="linkbtn" type="button" data-deals="off">ausschalten</button></p>`;
+  }
+  // Preissuche: Treffer aus den geladenen Deals + Direktlinks zu den Vergleichsportalen
+  const pool = deals.resp ? [...pickDeals(deals.resp, deals.groups || []), ...(deals.resp.trending || [])] : [];
+  const hits = dealQuery ? searchDeals(pool, dealQuery).slice(0, 5) : [];
+  const search = `<form class="deal-search" role="search" data-deal-search>
+      <input type="search" id="dealQ" placeholder="Produkt suchen, z. B. AirPods Pro" maxlength="100" value="${esc(dealQuery)}" aria-label="Produkt suchen">
+      <button class="btn small" type="submit">Preise vergleichen</button></form>
+    ${dealQuery ? `<div class="deal-links">${searchLinks(dealQuery).map(l => `<a class="btn small" href="${esc(l.url)}" target="_blank" rel="noopener noreferrer">${esc(l.label)} ↗</a>`).join("")}</div>
+      ${hits.length ? `<div class="deal-list">${hits.map(dealRow).join("")}</div>` : srv && settings.deals ? `<p class="muted small">Unter den geladenen Deals kein Treffer – die Links oben suchen im ganzen Angebot.</p>` : ""}` : ""}`;
+  el.innerHTML = `<div class="tile-head"><span class="ic-c">${ICON.tag}</span><h2>Angebote &amp; Preissuche</h2><span class="sub">MyDealz · Idealo · Geizhals</span></div>
+    <div class="deal-grid"><div class="deal-main">${body}</div><div class="deal-side">${search}</div></div>`;
+  if (typing) { const q = $("#dealQ"); q.value = typing.v; q.focus(); q.setSelectionRange(typing.pos, typing.pos); }
+  if (editing) applyLayout();
+}
+$("#dealTile").addEventListener("click", e => {
+  const b = e.target.closest("[data-deals]"); if (!b) return;
+  const a = b.dataset.deals;
+  if (a === "on" || a === "off") { settings.deals = a === "on"; saveSettings(); if (a === "off") deals = { key: "", at: 0, resp: null, loading: false, error: "" }; renderDeals(); maybeLoadDeals(true); }
+  else if (a === "reload") maybeLoadDeals(true);
+  else if (a === "more") { dealMore = !dealMore; renderDeals(); }
+});
+$("#dealTile").addEventListener("submit", e => {
+  if (!e.target.closest("[data-deal-search]")) return;
+  e.preventDefault();
+  dealQuery = $("#dealQ").value.trim().slice(0, 100);
+  renderDeals();
+  $("#dealQ")?.focus();
+});
 
 /* ================= Dashboard nach Wunsch (lib/layout.js) ================= */
 let editing = false;

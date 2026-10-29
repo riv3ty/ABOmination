@@ -10,6 +10,16 @@
       "items": [
         {
           "en": [
+            "Deals & price search",
+            "Current MyDealz deals for your subscriptions, plus a product search that opens Idealo, Geizhals and MyDealz."
+          ],
+          "de": [
+            "Angebote & Preissuche",
+            "Aktuelle MyDealz-Deals passend zu deinen Abos, dazu eine Produktsuche mit Direktlinks zu Idealo, Geizhals und MyDealz."
+          ]
+        },
+        {
+          "en": [
             "Push notifications",
             "Reminders even with the app closed – the server only delivers them and cannot read them."
           ],
@@ -146,18 +156,7 @@
         "en": "In progress",
         "de": "In Arbeit"
       },
-      "items": [
-        {
-          "en": [
-            "Deals & price search",
-            "Current MyDealz deals for your subscriptions, plus a product search that opens Idealo, Geizhals and MyDealz."
-          ],
-          "de": [
-            "Angebote & Preissuche",
-            "Aktuelle MyDealz-Deals passend zu deinen Abos, dazu eine Produktsuche mit Direktlinks zu Idealo, Geizhals und MyDealz."
-          ]
-        }
-      ]
+      "items": []
     },
     {
       "id": "next",

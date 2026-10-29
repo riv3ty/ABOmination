@@ -11,6 +11,7 @@ Where ABOmination is heading. Priorities can change – ideas and feedback are w
 
 ## ✅ Shipped
 
+- **Deals & price search** – Current MyDealz deals for your subscriptions, plus a product search that opens Idealo, Geizhals and MyDealz.
 - **Push notifications** – Reminders even with the app closed – the server only delivers them and cannot read them.
 - **Customizable dashboard** – Show, hide and rearrange the tiles the way you like.
 - **Your own lists: accounts, providers & payment methods** – Create bank accounts, providers and payment methods once and pick them from a dropdown.
@@ -27,7 +28,6 @@ Where ABOmination is heading. Priorities can change – ideas and feedback are w
 
 ## 🚧 In progress
 
-- **Deals & price search** – Current MyDealz deals for your subscriptions, plus a product search that opens Idealo, Geizhals and MyDealz.
 
 ## ⏭️ Next
 

@@ -44,6 +44,7 @@ Es gibt **keinen Passwort-Reset**: ohne Passwort ist der Tresor nicht zu entschl
 | DELETE | `/api/account` | `{ authKey }` | 204 (Konto + Tresor gelöscht) |
 | GET | `/api/vault` | – | `{ version, updatedAt, blob }` |
 | PUT | `/api/vault` | `{ blob, baseVersion }` | `{ version, updatedAt }` oder **409** `{ error: "conflict", version, updatedAt, blob }` |
+| GET | `/api/deals?groups=a,b` | – | `{ trending, groups: { a: [...] }, fetchedAt }` – MyDealz-RSS (beliebt + bis zu 12 Gruppen), 30 min zwischengespeichert; Einträge `{ title, url, price, merchant, category, date }` |
 | GET | `/api/push/key` | – | `{ publicKey }` (VAPID, für `pushManager.subscribe`) |
 | GET | `/api/push/status` | – | `{ devices: [{ endpoint, label, createdAt, lastOk }], queued, next }` |
 | POST | `/api/push/subscribe` | `{ endpoint, keys: { p256dh, auth }, label? }` | `{ ok }` – nur Adressen bekannter Push-Dienste der Browser; höchstens 10 Geräte |

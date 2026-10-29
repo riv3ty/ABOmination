@@ -21,6 +21,7 @@ export function sanitizeSettings(s) {
   if (typeof s.notif === "boolean") out.notif = s.notif;
   if (AUTOLOCK.includes(s.autoLock)) out.autoLock = s.autoLock;
   if (int(s.pushHour, 0, 23)) out.pushHour = s.pushHour;
+  if (typeof s.deals === "boolean") out.deals = s.deals;
   if (s.layout && !isDefault(s.layout)) out.layout = normalizeLayout(s.layout);
   return Object.keys(out).length ? out : null;
 }

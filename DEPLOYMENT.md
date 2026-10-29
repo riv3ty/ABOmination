@@ -30,7 +30,7 @@ docker compose ps                             # should be "healthy" after ~10 s
 curl -s http://127.0.0.1:8080/api/health      # {"ok":true,...}
 ```
 
-To pin a version instead of `latest`, set e.g. `ABO_VERSION=0.8.0` in `.env`.
+To pin a version instead of `latest`, set e.g. `ABO_VERSION=0.9.0` in `.env`.
 
 ### Option B: build it yourself
 
@@ -195,5 +195,5 @@ docker compose start app
 - The container runs as an unprivileged user with a read-only filesystem (except `/data`) and no extra capabilities.
 - Only `authKey` hashes (scrypt) and encrypted vaults are stored on the server; password and data key never leave the device.
 - Brute-force lockout, rate limits, limited parallel password checks, CSRF protection, strict Content-Security-Policy.
-- No third-party requests from the browser: fonts are embedded, exchange rates are fetched by the server (outbound to `api.frankfurter.dev` and, for push notifications, to the browsers' push services).
+- No third-party requests from the browser: fonts are embedded, exchange rates are fetched by the server (outbound to `api.frankfurter.dev`, for push notifications to the browsers' push services and, if deals are switched on, to `www.mydealz.de`).
 - Protocol details: [server/API.md](server/API.md).

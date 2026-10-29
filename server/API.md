@@ -44,6 +44,7 @@ There is **no password reset**: without the password the vault cannot be decrypt
 | DELETE | `/api/account` | `{ authKey }` | 204 (account and vault deleted) |
 | GET | `/api/vault` | – | `{ version, updatedAt, blob }` |
 | PUT | `/api/vault` | `{ blob, baseVersion }` | `{ version, updatedAt }` or **409** `{ error: "conflict", version, updatedAt, blob }` |
+| GET | `/api/deals?groups=a,b` | – | `{ trending, groups: { a: [...] }, fetchedAt }` – MyDealz RSS (trending + up to 12 groups), cached 30 min; items `{ title, url, price, merchant, category, date }` |
 | GET | `/api/push/key` | – | `{ publicKey }` (VAPID, for `pushManager.subscribe`) |
 | GET | `/api/push/status` | – | `{ devices: [{ endpoint, label, createdAt, lastOk }], queued, next }` |
 | POST | `/api/push/subscribe` | `{ endpoint, keys: { p256dh, auth }, label? }` | `{ ok }` – only endpoints of known browser push services; max. 10 devices |
