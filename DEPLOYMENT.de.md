@@ -28,7 +28,7 @@ docker compose ps                             # Status sollte nach ~10 s "health
 curl -s http://127.0.0.1:8080/api/health      # {"ok":true,...}
 ```
 
-Eine feste Version statt `latest`: in `.env` z. B. `ABO_VERSION=0.7.0` eintragen.
+Eine feste Version statt `latest`: in `.env` z. B. `ABO_VERSION=0.8.0` eintragen.
 
 ### Variante B: selbst bauen
 
@@ -125,6 +125,10 @@ Android (Chrome): `https://abo.example.de` öffnen → Menü ⋮ → **App insta
 iPhone (Safari): Teilen → **Zum Home-Bildschirm**.
 Die installierte App startet auch ohne Netz (Anmeldung dann mit der verschlüsselten Offline-Kopie).
 
+### Push-Benachrichtigungen
+
+In der App: *Einstellungen → Push-Benachrichtigungen → Auf diesem Gerät aktivieren*, danach eine Testnachricht senden. Voraussetzungen: HTTPS (über deinen Reverse Proxy) und ausgehender Zugriff des Containers auf die Push-Dienste der Browser (`fcm.googleapis.com`, `*.push.services.mozilla.com`, `*.push.apple.com`, `*.notify.windows.com`). Auf iPhone/iPad funktioniert Push nur in der zum Home-Bildschirm hinzugefügten App (ab iOS 16.4). Optional in `.env` `PUSH_SUBJECT` auf eine Kontaktadresse setzen (`mailto:du@example.de`), über die Push-Dienste den Betreiber erreichen können.
+
 ## 5. Verwaltung
 
 ```bash
@@ -189,5 +193,5 @@ docker compose start app
 - Der Container läuft als unprivilegierter Benutzer, mit schreibgeschütztem Dateisystem (außer `/data`), ohne Zusatzrechte.
 - Nur `authKey`-Hashes (scrypt) und verschlüsselte Tresore liegen auf dem Server; Passwort und Datenschlüssel verlassen das Gerät nie.
 - Sperre nach Fehlversuchen, Rate-Limits, begrenzte parallele Passwortprüfungen, CSRF-Schutz, strenge Content-Security-Policy.
-- Keine Aufrufe fremder Dienste aus dem Browser: Schriften sind eingebettet, Wechselkurse holt der Server (ausgehend nur zu `api.frankfurter.dev`).
+- Keine Aufrufe fremder Dienste aus dem Browser: Schriften sind eingebettet, Wechselkurse holt der Server (ausgehend zu `api.frankfurter.dev` und für Push-Benachrichtigungen zu den Push-Diensten der Browser).
 - Details zum Protokoll: [server/API.de.md](server/API.de.md).

@@ -25,5 +25,6 @@ Sicherheitskorrekturen gibt es nur für den aktuellen Stand auf `main` (und das 
 ## Überblick über das Sicherheitskonzept
 
 - Daten werden im Browser verschlüsselt (PBKDF2-SHA256 600k → HKDF → AES-256-GCM); der Server speichert nur Chiffretext und `scrypt(authKey)`.
+- Auch Push-Benachrichtigungen sind Ende-zu-Ende-verschlüsselt: Der Server erfährt nur, *wann* eine Erinnerung fällig ist und über welchen Push-Dienst sie zugestellt wird, nie den Text.
 - Sitzungen: httpOnly-/SameSite=Strict-Cookies mit CSRF-Header oder Bearer-Tokens für Apps; gespeichert als SHA-256-Hashes.
 - Schutz vor Passwort-Raten, Rate-Limits, strenge Content-Security-Policy, Container ohne Root-Rechte und mit schreibgeschütztem Dateisystem.

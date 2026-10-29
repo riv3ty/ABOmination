@@ -30,7 +30,7 @@ docker compose ps                             # should be "healthy" after ~10 s
 curl -s http://127.0.0.1:8080/api/health      # {"ok":true,...}
 ```
 
-To pin a version instead of `latest`, set e.g. `ABO_VERSION=0.7.0` in `.env`.
+To pin a version instead of `latest`, set e.g. `ABO_VERSION=0.8.0` in `.env`.
 
 ### Option B: build it yourself
 
@@ -127,6 +127,10 @@ Android (Chrome): open `https://abo.example.com` → menu ⋮ → **Install app*
 iPhone (Safari): Share → **Add to Home Screen**.
 The installed app also starts offline (login then uses the encrypted offline copy).
 
+### Push notifications
+
+In the app: „Einstellungen → Push-Benachrichtigungen → Auf diesem Gerät aktivieren“ (settings → push notifications → enable on this device), then send a test message. Requirements: HTTPS (your reverse proxy), outbound access from the container to the browsers' push services (`fcm.googleapis.com`, `*.push.services.mozilla.com`, `*.push.apple.com`, `*.notify.windows.com`). On iPhone/iPad, push only works in the app added to the home screen (iOS 16.4+). Optionally set `PUSH_SUBJECT` in `.env` to a contact (`mailto:you@example.com`) that push services can use to reach the operator.
+
 ## 5. Administration
 
 ```bash
@@ -191,5 +195,5 @@ docker compose start app
 - The container runs as an unprivileged user with a read-only filesystem (except `/data`) and no extra capabilities.
 - Only `authKey` hashes (scrypt) and encrypted vaults are stored on the server; password and data key never leave the device.
 - Brute-force lockout, rate limits, limited parallel password checks, CSRF protection, strict Content-Security-Policy.
-- No third-party requests from the browser: fonts are embedded, exchange rates are fetched by the server (outbound only to `api.frankfurter.dev`).
+- No third-party requests from the browser: fonts are embedded, exchange rates are fetched by the server (outbound to `api.frankfurter.dev` and, for push notifications, to the browsers' push services).
 - Protocol details: [server/API.md](server/API.md).

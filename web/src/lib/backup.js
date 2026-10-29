@@ -20,6 +20,7 @@ export function sanitizeSettings(s) {
   if (int(s.noticeRemind, 0, 60)) out.noticeRemind = s.noticeRemind;
   if (typeof s.notif === "boolean") out.notif = s.notif;
   if (AUTOLOCK.includes(s.autoLock)) out.autoLock = s.autoLock;
+  if (int(s.pushHour, 0, 23)) out.pushHour = s.pushHour;
   if (s.layout && !isDefault(s.layout)) out.layout = normalizeLayout(s.layout);
   return Object.keys(out).length ? out : null;
 }

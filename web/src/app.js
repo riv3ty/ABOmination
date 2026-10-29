@@ -14,6 +14,8 @@ import { analyzeStatement } from "./lib/bank.js";
 import { buildBackup, parseBackup } from "./lib/backup.js";
 import { mergeAch } from "./lib/merge.js";
 import { evaluate, formatNumber } from "./lib/calc.js";
+import { pushSupported, needsInstall, newPushKey, storeDeviceKey, currentSubscription, enablePush, disablePush, pushStatus, uploadSchedule, sendTest } from "./push.js";
+import { buildPushPlan } from "./lib/pushplan.js";
 import { TILES, SIZE_LABEL, defaultLayout, normalizeLayout, isDefault, sizeOf, move, toggleHidden, cycleSize } from "./lib/layout.js";
 import { LIST_TYPES, emptyLists, normalizeLists, seedFromSubs, namesOf, addItem, renameItem, removeItem, usageCount, renameInSubs, cleanName } from "./lib/lists.js";
 import { calcSalary, sanitizeIncome, leftover, STATES, SALARY_YEAR, INCOME_DEFAULT } from "./lib/salary.js";
@@ -21,13 +23,13 @@ import { calcSalary, sanitizeIncome, leftover, STATES, SALARY_YEAR, INCOME_DEFAU
 /* ================= Konstanten ================= */
 const KEY = "abo-manager-v1", META_KEY = "abo-manager-meta", SET_KEY = "abo-manager-settings",
       RATES_KEY = "abo-manager-rates", NOTIF_KEY = "abo-manager-notified", ACH_KEY = "abo-manager-achievements",
-      INCOME_KEY = "abo-manager-income", LISTS_KEY = "abo-manager-lists";
+      INCOME_KEY = "abo-manager-income", LISTS_KEY = "abo-manager-lists", PUSH_KEY = "abo-manager-push";
 
 
 /* ================= Speicher ================= */
 // Private Daten (Abos, Einstellungen, Sync-Zugang) liegen verschlüsselt im Profil-Tresor (Vault),
 // alles andere (Wechselkurse, Benachrichtigungs-Merker) unverschlüsselt im localStorage.
-const PRIVATE_KEYS = ["abo-manager-v1", "abo-manager-meta", "abo-manager-settings", "abo-manager-sync", "abo-manager-achievements", "abo-manager-income", "abo-manager-lists"];
+const PRIVATE_KEYS = ["abo-manager-v1", "abo-manager-meta", "abo-manager-settings", "abo-manager-sync", "abo-manager-achievements", "abo-manager-income", "abo-manager-lists", "abo-manager-push"];
 const lsGet = (k, fb) => {
   if (PRIVATE_KEYS.includes(k)) return Vault.get(k, fb);
   try { const v = JSON.parse(localStorage.getItem(k)); return v ?? fb; } catch { return fb; }
@@ -138,7 +140,7 @@ document.addEventListener("abo:pwchanged", () => { ach.pwChanged = true; saveAch
 
 // Beide Schlüssel liegen im Tresor; ein Fehlschlag beim (asynchronen) Verschlüsseln/Speichern meldet Vault.flush() selbst.
 function persist() { lsSet(KEY, subs); lsSet(META_KEY, meta); }
-function save() { meta.updatedAt = Date.now(); persist(); schedulePush(); }
+function save() { meta.updatedAt = Date.now(); persist(); schedulePush(); schedulePlanUpload(); }
 // changedAt: beim Zusammenführen zweier Stände (Server-Sync) gewinnt die zuletzt geänderte Seite
 const saveSettings = () => { settings.changedAt = Date.now(); return lsSet(SET_KEY, settings); };
 const saveLists = () => lsSet(LISTS_KEY, lists);
@@ -943,13 +945,14 @@ function openSettings() {
   $("#setAutoLock").value = String(settings.autoLock);
   $("#acName").textContent = Vault.name;
   renderSettingsInfo();
+  renderPush();
   dlgSet.showModal();
 }
 $("#btnSettings").onclick = openSettings;
 $("#setClose").onclick = () => dlgSet.close();
 $("#setBase").onchange = e => { settings.base = e.target.value; saveSettings(); render(); if (needRates()) refreshRates(false); };
-$("#setRemind").onchange = e => { settings.remindDays = Math.max(0, parseInt(e.target.value) || 0); saveSettings(); render(); };
-$("#setNoticeRemind").onchange = e => { settings.noticeRemind = Math.max(0, parseInt(e.target.value) || 0); saveSettings(); render(); };
+$("#setRemind").onchange = e => { settings.remindDays = Math.max(0, parseInt(e.target.value) || 0); saveSettings(); render(); schedulePlanUpload(); };
+$("#setNoticeRemind").onchange = e => { settings.noticeRemind = Math.max(0, parseInt(e.target.value) || 0); saveSettings(); render(); schedulePlanUpload(); };
 $("#setNotif").onchange = async e => {
   if (!e.target.checked) { settings.notif = false; saveSettings(); return; }
   let p = "denied";
@@ -963,6 +966,77 @@ $("#setNotif").onchange = async e => {
 $("#setAutoLock").onchange = e => { settings.autoLock = Number(e.target.value) || 0; saveSettings(); Vault.bump(); };
 $("#btnRates").onclick = () => refreshRates(true);
 $("#btnIcs").onclick = () => { exportIcs(); ach.exportedIcs = true; saveAch(); checkAchievements(subs, view()); };
+
+/* ================= Push-Benachrichtigungen (Server-Konto; src/push.js, lib/pushplan.js) ================= */
+// Push-Schlüssel des Kontos liegt im Tresor; { key: null } = abgeschaltet (Merker für den Abgleich)
+const pushRaw = () => lsGet(PUSH_KEY, null)?.key || null;
+let planTimer = null;
+// Erinnerungsplan neu berechnen und verschlüsselt hochladen (gebündelt, nach Änderungen)
+function schedulePlanUpload(delay = 4000) {
+  if (Vault.mode !== "server" || !pushRaw()) return;
+  clearTimeout(planTimer); planTimer = setTimeout(uploadPlan, delay);
+}
+async function uploadPlan() {
+  const raw = pushRaw(); if (!raw || Vault.mode !== "server") return;
+  try { await uploadSchedule(raw, buildPushPlan(view(), settings)); }
+  catch (e) { console.warn("Push-Plan nicht hochgeladen:", e.message); }
+}
+const fmtWhen = ts => new Date(ts).toLocaleString("de-DE", { weekday: "short", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
+async function renderPush() {
+  if (Vault.mode !== "server") return;
+  const sel = $("#pushHour"), hour = settings.pushHour ?? 9;
+  sel.innerHTML = Array.from({ length: 17 }, (_, i) => i + 6).map(h => `<option value="${h}"${h === hour ? " selected" : ""}>${String(h).padStart(2, "0")}:00 Uhr</option>`).join("");
+  const info = $("#pushInfo"), btn = on => { $("#pushOn").hidden = on; $("#pushOff").hidden = !on; $("#pushTest").hidden = !on; };
+  if (!pushSupported()) {
+    info.textContent = needsInstall()
+      ? "Auf dem iPhone und iPad: ABOmination über „Teilen → Zum Home-Bildschirm“ installieren und Push dann in der installierten App aktivieren."
+      : "Dieser Browser unterstützt keine Push-Benachrichtigungen.";
+    $("#pushOn").hidden = $("#pushOff").hidden = $("#pushTest").hidden = true;
+    return;
+  }
+  const on = !!(await currentSubscription().catch(() => null)) && Notification.permission === "granted";
+  btn(on);
+  let extra = "";
+  try {
+    const st = await pushStatus();
+    extra = ` · ${st.devices.length} Gerät${st.devices.length === 1 ? "" : "e"} im Konto` + (st.next ? ` · nächste Erinnerung ${fmtWhen(st.next)}` : "");
+  } catch {}
+  info.textContent = (on ? "Auf diesem Gerät aktiv" : "Auf diesem Gerät aus") + extra + ".";
+}
+$("#pushOn").onclick = async e => {
+  e.target.disabled = true;
+  try {
+    let raw = pushRaw();
+    if (!raw) { raw = newPushKey(); lsSet(PUSH_KEY, { key: raw, changedAt: Date.now() }); }
+    await enablePush(raw);
+    await uploadPlan();
+    showToast("🔔", "Push-Benachrichtigungen auf diesem Gerät aktiviert");
+  } catch (err) { alert(err.message || "Aktivieren fehlgeschlagen."); }
+  e.target.disabled = false; renderPush();
+};
+$("#pushOff").onclick = async () => {
+  try {
+    await disablePush();
+    // Letztes Gerät abgemeldet: Plan beim Server leeren und Push fürs Konto abschalten
+    const st = await pushStatus().catch(() => null);
+    if (st && !st.devices.length) { await uploadSchedule(pushRaw(), []).catch(() => {}); lsSet(PUSH_KEY, { key: null, changedAt: Date.now() }); }
+  } catch (err) { alert(err.message || "Abmelden fehlgeschlagen."); }
+  renderPush();
+};
+$("#pushTest").onclick = async () => {
+  try {
+    const r = await sendTest(pushRaw());
+    showToast("📨", r.sent ? `Testnachricht an ${r.sent} Gerät${r.sent > 1 ? "e" : ""} gesendet` : "Kein Gerät erreicht – Push auf dem Gerät erneut aktivieren.");
+  } catch (err) { alert(err.message || "Senden fehlgeschlagen."); }
+};
+$("#pushHour").onchange = e => { settings.pushHour = Number(e.target.value); saveSettings(); schedulePlanUpload(300); renderPush(); };
+// Beim Start: Schlüssel für den Service Worker aktuell halten, Plan auffrischen
+async function initPush() {
+  if (Vault.mode !== "server" || !pushRaw()) return;
+  const sub = await currentSubscription().catch(() => null);
+  if (sub) storeDeviceKey(pushRaw()).catch(() => {});
+  schedulePlanUpload(1500);
+}
 
 /* ================= Cloud-Sync (Datei, Nextcloud, Google Drive, OneNote) ================= */
 const SYNC_KEY = "abo-manager-sync";
@@ -1691,7 +1765,8 @@ export function startApp() {
   setInterval(checkReminders, 30 * 60 * 1000);
   if (Vault.mode === "server") {
     // Abgleich macht der ServerStore; hier nur neue Stände übernehmen und den Status anzeigen
-    document.addEventListener("abo:remote", () => { loadState(); render(); });
+    document.addEventListener("abo:remote", () => { loadState(); render(); initPush(); });
+    initPush();
     document.addEventListener("abo:serverstatus", renderServerSync);
     return;
   }

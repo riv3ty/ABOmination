@@ -39,7 +39,26 @@ const MIGRATIONS = [
      created_at  INTEGER NOT NULL,
      expires_at  INTEGER NOT NULL
    );
-   CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);`
+   CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);`,
+  // 2: Push-Benachrichtigungen (Geräte und verschlüsselter Erinnerungsplan)
+  `CREATE TABLE push_subs (
+     id          INTEGER PRIMARY KEY,
+     user_id     INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+     endpoint    TEXT NOT NULL UNIQUE,          -- Adresse beim Push-Dienst des Browsers
+     p256dh      TEXT NOT NULL,                 -- öffentlicher Schlüssel des Geräts (Web-Push-Verschlüsselung)
+     auth        TEXT NOT NULL,
+     label       TEXT NOT NULL DEFAULT '',
+     created_at  INTEGER NOT NULL,
+     last_ok     INTEGER
+   );
+   CREATE INDEX push_subs_user ON push_subs(user_id);
+   CREATE TABLE push_queue (
+     id          INTEGER PRIMARY KEY,
+     user_id     INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+     at          INTEGER NOT NULL,              -- Versandzeitpunkt (ms)
+     payload     TEXT NOT NULL                  -- vom Client verschlüsselt; der Server kann ihn nicht lesen
+   );
+   CREATE INDEX push_queue_at ON push_queue(at);`
 ];
 
 export function openDb(file) {

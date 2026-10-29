@@ -44,9 +44,18 @@ Es gibt **keinen Passwort-Reset**: ohne Passwort ist der Tresor nicht zu entschl
 | DELETE | `/api/account` | `{ authKey }` | 204 (Konto + Tresor gelöscht) |
 | GET | `/api/vault` | – | `{ version, updatedAt, blob }` |
 | PUT | `/api/vault` | `{ blob, baseVersion }` | `{ version, updatedAt }` oder **409** `{ error: "conflict", version, updatedAt, blob }` |
+| GET | `/api/push/key` | – | `{ publicKey }` (VAPID, für `pushManager.subscribe`) |
+| GET | `/api/push/status` | – | `{ devices: [{ endpoint, label, createdAt, lastOk }], queued, next }` |
+| POST | `/api/push/subscribe` | `{ endpoint, keys: { p256dh, auth }, label? }` | `{ ok }` – nur Adressen bekannter Push-Dienste der Browser; höchstens 10 Geräte |
+| DELETE | `/api/push/subscribe` | `{ endpoint }` | `{ ok }` |
+| PUT | `/api/push/schedule` | `{ items: [{ at, payload }] }` (max. 300) | `{ ok, queued }` – ersetzt den Plan des Kontos |
+| POST | `/api/push/test` | `{ payload }` | `{ sent, failed }` – sofort an alle Geräte |
 
 ### Konflikte
 `PUT /api/vault` schreibt nur, wenn `baseVersion` der aktuellen Version entspricht. Sonst kommt 409 mit dem aktuellen Stand; der Client führt zusammen und schreibt erneut mit der neuen Version.
+
+### Push-Benachrichtigungen
+Der Client berechnet seine Erinnerungen für die nächsten 45 Tage und verschlüsselt jeden Text mit einem Push-Schlüssel des Kontos (AES-256-GCM, 32 Zufallsbytes), der im Tresor liegt (`abo-manager-push`). `payload` = `v1.<iv>.<chiffretext>` (Base64url). Der Server speichert nur `at` (Versandzeit) und die undurchsichtige Nutzlast und stellt sie zum Zeitpunkt per Web Push zu (VAPID, RFC 8030/8291); der Service Worker entschlüsselt mit dem Schlüssel, den er in IndexedDB hält. Mehr als einen Tag überfällige Einträge entfallen.
 
 ### Schutz vor Passwort-Raten
 Pro IP und Name ab 5 Fehlversuchen exponentiell wachsende Sperre (bis 15 Minuten) → 429 mit `Retry-After`. Zusätzlich 30 Auth-Anfragen pro Minute und IP, allgemein 300 Anfragen pro Minute. Höchstens 4 scrypt-Prüfungen laufen gleichzeitig (Rest wartet; bei Überlast 503).

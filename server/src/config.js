@@ -30,6 +30,9 @@ export function loadConfig(env = process.env) {
     cookieSecure: bool(env.COOKIE_SECURE, true),
     sessionDays: int(env.SESSION_DAYS, 30, 1, 365),
     maxVaultBytes: int(env.MAX_VAULT_BYTES, 5 * 1024 * 1024, 64 * 1024, 50 * 1024 * 1024),
-    logLevel: env.LOG_LEVEL || "info"
+    logLevel: env.LOG_LEVEL || "info",
+    // Kontakt für die Push-Dienste (VAPID „subject“): mailto:… oder https://…
+    pushSubject: /^(mailto:|https:\/\/)/.test(env.PUSH_SUBJECT || "") ? env.PUSH_SUBJECT : "https://github.com/riv3ty/ABOmination",
+    pushIntervalMs: int(env.PUSH_INTERVAL_MS, 30000, 1000, 600000)
   };
 }

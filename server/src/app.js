@@ -12,6 +12,8 @@ import { KDF } from "./schemas.js";
 import authRoutes from "./routes/auth.js";
 import vaultRoutes from "./routes/vault.js";
 import ratesRoutes from "./routes/rates.js";
+import pushRoutes from "./routes/push.js";
+import { vapidKeys, makeSender, startScheduler } from "./push.js";
 
 export const VERSION = JSON.parse(fs.readFileSync(new URL("../../package.json", import.meta.url), "utf8")).version;   // eine Quelle für die Versionsnummer
 
@@ -32,7 +34,7 @@ export function buildCsp(html) {
   ].join("; ");
 }
 
-export async function buildApp({ config, db, logger = { level: config.logLevel }, fetchImpl }) {
+export async function buildApp({ config, db, logger = { level: config.logLevel }, fetchImpl, pushSend }) {
   const app = Fastify({ logger, trustProxy: config.trustProxy, bodyLimit: config.maxVaultBytes + 64 * 1024 });
   const secret = serverSecret(db), throttle = new Throttle();
 
@@ -75,6 +77,8 @@ export async function buildApp({ config, db, logger = { level: config.logLevel }
   await app.register(authRoutes, { config, db, secret, throttle });
   await app.register(vaultRoutes, { config, db });
   await app.register(ratesRoutes, { fetchImpl });
+  const keys = vapidKeys(db), send = pushSend || makeSender(keys, config.pushSubject);
+  await app.register(pushRoutes, { db, keys, send });
 
   // Web-App ausliefern (dist/ aus dem Build), falls vorhanden
   const index = path.join(config.staticDir, "index.html");
@@ -100,6 +104,7 @@ export async function buildApp({ config, db, logger = { level: config.logLevel }
 
   purgeExpired(db);
   const timer = setInterval(() => purgeExpired(db), 3600000); timer.unref();
-  app.addHook("onClose", async () => clearInterval(timer));
+  const stopPush = startScheduler(db, send, app.log, config.pushIntervalMs);
+  app.addHook("onClose", async () => { clearInterval(timer); stopPush(); });
   return app;
 }

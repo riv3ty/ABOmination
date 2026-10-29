@@ -10,6 +10,16 @@
       "items": [
         {
           "en": [
+            "Push notifications",
+            "Reminders even with the app closed – the server only delivers them and cannot read them."
+          ],
+          "de": [
+            "Push-Benachrichtigungen",
+            "Erinnerungen auch bei geschlossener App – der Server stellt sie nur zu und kann sie nicht lesen."
+          ]
+        },
+        {
+          "en": [
             "Customizable dashboard",
             "Show, hide and rearrange the tiles the way you like."
           ],
@@ -139,12 +149,12 @@
       "items": [
         {
           "en": [
-            "Push notifications",
-            "Reminders even with the app closed – the server only delivers them and cannot read them."
+            "Deals & price search",
+            "Current MyDealz deals for your subscriptions, plus a product search that opens Idealo, Geizhals and MyDealz."
           ],
           "de": [
-            "Push-Benachrichtigungen",
-            "Erinnerungen auch bei geschlossener App – der Server stellt sie nur zu und kann sie nicht lesen."
+            "Angebote & Preissuche",
+            "Aktuelle MyDealz-Deals passend zu deinen Abos, dazu eine Produktsuche mit Direktlinks zu Idealo, Geizhals und MyDealz."
           ]
         }
       ]
@@ -156,16 +166,6 @@
         "de": "Als Nächstes"
       },
       "items": [
-        {
-          "en": [
-            "Deals & price search",
-            "Current MyDealz deals for your subscriptions, plus a product search that opens Idealo, Geizhals and MyDealz."
-          ],
-          "de": [
-            "Angebote & Preissuche",
-            "Aktuelle MyDealz-Deals passend zu deinen Abos, dazu eine Produktsuche mit Direktlinks zu Idealo, Geizhals und MyDealz."
-          ]
-        },
         {
           "en": [
             "Native Android app",

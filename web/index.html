@@ -277,6 +277,23 @@
       <div class="row-btns"><button class="btn small" id="btnIcs">📆 Kalender-Datei (.ics) exportieren</button></div>
     </section>
 
+    <section>
+      <h3>Push-Benachrichtigungen</h3>
+      <div class="srv-only">
+        <p class="small" id="pushInfo" style="margin-top:0"></p>
+        <label>Uhrzeit der Erinnerungen
+          <select id="pushHour"></select>
+        </label>
+        <div class="row-btns">
+          <button class="btn small primary" id="pushOn">🔔 Auf diesem Gerät aktivieren</button>
+          <button class="btn small" id="pushTest" hidden>Testnachricht senden</button>
+          <button class="btn small" id="pushOff" hidden>Auf diesem Gerät deaktivieren</button>
+        </div>
+        <p class="muted small">Erinnerungen an Zahlungen und Kündigungsfristen kommen auch bei geschlossener App. Der Server erfährt nur, <b>wann</b> eine Erinnerung fällig ist; den Text verschlüsselt die App, lesen können ihn nur deine Geräte.</p>
+      </div>
+      <p class="muted small local-only" style="margin-top:0">Push-Benachrichtigungen gibt es mit einem Server-Konto (ABOmination selbst hosten). Im lokalen Profil erscheinen Hinweise, solange die App geöffnet ist.</p>
+    </section>
+
     <section class="local-only">
       <h3>Cloud-Sync (Geräte abgleichen)</h3>
       <label>Anbieter

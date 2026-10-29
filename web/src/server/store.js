@@ -196,6 +196,12 @@ export class ServerStore {
   // Abmelden: Sitzung beenden und Offline-Kopie von diesem Gerät entfernen
   logout() {
     return this.run(async () => {
+      // Push: Gerät beim Server abmelden und Schlüssel löschen, sonst kämen weiter Mitteilungen
+      try {
+        const sub = await (await navigator.serviceWorker?.getRegistration())?.pushManager?.getSubscription();
+        if (sub) { await api("DELETE", "/api/push/subscribe", { endpoint: sub.endpoint }).catch(() => {}); await sub.unsubscribe(); }
+        indexedDB.deleteDatabase("abo-push");
+      } catch {}
       try { await api("POST", "/api/auth/logout"); } catch {}
       localStorage.removeItem(CACHE_PREFIX + normName(this.username));
     });

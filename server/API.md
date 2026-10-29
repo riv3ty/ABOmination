@@ -44,9 +44,18 @@ There is **no password reset**: without the password the vault cannot be decrypt
 | DELETE | `/api/account` | `{ authKey }` | 204 (account and vault deleted) |
 | GET | `/api/vault` | – | `{ version, updatedAt, blob }` |
 | PUT | `/api/vault` | `{ blob, baseVersion }` | `{ version, updatedAt }` or **409** `{ error: "conflict", version, updatedAt, blob }` |
+| GET | `/api/push/key` | – | `{ publicKey }` (VAPID, for `pushManager.subscribe`) |
+| GET | `/api/push/status` | – | `{ devices: [{ endpoint, label, createdAt, lastOk }], queued, next }` |
+| POST | `/api/push/subscribe` | `{ endpoint, keys: { p256dh, auth }, label? }` | `{ ok }` – only endpoints of known browser push services; max. 10 devices |
+| DELETE | `/api/push/subscribe` | `{ endpoint }` | `{ ok }` |
+| PUT | `/api/push/schedule` | `{ items: [{ at, payload }] }` (max. 300) | `{ ok, queued }` – replaces the account's schedule |
+| POST | `/api/push/test` | `{ payload }` | `{ sent, failed }` – sends immediately to all devices |
 
 ### Conflicts
 `PUT /api/vault` only writes if `baseVersion` matches the current version. Otherwise it returns 409 with the current state; the client merges and writes again with the new version.
+
+### Push notifications
+The client computes its reminders for the next 45 days and encrypts every text with an account push key (AES-256-GCM, 32 random bytes) that lives in the vault (`abo-manager-push`). `payload` = `v1.<iv>.<ciphertext>` (base64url). The server only stores `at` (send time) and the opaque payload and delivers it via Web Push (VAPID, RFC 8030/8291) at that time; the service worker decrypts it with the key it keeps in IndexedDB. Entries more than a day overdue are dropped.
 
 ### Brute-force protection
 Per IP and name, an exponentially growing lockout after 5 failed attempts (up to 15 minutes) → 429 with `Retry-After`. Additionally 30 auth requests per minute and IP, 300 requests per minute overall. At most 4 scrypt checks run in parallel (the rest waits; 503 when overloaded).

@@ -25,5 +25,6 @@ Only the latest version on `main` (and the `latest` Docker image) receives secur
 ## Design summary
 
 - Data is encrypted in the browser (PBKDF2-SHA256 600k → HKDF → AES-256-GCM); the server stores only ciphertext and `scrypt(authKey)`.
+- Push notifications are end-to-end encrypted as well: the server only learns *when* a reminder is due and which push service delivers it, never the text.
 - Sessions: httpOnly/SameSite=Strict cookies with CSRF header, or bearer tokens for apps; stored as SHA-256 hashes.
 - Brute-force protection, rate limits, strict Content-Security-Policy, non-root read-only container.
