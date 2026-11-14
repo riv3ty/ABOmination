@@ -33,11 +33,11 @@
     "vitest": "^5.0.3"
   },
   "dependencies": {
-    "@fastify/cookie": "^11.1.2",
-    "@fastify/rate-limit": "^11.2.0",
-    "@fastify/static": "^10.1.5",
-    "fastify": "^5.12.5",
-    "web-push": "3.6.7"
+    "@fastify/cookie": "^11.1.5",
+    "@fastify/rate-limit": "^11.2.2",
+    "@fastify/static": "^10.1.10",
+    "fastify": "^5.12.8",
+    "web-push": "4.0.0"
   },
   "bin": {
     "abo": "server/bin/abo.js"
